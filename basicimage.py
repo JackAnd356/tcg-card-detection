@@ -1,7 +1,7 @@
 import cv2
 import Cards
 
-webcam = cv2.VideoCapture(2)
+webcam = cv2.VideoCapture(0)
 cam = 0
 """Main while loop - frame from webcam is read, blurred and greyed, and all card-shaped contours are processed"""
 while (cam == 0):

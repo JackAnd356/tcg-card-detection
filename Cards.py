@@ -26,8 +26,8 @@ def preprocess_image(image):
     blur = cv2.GaussianBlur(gray,(5,5),0)
 
     img_w, img_h = np.shape(image)[:2]
-    bkg_level = gray[int(img_h/100)][int(img_w/2)]
-    thresh_level = bkg_level + BKG_THRESH
+    bkg_level = np.median(gray)
+    thresh_level = min(bkg_level + BKG_THRESH, 255)
 
     retval, thresh = cv2.threshold(blur,thresh_level,255,cv2.THRESH_BINARY)
     
@@ -39,7 +39,7 @@ def find_cards(thresh_image):
     from largest to smallest."""
 
     # Find contours and sort their indices by contour size
-    dummy,cnts,hier = cv2.findContours(thresh_image,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    cnts,hier = cv2.findContours(thresh_image,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     index_sort = sorted(range(len(cnts)), key=lambda i : cv2.contourArea(cnts[i]),reverse=True)
 
     # If there are no contours, do nothing
@@ -104,6 +104,8 @@ def draw_on_card(qCard, frame):
     x = qCard.center[0]
     y = qCard.center[1]
     cv2.circle(frame,(x,y),5,(255,0,0),-1)
+
+    return frame
 
 def flattener(image, pts, w, h):
     """Flattens an image of a card into a top-down 200x300 perspective.
