@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import pytesseract
 
 # Adaptive threshold levels
 BKG_THRESH = 60
@@ -12,6 +13,9 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 class Query_Card:
     def __init__(self):
+        self.name = ""
+        self.id = ""
+        self.set_code = ""
         self.contour = []
         self.width = 0
         self.height = 0
@@ -96,6 +100,12 @@ def preprocess_card(contour, frame):
 
     # Warp card into 200x300 flattened image using perspective transform
     qCard.warp = flattener(frame, pts, w, h)
+
+    (name, id, setCode) = get_card_details(qCard.warp)
+    qCard.name = name
+    qCard.id = id
+    qCard.set_code = setCode
+
     return qCard
 
 def draw_on_card(qCard, frame):
@@ -106,6 +116,16 @@ def draw_on_card(qCard, frame):
     cv2.circle(frame,(x,y),5,(255,0,0),-1)
 
     return frame
+
+def get_card_details(image):
+    nameImg = image[15:175, 10:40]
+    cardName = pytesseract.image_to_string(nameImg)
+    cardIDImg = image[10:40, 275:295]
+    cardID = pytesseract.image_to_string(cardIDImg)
+    cardSetCodeImg = image[145:180, 220:260]
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg)
+    return (cardName, cardID, cardSetCode)
+
 
 def flattener(image, pts, w, h):
     """Flattens an image of a card into a top-down 200x300 perspective.
@@ -162,8 +182,6 @@ def flattener(image, pts, w, h):
     dst = np.array([[0,0],[maxWidth-1,0],[maxWidth-1,maxHeight-1],[0, maxHeight-1]], np.float32)
     M = cv2.getPerspectiveTransform(temp_rect,dst)
     warp = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
-    warp = cv2.cvtColor(warp,cv2.COLOR_BGR2GRAY)
-
-        
+    warp = cv2.cvtColor(warp,cv2.COLOR_BGR2RGB)
 
     return warp
