@@ -3,6 +3,16 @@ import Cards
 
 webcam = cv2.VideoCapture(0)
 cam = 0
+
+def empty(a):
+    pass
+
+cv2.namedWindow("Parameters")
+cv2.resizeWindow("Parameters", 640, 180)
+cv2.createTrackbar("Threshold1", "Parameters", 100, 255, empty)
+cv2.createTrackbar("Threshold2", "Parameters", 140, 255, empty)
+cv2.createTrackbar("Area", "Parameters", 35000, 100000, empty)
+
 """Main while loop - frame from webcam is read, blurred and greyed, and all card-shaped contours are processed"""
 while (cam == 0):
     ret, frame = webcam.read()
@@ -20,7 +30,7 @@ while (cam == 0):
 
                 frame = Cards.draw_on_card(cards[cCount], frame)
                 cCount = cCount + 1
-    
+
         if (len(cards) != 0):
                 temp_cnts = []
                 for i in range(len(cards)):

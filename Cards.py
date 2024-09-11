@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import pytesseract
 
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
 # Adaptive threshold levels
 BKG_THRESH = 60
 CARD_THRESH = 30
@@ -29,13 +31,15 @@ def preprocess_image(image):
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray,(5,5),0)
 
-    img_w, img_h = np.shape(image)[:2]
-    bkg_level = np.median(gray)
-    thresh_level = min(bkg_level + BKG_THRESH, 255)
+    threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
+    threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
+    imgCanny = cv2.Canny(blur, threshold1, threshold2)
 
-    retval, thresh = cv2.threshold(blur,thresh_level,255,cv2.THRESH_BINARY)
+
+    kernel = np.ones((5, 5), np.uint8)
+    imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
     
-    return thresh
+    return imgDil
 
 def find_cards(thresh_image):
     """Finds all card-sized contours in a thresholded camera image.
@@ -115,14 +119,21 @@ def draw_on_card(qCard, frame):
     y = qCard.center[1]
     cv2.circle(frame,(x,y),5,(255,0,0),-1)
 
+    card_info = qCard.name + ", " + qCard.id + ", " + qCard.set_code
+    print(card_info)
+
+    "cv2.putText(frame, card_info, (x,y), font, 1, (255, 0, 0), 2, cv2.LINE_AA)"
+
     return frame
 
 def get_card_details(image):
-    nameImg = image[15:175, 10:40]
+    """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
+       See https://pypi.org/project/pytesseract/"""
+    nameImg = image[10:40, 15:175]
     cardName = pytesseract.image_to_string(nameImg)
-    cardIDImg = image[10:40, 275:295]
+    cardIDImg = image[275:295, 10:40]
     cardID = pytesseract.image_to_string(cardIDImg)
-    cardSetCodeImg = image[145:180, 220:260]
+    cardSetCodeImg = image[220:260, 145:180]
     cardSetCode = pytesseract.image_to_string(cardSetCodeImg)
     return (cardName, cardID, cardSetCode)
 
