@@ -43,7 +43,8 @@ def processCardImage(cardImageData):
     setName = ""
     #End dummy code
     url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
-    payload = {'id': cardId}
+    payload = {'id': cardId, 'tcgplayer_data': None}
+    payload = '&'.join([k if v is None else f"{k}={v}" for k, v in payload.items()])
     resp = requests.get(url, params=payload)
     if resp.status_code == 200:
         cardData = resp.json()
