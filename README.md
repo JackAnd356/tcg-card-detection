@@ -3,3 +3,6 @@ Flask
 FuzzyWuzzy
 requests
 python-Levenshtein
+pytesseract
+opencv
+numpy
