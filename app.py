@@ -1,6 +1,18 @@
-from flask import Flask, request, jsonify
+import bson
 import requests
+import os
+from flask import Flask, request, jsonify, current_app, g, Blueprint, render_template
 from fuzzywuzzy import fuzz
+from werkzeug.local import LocalProxy
+from flask_pymongo import PyMongo
+from pymongo.errors import DuplicateKeyError, OperationFailure
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
+from flask_cors import CORS
+from json import JSONEncoder
+from bson import json_util, ObjectId
+from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 
@@ -13,25 +25,77 @@ testCardContentData = [{'cardID': '46986414', 'card-name': 'Dark Magician', 'car
                        {'cardID': '89631139', 'card-name': 'Blue-Eyes White Dragon', 'card-text': 'This legendary dragon is a powerful engine of destruction. Virtualy invincible, very few have faced this awesome creature and lived to tell the tale.', 'atk': 3000, 'def': 2500},
                        {'cardID': '74677422', 'card-name': 'Red-Eyes Black Dragon', 'card-text': 'A ferocious dragon with a deadly attack', 'atk': 2400, 'def': 2000}]
 
-#Web API Endpoints
 
-@app.get("/testCardImageData")
-def get_testCardImageData():
-    return jsonify(testCardImageData)
 
-@app.get("/testCardContentData")
-def get_testCardContentData():
-    return jsonify(testCardContentData)
+#MongoDB Integration
+def get_db():
+    """
+    Configuration method to return db instance
+    """
+    db = getattr(g, "_database", None)
 
-@app.post("/getCardInfo")
-def post_getCardInfo():
-    if request.is_json:
-        clientCardInfo = request.get_json()
-        card = processCardImage(clientCardInfo)
-        if 'error' in card:
-            return {"error": card['error']}, 415
-        return card, 201
-    return {"error": "Request must be JSON"}, 415
+    if db is None:
+
+        db = g._database = PyMongo(current_app).db
+       
+    return db
+
+class MongoJsonEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return json_util.default(obj, json_util.CANONICAL_JSON_OPTIONS)
+
+# Use LocalProxy to read the global db instance with just `db`
+db = LocalProxy(get_db)
+
+#Flask Initialization
+def create_app():
+
+    APP_DIR = os.path.abspath(os.path.dirname(__file__))
+    STATIC_FOLDER = os.path.join(APP_DIR, 'build/static')
+    TEMPLATE_FOLDER = os.path.join(APP_DIR, 'build')
+
+    app = Flask(__name__, static_folder=STATIC_FOLDER,
+                template_folder=TEMPLATE_FOLDER,
+                )
+    CORS(app)
+    app.json_encoder = MongoJsonEncoder
+    app.register_blueprint(Blueprint('card-detection-api', 'card-detection-api', url_prefix='/testDBInterface'))
+    
+    #Web API Endpoints
+
+    @app.get("/testCardImageData")
+    def get_testCardImageData():
+        return jsonify(testCardImageData)
+
+    @app.get("/testCardContentData")
+    def get_testCardContentData():
+        return jsonify(testCardContentData)
+
+    @app.post("/getCardInfo")
+    def post_getCardInfo():
+        if request.is_json:
+            clientCardInfo = request.get_json()
+            card = processCardImage(clientCardInfo)
+            if 'error' in card:
+                return {"error": card['error']}, 415
+            return card, 201
+        return {"error": "Request must be JSON"}, 415
+    
+    @app.post("/getUserCollection")
+    def post_getUserCollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            db.
+            if 'error' in card:
+                return {"error": card['error']}, 415
+            return card, 201
+        return {"error": "Request must be JSON"}, 415
+
+    return app
 
 #Methods
 
@@ -60,3 +124,11 @@ def processCardImage(cardImageData):
             return {'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'}
         return cardData
     return {'error': 'card not found'}    
+
+#Main Run Method
+if __name__ == "__main__":
+    app = create_app()
+    app.config['DEBUG'] = True
+    app.config['MONGO_URI'] = "mongodb+srv://jaredanderson676:lYo67dNxPpT6RPAW@tcg-card-detection-dev.szrau.mongodb.net/?retryWrites=true&w=majority&appName=TCG-Card-Detection-Dev"
+
+    app.run()
