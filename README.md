@@ -3,3 +3,7 @@ Flask
 FuzzyWuzzy
 requests
 python-Levenshtein
+pytesseract
+opencv
+pymongo
+python-dotenv
