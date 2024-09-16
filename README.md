@@ -5,7 +5,5 @@ requests
 python-Levenshtein
 pytesseract
 opencv
-numpy
-fastapi
 pymongo
 python-dotenv
