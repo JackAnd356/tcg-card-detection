@@ -1,6 +1,8 @@
 import bson
+import json
 import requests
 import os
+from pymongo import database
 from flask import Flask, request, jsonify, current_app, g, Blueprint, render_template
 from fuzzywuzzy import fuzz
 from werkzeug.local import LocalProxy
@@ -12,6 +14,10 @@ from flask_cors import CORS
 from json import JSONEncoder
 from bson import json_util, ObjectId
 from datetime import datetime, timedelta
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+uri = "mongodb+srv://jaredanderson676:lYo67dNxPpT6RPAW@tcg-card-detection-dev.szrau.mongodb.net/?retryWrites=true&w=majority&appName=TCG-Card-Detection-Dev"
 
 
 app = Flask(__name__)
@@ -28,42 +34,16 @@ testCardContentData = [{'cardID': '46986414', 'card-name': 'Dark Magician', 'car
 
 
 #MongoDB Integration
-def get_db():
-    """
-    Configuration method to return db instance
-    """
-    db = getattr(g, "_database", None)
+    
+def parse_json(data):
+    return json.loads(json_util.dumps(data))
 
-    if db is None:
-
-        db = g._database = PyMongo(current_app).db
-       
-    return db
-
-class MongoJsonEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.strftime("%Y-%m-%d %H:%M:%S")
-        if isinstance(obj, ObjectId):
-            return str(obj)
-        return json_util.default(obj, json_util.CANONICAL_JSON_OPTIONS)
-
-# Use LocalProxy to read the global db instance with just `db`
-db = LocalProxy(get_db)
+client = MongoClient(uri, server_api=ServerApi('1'))
 
 #Flask Initialization
 def create_app():
 
-    APP_DIR = os.path.abspath(os.path.dirname(__file__))
-    STATIC_FOLDER = os.path.join(APP_DIR, 'build/static')
-    TEMPLATE_FOLDER = os.path.join(APP_DIR, 'build')
-
-    app = Flask(__name__, static_folder=STATIC_FOLDER,
-                template_folder=TEMPLATE_FOLDER,
-                )
-    CORS(app)
-    app.json_encoder = MongoJsonEncoder
-    app.register_blueprint(Blueprint('card-detection-api', 'card-detection-api', url_prefix='/testDBInterface'))
+    app = Flask(__name__)
     
     #Web API Endpoints
 
@@ -89,10 +69,62 @@ def create_app():
     def post_getUserCollection():
         if request.is_json:
             clientUserInfo = request.get_json()
-            db.
-            if 'error' in card:
-                return {"error": card['error']}, 415
-            return card, 201
+            database = client['card_detection_info']
+            collection = database['card_collection']
+            results = collection.find({'userid' : clientUserInfo['userid']})
+            results = parse_json(results)
+            return results, 201
+        return {"error": "Request must be JSON"}, 415
+    @app.post("/addToUserCollection")
+    def post_addToUserCollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['card_collection']
+            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode']}
+            if 'rarity' in clientUserInfo:
+                payload['rarity'] = clientUserInfo['rarity']
+            else :
+                payload['rarity'] = ""
+            results = collection.find_one(payload)
+            if results == None:
+                payload['quantity'] = clientUserInfo['quantity']
+                insertRes = collection.insert_one(payload)
+                return {'success' : insertRes.acknowledged}, 201
+            else :
+                results = parse_json(results)
+                currCount = results['quantity']
+                currCount += clientUserInfo['quantity']
+                updateOp = { "$set" : 
+                                { "quantity" : currCount }
+                            }
+                upRes = collection.update_one(payload, updateOp)
+                return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
+        return {"error": "Request must be JSON"}, 415
+    @app.post("/removeFromUserCollection")
+    def post_removeFromUserCollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['card_collection']
+            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode']}
+            if 'rarity' in clientUserInfo:
+                payload['rarity'] = clientUserInfo['rarity']
+            else :
+                payload['rarity'] = ""
+            results = collection.find_one(payload)
+            if results == None:
+                return {"error": "Tried to remove a card that you don't have"}, 415
+            if clientUserInfo['quantity'] == 'all' or results['quantity'] <= clientUserInfo['quantity']:
+                delRes = collection.delete_one(payload)
+                return {'Message' : 'Card removed from collection', 'remCnt' : delRes.deleted_count}, 201
+            currCount = results['quantity']
+            currCount -= clientUserInfo['quantity']
+            updateOp = { "$set" : 
+                            { "quantity" : currCount }
+                        }
+            upRes = collection.update_one(payload, updateOp)
+            return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
         return {"error": "Request must be JSON"}, 415
 
     return app
@@ -128,7 +160,5 @@ def processCardImage(cardImageData):
 #Main Run Method
 if __name__ == "__main__":
     app = create_app()
-    app.config['DEBUG'] = True
-    app.config['MONGO_URI'] = "mongodb+srv://jaredanderson676:lYo67dNxPpT6RPAW@tcg-card-detection-dev.szrau.mongodb.net/?retryWrites=true&w=majority&appName=TCG-Card-Detection-Dev"
 
     app.run()
