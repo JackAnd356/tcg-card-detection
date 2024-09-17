@@ -136,26 +136,41 @@ def processCardImage(cardImageData):
     cardId = cardImageData['cardid']
     cardSetCode = cardImageData['setcode']
     cardName = cardImageData['name']
+    cardGame = cardImageData['game']
     setName = ""
     #End dummy code
-    url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
-    payload = {'id': cardId, 'tcgplayer_data': None}
-    payload = '&'.join([k if v is None else f"{k}={v}" for k, v in payload.items()])
-    resp = requests.get(url, params=payload)
-    if resp.status_code == 200:
-        cardData = resp.json()
-        if fuzz.ratio(cardData['data'][0]['name'], cardName) < 90:
+    if cardGame == 'yugioh':
+        url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
+        payload = {'id': cardId, 'tcgplayer_data': None}
+        payload = '&'.join([k if v is None else f"{k}={v}" for k, v in payload.items()])
+        resp = requests.get(url, params=payload)
+        if resp.status_code == 200:
+            cardData = resp.json()
+            if fuzz.ratio(cardData['data'][0]['name'], cardName) < 90:
+                print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
+                return {'error': 'card search returned wrong card. please try scanning again'}
             print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
-            return {'error': 'card search returned wrong card. please try scanning again'}
-        print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
-        for setData in cardData['data'][0]['card_sets']:
-            if fuzz.ratio(setData['set_code'], cardSetCode) > 95:
-               setName = setData['set_name']
-               break
-        if setName == "":
-            return {'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'}
-        return cardData
-    return {'error': 'card not found'}    
+            for setData in cardData['data'][0]['card_sets']:
+                if fuzz.ratio(setData['set_code'], cardSetCode) > 95:
+                   setName = setData['set_name']
+                   break
+            if setName == "":
+                return {'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'}
+            return cardData
+        return {'error': 'card not found'} 
+    if cardGame == 'mtg':
+        url = 'https://api.scryfall.com/cards/named'
+        headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+        payload = {'exact' : cardName}
+        resp = requests.get(url, params=payload, headers=headers)
+        print(resp.url)
+        if resp.status_code == 200:
+            cardData = resp.json()
+            return cardData
+        return {'error': 'card not found'} 
+    if cardGame == 'pokemon':
+        return {'error': 'card not found'} 
+    return {'error': 'card not found'} 
 
 #Main Run Method
 if __name__ == "__main__":
