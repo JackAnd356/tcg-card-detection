@@ -169,6 +169,14 @@ def processCardImage(cardImageData):
             return cardData
         return {'error': 'card not found'} 
     if cardGame == 'pokemon':
+        apikey = '28fdff44-a6d1-4b63-8896-f7b76872a628'
+        url = 'https://api.pokemontcg.io/v2/cards/'
+        headers = {'X-Api-Key' : apikey}
+        url += cardId
+        resp = requests.get(url, headers=headers)
+        if resp.status_code == 200:
+            cardData = resp.json()
+            return cardData
         return {'error': 'card not found'} 
     return {'error': 'card not found'} 
 
