@@ -8,8 +8,8 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 BKG_THRESH = 60
 CARD_THRESH = 30
 
-CARD_MAX_AREA = 120000
-CARD_MIN_AREA = 25000
+CARD_MAX_AREA = 200000
+CARD_MIN_AREA = 15000
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -76,10 +76,15 @@ def find_cards(thresh_image):
         size = cv2.contourArea(cnts_sort[i])
         peri = cv2.arcLength(cnts_sort[i],True)
         approx = cv2.approxPolyDP(cnts_sort[i],0.01*peri,True)
+
+        if i == 0: 
+            print(size)
+            print(hier_sort[i][3])
+            print(len(approx))
         
         if ((size < CARD_MAX_AREA) and (size > CARD_MIN_AREA)
             and (hier_sort[i][3] == -1) and (len(approx) == 4)):
-            cnt_is_card[i] = 1
+                cnt_is_card[i] = 1
 
     return cnts_sort, cnt_is_card
 
@@ -129,12 +134,13 @@ def draw_on_card(qCard, frame):
 def get_card_details(image):
     """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
        See https://pypi.org/project/pytesseract/"""
-    nameImg = image[10:40, 15:175]
+    nameImg = image[5:60, 10:330]
     cardName = pytesseract.image_to_string(nameImg)
-    cardIDImg = image[275:295, 10:40]
-    cardID = pytesseract.image_to_string(cardIDImg)
-    cardSetCodeImg = image[220:260, 145:180]
-    cardSetCode = pytesseract.image_to_string(cardSetCodeImg)
+    cardIDImg = image[575:600, 5:60]
+    cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13')
+    cardSetCodeImg = image[430:450, 300:380]
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13')
+    cv2.rectangle(image, (300,430), (380, 450), (255, 0, 0), 1)
     return (cardName, cardID, cardSetCode)
 
 
@@ -185,8 +191,8 @@ def flattener(image, pts, w, h):
             temp_rect[3] = pts[1][0] # Bottom left
             
         
-    maxWidth = 200
-    maxHeight = 300
+    maxWidth = 400
+    maxHeight = 600
 
     # Create destination array, calculate perspective transform matrix,
     # and warp card image
