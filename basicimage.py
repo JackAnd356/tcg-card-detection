@@ -13,13 +13,23 @@ cv2.createTrackbar("Area", "Parameters", 0, 100000, empty)
 """Main while loop - frame from webcam is read, blurred and greyed, and all card-shaped contours are processed"""
 frame = cv2.imread("./images/stardust_dragon_img.jpg")
 
+height, width = frame.shape[:2]
+
+# Define the new dimensions
+new_width = 600
+new_height = int(new_width * height / width)
+
+# Resize the image
+frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
 thresh = Cards.preprocess_image(frame)
 ccs, isCard = Cards.find_cards(thresh)
 
 cards = []
 cCount = 0
 
-cv2.drawContours(frame,ccs[0], -1, (255,0,0), 10)
+"""cv2.drawContours(frame,ccs[0], -1, (255,0,0), 10)
+cv2.imshow("Contours", thresh)"""
 
 if len(ccs) != 0:
     for i in range(len(ccs)):

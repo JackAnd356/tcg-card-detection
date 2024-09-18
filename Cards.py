@@ -8,8 +8,8 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 BKG_THRESH = 60
 CARD_THRESH = 30
 
-CARD_MAX_AREA = 200000
-CARD_MIN_AREA = 15000
+CARD_MAX_AREA = 2000000
+CARD_MIN_AREA = 5000
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -29,7 +29,7 @@ def preprocess_image(image):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
 
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray,(5,5),0)
+    blur = cv2.GaussianBlur(gray,(11,11),0)
 
     threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
     threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
@@ -134,13 +134,31 @@ def draw_on_card(qCard, frame):
 def get_card_details(image):
     """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
        See https://pypi.org/project/pytesseract/"""
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Extract card name
     nameImg = image[5:60, 10:330]
+    nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("NameImg", nameImg)
     cardName = pytesseract.image_to_string(nameImg)
-    cardIDImg = image[575:600, 5:60]
+    
+    # Extract card ID
+    cardIDImg = image[585:598, 0:70]
+    cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("cardIDImg", cardIDImg)
     cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13')
-    cardSetCodeImg = image[430:450, 300:380]
+    
+    # Extract card set code
+    cardSetCodeImg = image[430:450, 285:380]
+    cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("setCodeImg", cardSetCodeImg)
     cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13')
-    cv2.rectangle(image, (300,430), (380, 450), (255, 0, 0), 1)
+    
+    # Draw rectangles around the areas
+    cv2.rectangle(image, (10, 5), (330, 60), (255, 0, 0), 1)  # Around name
+    cv2.rectangle(image, (0, 585), (70, 598), (255, 0, 0), 1)  # Around card ID
+    cv2.rectangle(image, (285, 430), (380, 450), (255, 0, 0), 1)  # Around set code
+
     return (cardName, cardID, cardSetCode)
 
 
