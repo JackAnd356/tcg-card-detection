@@ -2,6 +2,7 @@ import bson
 import json
 import requests
 import os
+from dotenv import load_dotenv, find_dotenv
 from pymongo import database
 from flask import Flask, request, jsonify, current_app, g, Blueprint, render_template
 from fuzzywuzzy import fuzz
@@ -16,8 +17,10 @@ from bson import json_util, ObjectId
 from datetime import datetime, timedelta
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+load_dotenv(find_dotenv())
 
-uri = "mongodb+srv://jaredanderson676:lYo67dNxPpT6RPAW@tcg-card-detection-dev.szrau.mongodb.net/?retryWrites=true&w=majority&appName=TCG-Card-Detection-Dev"
+
+uri = os.getenv('MONGODB_STRING')
 
 
 app = Flask(__name__)
@@ -59,10 +62,9 @@ def create_app():
     def post_getCardInfo():
         if request.is_json:
             clientCardInfo = request.get_json()
-            card = processCardImage(clientCardInfo)
-            if 'error' in card:
-                return {"error": card['error']}, 415
-            return card, 201
+            cards = processCardImage(clientCardInfo)
+            retData = {'cards' : cards}
+            return retData, 201
         return {"error": "Request must be JSON"}, 415
     
     @app.post("/getUserCollection")
@@ -133,52 +135,66 @@ def create_app():
 
 def processCardImage(cardImageData):
     #Replace enclosed with actual card image parsing
-    cardId = cardImageData['cardid']
-    cardSetCode = cardImageData['setcode']
-    cardName = cardImageData['name']
-    cardGame = cardImageData['game']
-    setName = ""
+    cards = cardImageData['cards']
     #End dummy code
-    if cardGame == 'yugioh':
-        url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
-        payload = {'id': cardId, 'tcgplayer_data': None}
-        payload = '&'.join([k if v is None else f"{k}={v}" for k, v in payload.items()])
-        resp = requests.get(url, params=payload)
-        if resp.status_code == 200:
-            cardData = resp.json()
-            if fuzz.ratio(cardData['data'][0]['name'], cardName) < 90:
+    scannedCards = []
+    for card in cards:
+        cardId = card['cardid']
+        cardSetCode = card['setcode']
+        cardName = card['name']
+        cardGame = card['game']
+        setName = ""
+        if cardGame == 'yugioh':
+            url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
+            payload = {'id': cardId, 'tcgplayer_data': None}
+            payload = '&'.join([k if v is None else f"{k}={v}" for k, v in payload.items()])
+            resp = requests.get(url, params=payload)
+            if resp.status_code == 200:
+                cardData = resp.json()
+                if fuzz.ratio(cardData['data'][0]['name'], cardName) < 90:
+                    print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
+                    scannedCards.append({'error': 'card search returned wrong card. please try scanning again'})
+                    continue
                 print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
-                return {'error': 'card search returned wrong card. please try scanning again'}
-            print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
-            for setData in cardData['data'][0]['card_sets']:
-                if fuzz.ratio(setData['set_code'], cardSetCode) > 95:
-                   setName = setData['set_name']
-                   break
-            if setName == "":
-                return {'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'}
-            return cardData
-        return {'error': 'card not found'} 
-    if cardGame == 'mtg':
-        url = 'https://api.scryfall.com/cards/named'
-        headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
-        payload = {'exact' : cardName}
-        resp = requests.get(url, params=payload, headers=headers)
-        print(resp.url)
-        if resp.status_code == 200:
-            cardData = resp.json()
-            return cardData
-        return {'error': 'card not found'} 
-    if cardGame == 'pokemon':
-        apikey = '28fdff44-a6d1-4b63-8896-f7b76872a628'
-        url = 'https://api.pokemontcg.io/v2/cards/'
-        headers = {'X-Api-Key' : apikey}
-        url += cardId
-        resp = requests.get(url, headers=headers)
-        if resp.status_code == 200:
-            cardData = resp.json()
-            return cardData
-        return {'error': 'card not found'} 
-    return {'error': 'card not found'} 
+                for setData in cardData['data'][0]['card_sets']:
+                    if fuzz.ratio(setData['set_code'], cardSetCode) > 95:
+                       setName = setData['set_name']
+                       continue
+                if setName == "":
+                    scannedCards.append({'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'})
+                    continue
+                scannedCards.append(cardData)
+                continue
+            scannedCards.append({'error': 'card not found'})
+            continue
+        if cardGame == 'mtg':
+            url = 'https://api.scryfall.com/cards/named'
+            headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+            payload = {'exact' : cardName, 'set' : cardSetCode}
+            resp = requests.get(url, params=payload, headers=headers)
+            if resp.status_code == 200:
+                cardData = resp.json()
+                if fuzz.ratio(cardData['collector_number'], cardId) < 90:
+                   print("Fuzzy ratio is: ", fuzz.ratio(cardData['collector_number'], cardId))
+                   scannedCards.append({'error': 'card search returned wrong card. please try scanning again'})
+                   continue
+                scannedCards.append(cardData)
+                continue
+            scannedCards.append({'error': 'card not found'})
+            continue
+        if cardGame == 'pokemon':
+            apikey = os.getenv('POKEMON_API_KEY')
+            url = 'https://api.pokemontcg.io/v2/cards/'
+            headers = {'X-Api-Key' : apikey}
+            url += cardId
+            resp = requests.get(url, headers=headers)
+            if resp.status_code == 200:
+                cardData = resp.json()
+                scannedCards.append(cardData)
+                continue
+            scannedCards.append({'error': 'card not found'})
+            continue
+    return scannedCards
 
 #Main Run Method
 if __name__ == "__main__":
