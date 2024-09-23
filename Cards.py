@@ -8,8 +8,8 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 BKG_THRESH = 60
 CARD_THRESH = 30
 
-CARD_MAX_AREA = 120000
-CARD_MIN_AREA = 25000
+CARD_MAX_AREA = 2000000
+CARD_MIN_AREA = 5000
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -29,7 +29,7 @@ def preprocess_image(image):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
 
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray,(5,5),0)
+    blur = cv2.GaussianBlur(gray,(11,11),0)
 
     threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
     threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
@@ -76,10 +76,15 @@ def find_cards(thresh_image):
         size = cv2.contourArea(cnts_sort[i])
         peri = cv2.arcLength(cnts_sort[i],True)
         approx = cv2.approxPolyDP(cnts_sort[i],0.01*peri,True)
+
+        if i == 0: 
+            print(size)
+            print(hier_sort[i][3])
+            print(len(approx))
         
         if ((size < CARD_MAX_AREA) and (size > CARD_MIN_AREA)
             and (hier_sort[i][3] == -1) and (len(approx) == 4)):
-            cnt_is_card[i] = 1
+                cnt_is_card[i] = 1
 
     return cnts_sort, cnt_is_card
 
@@ -129,12 +134,31 @@ def draw_on_card(qCard, frame):
 def get_card_details(image):
     """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
        See https://pypi.org/project/pytesseract/"""
-    nameImg = image[10:40, 15:175]
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Extract card name
+    nameImg = image[5:60, 10:330]
+    nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("NameImg", nameImg)
     cardName = pytesseract.image_to_string(nameImg)
-    cardIDImg = image[275:295, 10:40]
-    cardID = pytesseract.image_to_string(cardIDImg)
-    cardSetCodeImg = image[220:260, 145:180]
-    cardSetCode = pytesseract.image_to_string(cardSetCodeImg)
+    
+    # Extract card ID
+    cardIDImg = image[585:598, 0:70]
+    cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("cardIDImg", cardIDImg)
+    cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13')
+    
+    # Extract card set code
+    cardSetCodeImg = image[430:450, 285:380]
+    cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("setCodeImg", cardSetCodeImg)
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13')
+    
+    # Draw rectangles around the areas
+    cv2.rectangle(image, (10, 5), (330, 60), (255, 0, 0), 1)  # Around name
+    cv2.rectangle(image, (0, 585), (70, 598), (255, 0, 0), 1)  # Around card ID
+    cv2.rectangle(image, (285, 430), (380, 450), (255, 0, 0), 1)  # Around set code
+
     return (cardName, cardID, cardSetCode)
 
 
@@ -185,8 +209,8 @@ def flattener(image, pts, w, h):
             temp_rect[3] = pts[1][0] # Bottom left
             
         
-    maxWidth = 200
-    maxHeight = 300
+    maxWidth = 400
+    maxHeight = 600
 
     # Create destination array, calculate perspective transform matrix,
     # and warp card image
