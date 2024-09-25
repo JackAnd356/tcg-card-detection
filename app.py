@@ -2,6 +2,7 @@ import bson
 import json
 import requests
 import os
+import bcrypt
 from dotenv import load_dotenv, find_dotenv
 from pymongo import database
 from flask import Flask, request, jsonify, current_app, g, Blueprint, render_template
@@ -50,24 +51,59 @@ def create_app():
     
     #Web API Endpoints
 
-    @app.get("/testCardImageData")
+    @app.get('/testCardImageData')
     def get_testCardImageData():
         return jsonify(testCardImageData)
 
-    @app.get("/testCardContentData")
+    @app.get('/testCardContentData')
     def get_testCardContentData():
         return jsonify(testCardContentData)
 
-    @app.post("/getCardInfo")
+    @app.post('/getCardInfo')
     def post_getCardInfo():
         if request.is_json:
             clientCardInfo = request.get_json()
             cards = processCardImage(clientCardInfo)
             retData = {'cards' : cards}
             return retData, 201
-        return {"error": "Request must be JSON"}, 415
+        return {'error': 'Request must be JSON'}, 415
     
-    @app.post("/getUserCollection")
+    @app.post('/authenticateUser')
+    def post_authenticateUser():
+        if request.is_json:
+            userLoginInfo = request.get_json()
+            username = userLoginInfo['username']
+            authenticator = userLoginInfo['authenticationToken']
+            database = client['card_detection_info']
+            collection = database['user_data']
+            userData = collection.find_one({'userid' : username})
+            if userData == None:
+                return {'error': 'Incorrect Username', 'success' : 0}, 415
+            if bcrypt.checkpw(authenticator.encode('UTF-8'), userData['password']):
+                return {'success' : 1}, 201
+            else :
+                return {'error': 'Incorrect Password', 'success' : 0}, 415
+        return {'error': 'Request must be JSON', 'success' : 0}, 415
+    
+    @app.post('/saveTestUserPass')
+    def post_saveTestUserPass():
+        if request.is_json:
+            userLoginInfo = request.get_json()
+            username = userLoginInfo['username']
+            authenticator = userLoginInfo['authenticationToken']
+            database = client['card_detection_info']
+            collection = database['user_data']
+            userData = collection.find_one({'userid' : username})
+            if userData == None:
+                return {'error': 'Incorrect Username', 'success' : 0}, 415
+            updateOp = { '$set' : 
+                                { 'password' : bcrypt.hashpw(authenticator.encode('UTF-8'),bcrypt.gensalt(rounds=15)) }
+                            }
+            collection.update_one({'userid' : username}, updateOp)
+            return {'success' : 1}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 415
+    
+    @app.post('/getUserCollection')
     def post_getUserCollection():
         if request.is_json:
             clientUserInfo = request.get_json()
@@ -76,8 +112,9 @@ def create_app():
             results = collection.find({'userid' : clientUserInfo['userid']})
             results = parse_json(results)
             return results, 201
-        return {"error": "Request must be JSON"}, 415
-    @app.post("/addToUserCollection")
+        return {'error': 'Request must be JSON'}, 415
+    
+    @app.post('/addToUserCollection')
     def post_addToUserCollection():
         if request.is_json:
             clientUserInfo = request.get_json()
@@ -87,7 +124,7 @@ def create_app():
             if 'rarity' in clientUserInfo:
                 payload['rarity'] = clientUserInfo['rarity']
             else :
-                payload['rarity'] = ""
+                payload['rarity'] = ''
             results = collection.find_one(payload)
             if results == None:
                 payload['quantity'] = clientUserInfo['quantity']
@@ -97,13 +134,14 @@ def create_app():
                 results = parse_json(results)
                 currCount = results['quantity']
                 currCount += clientUserInfo['quantity']
-                updateOp = { "$set" : 
-                                { "quantity" : currCount }
+                updateOp = { '$set' : 
+                                { 'quantity' : currCount }
                             }
                 upRes = collection.update_one(payload, updateOp)
                 return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
-        return {"error": "Request must be JSON"}, 415
-    @app.post("/removeFromUserCollection")
+        return {'error': 'Request must be JSON'}, 415
+    
+    @app.post('/removeFromUserCollection')
     def post_removeFromUserCollection():
         if request.is_json:
             clientUserInfo = request.get_json()
@@ -113,21 +151,21 @@ def create_app():
             if 'rarity' in clientUserInfo:
                 payload['rarity'] = clientUserInfo['rarity']
             else :
-                payload['rarity'] = ""
+                payload['rarity'] = ''
             results = collection.find_one(payload)
             if results == None:
-                return {"error": "Tried to remove a card that you don't have"}, 415
+                return {'error': 'Tried to remove a card that you do not have'}, 415
             if clientUserInfo['quantity'] == 'all' or results['quantity'] <= clientUserInfo['quantity']:
                 delRes = collection.delete_one(payload)
                 return {'Message' : 'Card removed from collection', 'remCnt' : delRes.deleted_count}, 201
             currCount = results['quantity']
             currCount -= clientUserInfo['quantity']
-            updateOp = { "$set" : 
-                            { "quantity" : currCount }
+            updateOp = { '$set' : 
+                            { 'quantity' : currCount }
                         }
             upRes = collection.update_one(payload, updateOp)
             return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
-        return {"error": "Request must be JSON"}, 415
+        return {'error': 'Request must be JSON'}, 415
 
     return app
 
@@ -143,24 +181,24 @@ def processCardImage(cardImageData):
         cardSetCode = card['setcode']
         cardName = card['name']
         cardGame = card['game']
-        setName = ""
+        setName = ''
         if cardGame == 'yugioh':
             url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
             payload = {'id': cardId, 'tcgplayer_data': None}
-            payload = '&'.join([k if v is None else f"{k}={v}" for k, v in payload.items()])
+            payload = '&'.join([k if v is None else f'{k}={v}' for k, v in payload.items()])
             resp = requests.get(url, params=payload)
             if resp.status_code == 200:
                 cardData = resp.json()
                 if fuzz.ratio(cardData['data'][0]['name'], cardName) < 90:
-                    print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
+                    print('Fuzzy ratio is: ', fuzz.ratio(cardData['data'][0]['name'], cardName))
                     scannedCards.append({'error': 'card search returned wrong card. please try scanning again'})
                     continue
-                print("Fuzzy ratio is: ", fuzz.ratio(cardData['data'][0]['name'], cardName))
+                print('Fuzzy ratio is: ', fuzz.ratio(cardData['data'][0]['name'], cardName))
                 for setData in cardData['data'][0]['card_sets']:
                     if fuzz.ratio(setData['set_code'], cardSetCode) > 95:
                        setName = setData['set_name']
                        continue
-                if setName == "":
+                if setName == '':
                     scannedCards.append({'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'})
                     continue
                 scannedCards.append(cardData)
@@ -175,7 +213,7 @@ def processCardImage(cardImageData):
             if resp.status_code == 200:
                 cardData = resp.json()
                 if fuzz.ratio(cardData['collector_number'], cardId) < 90:
-                   print("Fuzzy ratio is: ", fuzz.ratio(cardData['collector_number'], cardId))
+                   print('Fuzzy ratio is: ', fuzz.ratio(cardData['collector_number'], cardId))
                    scannedCards.append({'error': 'card search returned wrong card. please try scanning again'})
                    continue
                 scannedCards.append(cardData)
@@ -197,7 +235,7 @@ def processCardImage(cardImageData):
     return scannedCards
 
 #Main Run Method
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = create_app()
 
     app.run()
