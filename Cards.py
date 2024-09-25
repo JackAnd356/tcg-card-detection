@@ -141,24 +141,19 @@ def get_yugioh_card_details(image):
     nameImg = image[5:60, 10:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("NameImg", nameImg)
-    cardName = pytesseract.image_to_string(nameImg)
+    cardName = pytesseract.image_to_string(nameImg, config='-c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
     
     # Extract card ID
-    cardIDImg = image[585:598, 0:70]
+    cardIDImg = image[585:598, 5:70]
     cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("cardIDImg", cardIDImg)
-    cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13')
+    cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789')
     
     # Extract card set code
-    cardSetCodeImg = image[430:450, 285:380]
+    cardSetCodeImg = image[435:450, 285:380]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("setCodeImg", cardSetCodeImg)
-    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13')
-    
-    # Draw rectangles around the areas
-    cv2.rectangle(image, (10, 5), (330, 60), (255, 0, 0), 1)  # Around name
-    cv2.rectangle(image, (0, 585), (70, 598), (255, 0, 0), 1)  # Around card ID
-    cv2.rectangle(image, (285, 430), (380, 450), (255, 0, 0), 1)  # Around set code
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
 
     return (cardName, cardID, cardSetCode)
 
@@ -171,19 +166,13 @@ def get_mtg_card_details(image):
     nameImg = image[20:60, 30:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("NameImg", nameImg)
-    cardName = pytesseract.image_to_string(nameImg)
+    cardName = pytesseract.image_to_string(nameImg, config='-c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
     
     # Extract card ID
     cardSetCodeImg = image[560:572, 0:70]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("cardIDImg", cardSetCodeImg)
-    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13')
-    
-    
-    # Draw rectangles around the areas
-    cv2.rectangle(image, (10, 5), (330, 60), (255, 0, 0), 1)  # Around name
-    cv2.rectangle(image, (0, 585), (70, 598), (255, 0, 0), 1)  # Around card ID
-    cv2.rectangle(image, (285, 430), (380, 450), (255, 0, 0), 1)  # Around set code
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
 
     return (cardName, cardSetCode)
 
