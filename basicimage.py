@@ -11,7 +11,7 @@ cv2.createTrackbar("Threshold2", "Parameters", 140, 255, empty)
 cv2.createTrackbar("Area", "Parameters", 0, 100000, empty)
 
 """Main while loop - frame from webcam is read, blurred and greyed, and all card-shaped contours are processed"""
-frame = cv2.imread("./images/stardust_dragon_img.jpg")
+frame = cv2.imread("./images/the_one_ring.webp")
 
 height, width = frame.shape[:2]
 
@@ -34,7 +34,7 @@ cv2.imshow("Contours", thresh)"""
 if len(ccs) != 0:
     for i in range(len(ccs)):
         if isCard[i]:
-            cards.append(Cards.preprocess_card(ccs[i], frame))
+            cards.append(Cards.preprocess_card(ccs[i], frame, 'MagicTheGathering'))
 
             frame = Cards.draw_on_card(cards[cCount], frame)
             cCount = cCount + 1

@@ -88,7 +88,7 @@ def find_cards(thresh_image):
 
     return cnts_sort, cnt_is_card
 
-def preprocess_card(contour, frame):
+def preprocess_card(contour, frame, cardType):
     qCard = Query_Card()
     qCard.contour = contour
 
@@ -110,9 +110,10 @@ def preprocess_card(contour, frame):
     # Warp card into 200x300 flattened image using perspective transform
     qCard.warp = flattener(frame, pts, w, h)
 
-    (name, id, setCode) = get_card_details(qCard.warp)
+    if cardType == 'Yugioh': (name, id, setCode) = get_yugioh_card_details(qCard.warp)
+    elif cardType == 'MagicTheGathering': (name, setCode) = get_mtg_card_details(qCard.warp)
     qCard.name = name
-    qCard.id = id
+    if cardType == 'Yugioh': qCard.id = id
     qCard.set_code = setCode
 
     return qCard
@@ -131,7 +132,7 @@ def draw_on_card(qCard, frame):
 
     return frame
 
-def get_card_details(image):
+def get_yugioh_card_details(image):
     """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
        See https://pypi.org/project/pytesseract/"""
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -160,6 +161,31 @@ def get_card_details(image):
     cv2.rectangle(image, (285, 430), (380, 450), (255, 0, 0), 1)  # Around set code
 
     return (cardName, cardID, cardSetCode)
+
+def get_mtg_card_details(image):
+    """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
+       See https://pypi.org/project/pytesseract/"""
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Extract card name
+    nameImg = image[20:60, 30:330]
+    nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("NameImg", nameImg)
+    cardName = pytesseract.image_to_string(nameImg)
+    
+    # Extract card ID
+    cardSetCodeImg = image[560:572, 0:70]
+    cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("cardIDImg", cardSetCodeImg)
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13')
+    
+    
+    # Draw rectangles around the areas
+    cv2.rectangle(image, (10, 5), (330, 60), (255, 0, 0), 1)  # Around name
+    cv2.rectangle(image, (0, 585), (70, 598), (255, 0, 0), 1)  # Around card ID
+    cv2.rectangle(image, (285, 430), (380, 450), (255, 0, 0), 1)  # Around set code
+
+    return (cardName, cardSetCode)
 
 
 def flattener(image, pts, w, h):
