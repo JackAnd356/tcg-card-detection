@@ -7,3 +7,4 @@ pytesseract
 opencv
 pymongo
 python-dotenv
+bcrypt
