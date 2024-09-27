@@ -4,26 +4,41 @@ import pytesseract
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-# Adaptive threshold levels
-BKG_THRESH = 60
-CARD_THRESH = 30
+# Threshold Levels
+THRESH_LOW = 0
+THRESH_HIGH = 140
 
 CARD_MAX_AREA = 2000000
 CARD_MIN_AREA = 5000
 
-font = cv2.FONT_HERSHEY_SIMPLEX
 
-class Query_Card:
-    def __init__(self):
-        self.name = ""
-        self.id = ""
-        self.set_code = ""
-        self.contour = []
-        self.width = 0
-        self.height = 0
-        self.corner_pts = []
-        self.center = []
-        self.warp = []
+"""Processes the input image and returns a dictionary with a list of all cards in frame, 
+card info is provided as a dictionary within each card"""
+def process_image(image):
+    height, width = image.shape[:2]
+    cards = []
+
+    # Define the new dimensions
+    new_width = 600
+    new_height = int(new_width * height / width)
+
+    # Resize the image
+    image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
+    thresh = preprocess_image(image)
+    ccs, isCard = find_cards(thresh)
+
+    if len(ccs) == 0: return None
+
+    for i in range(len(ccs)):
+        if isCard[i]:
+            cards.append(preprocess_card(ccs[i], image, "yugioh"))
+
+    frameCards = dict()
+    frameCards["cards"] = cards
+    return frameCards
+                
+
 
 def preprocess_image(image):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
@@ -31,8 +46,8 @@ def preprocess_image(image):
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray,(11,11),0)
 
-    threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
-    threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
+    threshold1 = THRESH_LOW
+    threshold2 = THRESH_HIGH
     imgCanny = cv2.Canny(blur, threshold1, threshold2)
 
 
@@ -77,10 +92,9 @@ def find_cards(thresh_image):
         peri = cv2.arcLength(cnts_sort[i],True)
         approx = cv2.approxPolyDP(cnts_sort[i],0.01*peri,True)
 
-        if i == 0: 
-            print(size)
-            print(hier_sort[i][3])
-            print(len(approx))
+        "print(size)"
+        "print(hier_sort[i][3])"
+        "print(len(approx))"
         
         if ((size < CARD_MAX_AREA) and (size > CARD_MIN_AREA)
             and (hier_sort[i][3] == -1) and (len(approx) == 4)):
@@ -89,43 +103,43 @@ def find_cards(thresh_image):
     return cnts_sort, cnt_is_card
 
 def preprocess_card(contour, frame, cardType):
-    qCard = Query_Card()
-    qCard.contour = contour
+    qCard = dict()
+    qCard["contour"] = contour
 
     peri = cv2.arcLength(contour,True)
     approx = cv2.approxPolyDP(contour,0.01*peri,True)
     pts = np.float32(approx)
-    qCard.corner_pts = pts
+    qCard["corner_points"] = pts
 
     # Find width and height of card's bounding rectangle
     x,y,w,h = cv2.boundingRect(contour)
-    qCard.width, qCard.height = w, h
+    qCard["width"] = w, qCard["height"] = w, h
 
     # Find center point of card by taking x and y average of the four corners.
     average = np.sum(pts, axis=0)/len(pts)
     cent_x = int(average[0][0])
     cent_y = int(average[0][1])
-    qCard.center = [cent_x, cent_y]
+    qCard["centerpoint"] = [cent_x, cent_y]
 
     # Warp card into 200x300 flattened image using perspective transform
-    qCard.warp = flattener(frame, pts, w, h)
+    qCard["warp"] = flattener(frame, pts, w, h)
 
-    if cardType == 'Yugioh': (name, id, setCode) = get_yugioh_card_details(qCard.warp)
-    elif cardType == 'MagicTheGathering': (name, setCode) = get_mtg_card_details(qCard.warp)
-    qCard.name = name
-    if cardType == 'Yugioh': qCard.id = id
-    qCard.set_code = setCode
+    if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp"])
+    elif cardType == 'mtg': (name, setCode) = get_mtg_card_details(qCard["warp"])
+    qCard["name"] = name
+    if cardType == 'yugioh': qCard["cardid"] = id
+    qCard["setcode"] = setCode
 
     return qCard
 
 def draw_on_card(qCard, frame):
     """Draw the card name, center point, and contour on the camera image."""
 
-    x = qCard.center[0]
-    y = qCard.center[1]
+    x = qCard["centerpoint"][0]
+    y = qCard["centerpoint"][1]
     cv2.circle(frame,(x,y),5,(255,0,0),-1)
 
-    card_info = qCard.name + ", " + qCard.id + ", " + qCard.set_code
+    card_info = qCard["name"] + ", " + qCard["cardid"] + ", " + qCard["setcode"]
     print(card_info)
 
     "cv2.putText(frame, card_info, (x,y), font, 1, (255, 0, 0), 2, cv2.LINE_AA)"
