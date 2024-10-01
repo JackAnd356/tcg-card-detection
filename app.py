@@ -68,6 +68,32 @@ def create_app():
             return retData, 201
         return {'error': 'Request must be JSON'}, 415
     
+    @app.post('/createNewUser')
+    def post_createNewUser():
+        if request.is_json:
+            userCreateInfo = request.get_json()
+            username = userCreateInfo['username']
+            authenticator = userCreateInfo['authenticationToken']
+            email = userCreateInfo['email']
+            storefront = userCreateInfo['storefront']
+            if type(username) != str or type(authenticator) != str or type(email) != str or type(storefront) != int:
+                return {'error' : 'Incorrect data type passed for one or more inputs'}, 415
+            database = client['card_detection_info']
+            collection = database['user_data']
+            dupCheck = collection.find_one({'username' : username})
+            if dupCheck != None:
+                return {'error' : 'Username already in use'}, 415
+            coreUserInfo = collection.find_one({'coreuser' : 1})
+            userid = str(int(coreUserInfo['currentmaxuserid']) + 1)
+            updateOp = { '$set' : 
+                                { 'currentmaxuserid' : userid }
+                            }
+            collection.update_one({'coreuser' : 1}, updateOp)
+            payload = {'username' : username, 'userid' : userid, 'password' : bcrypt.hashpw(authenticator.encode('UTF-8'),bcrypt.gensalt(rounds=15)), 'email' : email, 'storefront' : storefront}
+            insertRes = collection.insert_one(payload)
+            return {'success' : insertRes.acknowledged}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 415
+    
     @app.post('/authenticateUser')
     def post_authenticateUser():
         if request.is_json:
@@ -76,7 +102,7 @@ def create_app():
             authenticator = userLoginInfo['authenticationToken']
             database = client['card_detection_info']
             collection = database['user_data']
-            userData = collection.find_one({'userid' : username})
+            userData = collection.find_one({'username' : username})
             if userData == None:
                 return {'error': 'Incorrect Username', 'success' : 0}, 415
             if bcrypt.checkpw(authenticator.encode('UTF-8'), userData['password']):
@@ -85,22 +111,79 @@ def create_app():
                 return {'error': 'Incorrect Password', 'success' : 0}, 415
         return {'error': 'Request must be JSON', 'success' : 0}, 415
     
-    @app.post('/saveTestUserPass')
-    def post_saveTestUserPass():
+    @app.post('/saveUserPass')
+    def post_saveUserPass():
         if request.is_json:
-            userLoginInfo = request.get_json()
-            username = userLoginInfo['username']
-            authenticator = userLoginInfo['authenticationToken']
+            userPassInfo = request.get_json()
+            userid = userPassInfo['userid']
+            authenticator = userPassInfo['authenticationToken']
+            database = client['card_detection_info']
+            collection = database['user_data']
+            userData = collection.find_one({'userid' : userid})
+            if userData == None:
+                return {'error': 'Incorrect UserID', 'success' : 0}, 415
+            updateOp = { '$set' : 
+                                { 'password' : bcrypt.hashpw(authenticator.encode('UTF-8'),bcrypt.gensalt(rounds=15)) }
+                            }
+            collection.update_one({'userid' : userid}, updateOp)
+            return {'success' : 1}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 415
+
+    @app.post('/saveUserEmail')
+    def post_saveUserEmail():
+        if request.is_json:
+            userEmailInfo = request.get_json()
+            userid = userEmailInfo['userid']
+            email = userEmailInfo['email']
+            database = client['card_detection_info']
+            collection = database['user_data']
+            userData = collection.find_one({'userid' : userid})
+            if userData == None:
+                return {'error': 'Incorrect UserID', 'success' : 0}, 415
+            updateOp = { '$set' : 
+                                { 'email' : email }
+                            }
+            collection.update_one({'userid' : userid}, updateOp)
+            return {'success' : 1}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 415
+    
+    @app.post('/saveUserStorefront')
+    def post_saveUserStorefront():
+        if request.is_json:
+            userStoreInfo = request.get_json()
+            username = userStoreInfo['username']
+            storefront = userStoreInfo['storefront']
+            if type(storefront) != int:
+                return {'error': 'Incorrect Storefront Value Type', 'success' : 0}, 415
+            if storefront > 2 or storefront < 0:
+                return {'error': 'Storefront Value Not Supported', 'success' : 0}, 415
             database = client['card_detection_info']
             collection = database['user_data']
             userData = collection.find_one({'userid' : username})
             if userData == None:
-                return {'error': 'Incorrect Username', 'success' : 0}, 415
+                return {'error': 'Incorrect UserID', 'success' : 0}, 415
             updateOp = { '$set' : 
-                                { 'password' : bcrypt.hashpw(authenticator.encode('UTF-8'),bcrypt.gensalt(rounds=15)) }
+                                { 'storefront' : storefront }
                             }
             collection.update_one({'userid' : username}, updateOp)
             return {'success' : 1}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 415
+
+    @app.post('/deleteUser')
+    def post_deleteUser():
+        if request.is_json:
+            userDeleteInfo = request.get_json()
+            userid = userDeleteInfo['userid']
+            database = client['card_detection_info']
+            userCollection = database['user_data']
+            cardCollection = database['card_collection']
+            userData = userCollection.find_one({'userid' : userid})
+            if userData == None:
+                return {'error': 'Incorrect UserID', 'success' : 0}, 415
+            payload = {'userid' : userid}
+            userDel = userCollection.delete_one(payload)
+            cardDel = cardCollection.delete_many(payload)
+            return {'Message' : 'User removed', 'remUserCnt' : userDel.deleted_count, 'remCardCnt' : cardDel.deleted_count}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 415
     
     @app.post('/getUserCollection')
@@ -110,6 +193,17 @@ def create_app():
             database = client['card_detection_info']
             collection = database['card_collection']
             results = collection.find({'userid' : clientUserInfo['userid']})
+            results = parse_json(results)
+            return results, 201
+        return {'error': 'Request must be JSON'}, 415
+    
+    @app.post('/getUserSubcollection')
+    def post_getUserSubcollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['card_collection']
+            results = collection.find({'userid' : clientUserInfo['userid'], 'subcollections' : clientUserInfo['subcollection']})
             results = parse_json(results)
             return results, 201
         return {'error': 'Request must be JSON'}, 415
@@ -166,7 +260,6 @@ def create_app():
             upRes = collection.update_one(payload, updateOp)
             return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
         return {'error': 'Request must be JSON'}, 415
-
     return app
 
 #Methods
