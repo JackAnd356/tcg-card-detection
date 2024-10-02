@@ -2,6 +2,8 @@ import requests
 import random
 import os
 import time
+import tensorflow as tf
+import cv2
 
 def getYugiohSample(numCards):
     url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -94,3 +96,38 @@ def getPokemonSample(numCards):
             if counter >= numCards: break
     else:
         print(f'API Gave Error Status Code: {resp.status_code}')
+
+def getTrainingData():
+    training_images = []
+    test_images = []
+
+    getYugiohSample(200)
+    getMTGSample(200)
+    getPokemonSample(200)
+
+    for i, filename in enumerate(os.listdir("/sample_images/yugioh")):
+        filepath = os.path.join("/sample_images/yugioh", filename)
+        img = cv2.imread(filepath)
+        imgGray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        imgSmall = cv2.resize(imgGray, (300, 450), cv2.INTER_AREA)
+        if i < 150: training_images.append(imgSmall)
+        else: test_images.append(imgSmall)
+
+    for i, filename in enumerate(os.listdir("/sample_images/mtg")):
+        filepath = os.path.join("/sample_images/mtg", filename)
+        img = cv2.imread(filepath)
+        imgGray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        imgSmall = cv2.resize(imgGray, (300, 450), cv2.INTER_AREA)
+        if i < 150: training_images.append(imgSmall)
+        else: test_images.append(imgSmall)
+
+    for i, filename in enumerate(os.listdir("/sample_images/pokemon")):
+        filepath = os.path.join("/sample_images/pokemon", filename)
+        img = cv2.imread(filepath)
+        imgGray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        imgSmall = cv2.resize(imgGray, (300, 450), cv2.INTER_AREA)
+        if i < 150: training_images.append(imgSmall)
+        else: test_images.append(imgSmall)
+
+    return training_images, test_images
+
