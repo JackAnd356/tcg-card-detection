@@ -11,11 +11,10 @@ def getYugiohSample(numCards):
         cards = cardData["data"]
 
         random.shuffle(cards)
-        sample = cards[:numCards]
 
         counter = 0
 
-        for i,card in enumerate(sample):
+        for i,card in enumerate(cards):
             img_url = card["card_images"][0]["image_url"]
             card_name = card["name"].replace(' ', '_').replace('/', '_')
             filename = f'sample_images/yugioh/{card_name}.jpg'
@@ -28,6 +27,8 @@ def getYugiohSample(numCards):
                 print(f'Downloaded {card_name} Num: {i}/{numCards} Total Downloaded: {counter}')
             else:
                 print(f'Failed to get Image of: {card_name}')
+            if counter >= numCards: break
+            time.sleep(0.2)
     else:
         print(f'API Gave Error Status Code: {resp.status_code}')
 
@@ -60,3 +61,36 @@ def getMTGSample(numCards):
             print(f'API Gave Error Status Code: {resp.status_code}')
         
         time.sleep(0.2)
+
+def getPokemonSample(numCards):
+    apikey = os.getenv('POKEMON_API_KEY')
+    url = 'https://api.pokemontcg.io/v2/cards'
+    headers = {'X-Api-Key' : apikey}
+    params = {'pageSize' : 250}
+
+    resp = requests.get(url, headers=headers, params=params)
+
+    if resp.status_code == 200:
+        card_data = resp.json()
+        cards = card_data["data"]
+
+        random.shuffle(cards)
+        counter = 0
+
+        for i, card in enumerate(cards):
+            image_url = card['images']['large']
+            card_name = card['name'].replace(' ', '_').replace('/', '_')
+            image_filename = f"sample_images/pokemon/{card_name}.jpg"
+
+            img_response = requests.get(image_url)
+
+            if img_response.status_code == 200:
+                counter += 1
+                with open(image_filename, "wb") as img_file:
+                    img_file.write(img_response.content)
+                print(f"Downloaded: {card_name} Total Downloaded: {counter}")
+            else:
+                print(f"Failed to download image for card: {card_name}")
+            if counter >= numCards: break
+    else:
+        print(f'API Gave Error Status Code: {resp.status_code}')
