@@ -3,6 +3,8 @@ import json
 import requests
 import os
 import bcrypt
+import datetime
+from datetime import date
 from dotenv import load_dotenv, find_dotenv
 from pymongo import database
 from flask import Flask, request, jsonify, current_app, g, Blueprint, render_template
@@ -106,6 +108,51 @@ def create_app():
             if userData == None:
                 return {'error': 'Incorrect Username', 'success' : 0}, 415
             if bcrypt.checkpw(authenticator.encode('UTF-8'), userData['password']):
+                cardCollection = database['card_collection']
+                userid = userData['userid']
+                results = cardCollection.find({'userid' : userid})
+                results = parse_json(results)
+                for res in results :
+                    print(res)
+                    game = res['game']
+                    cardId = res['cardid']
+                    cardSetCode = res['setcode']
+                    price = ""
+                    if game == 'yugioh':
+                        url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
+                        payload = {'id': cardId, 'tcgplayer_data': None}
+                        payload = '&'.join([k if v is None else f'{k}={v}' for k, v in payload.items()])
+                        resp = requests.get(url, params=payload)
+                        if resp.status_code == 200:
+                            cardData = resp.json()
+                            for cardSet in cardData['data'][0]['card_sets']:
+                                if cardSet['set_code'] == cardSetCode:
+                                    price = cardSet['set_price']
+                                    break
+                    elif game == 'mtg':
+                        url = 'https://api.scryfall.com/cards/'
+                        headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+                        url += cardId
+                        resp = requests.get(url, headers=headers)
+                        if resp.status_code == 200:
+                            cardData = resp.json()
+                            price = cardData['prices']['usd']
+                    elif game == 'pokemon':
+                        apikey = os.getenv('POKEMON_API_KEY')
+                        url = 'https://api.pokemontcg.io/v2/cards/'
+                        headers = {'X-Api-Key' : apikey}
+                        url += cardId
+                        resp = requests.get(url, headers=headers)
+                        if resp.status_code == 200:
+                            cardData = resp.json()
+                            price = cardData['tcgplayer']['prices']['normal']['market']
+                    payload = {'userid' : userid, 'cardid' : cardId, 'setcode' : cardSetCode, 'game' : game, 'rarity' : res['rarity']}
+                    updateOp = updateOp = { '$set' : 
+                                { 'price' : price,
+                                  'pricedate' : datetime.utcnow()
+                                }
+                            }
+                    cardCollection.update_one(payload, updateOp)
                 return {'success' : 1}, 201
             else :
                 return {'error': 'Incorrect Password', 'success' : 0}, 415
@@ -214,7 +261,7 @@ def create_app():
             clientUserInfo = request.get_json()
             database = client['card_detection_info']
             collection = database['card_collection']
-            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode']}
+            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode'], 'game' : clientUserInfo['game']}
             if 'rarity' in clientUserInfo:
                 payload['rarity'] = clientUserInfo['rarity']
             else :
@@ -222,6 +269,8 @@ def create_app():
             results = collection.find_one(payload)
             if results == None:
                 payload['quantity'] = clientUserInfo['quantity']
+                payload['price'] = clientUserInfo['price']
+                payload['pricedate'] = datetime.now(tz=datetime.timezone.utc)
                 insertRes = collection.insert_one(payload)
                 return {'success' : insertRes.acknowledged}, 201
             else :
@@ -229,7 +278,9 @@ def create_app():
                 currCount = results['quantity']
                 currCount += clientUserInfo['quantity']
                 updateOp = { '$set' : 
-                                { 'quantity' : currCount }
+                                { 'quantity' : currCount,
+                                  'price' : clientUserInfo['price'],
+                                  'pricedate' : datetime.now(tz=datetime.timezone.utc)}
                             }
                 upRes = collection.update_one(payload, updateOp)
                 return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
