@@ -4,7 +4,7 @@ import requests
 import os
 import bcrypt
 import datetime
-from datetime import date
+from datetime import date, timezone
 from dotenv import load_dotenv, find_dotenv
 from pymongo import database
 from flask import Flask, request, jsonify, current_app, g, Blueprint, render_template
@@ -117,6 +117,11 @@ def create_app():
                     game = res['game']
                     cardId = res['cardid']
                     cardSetCode = res['setcode']
+                    oldPriceDate = datetime.strptime(res['pricedate']['$date'], "%Y-%m-%dT%H:%M:%S.%fZ")
+                    oldPriceDate = oldPriceDate.replace(tzinfo=timezone.utc)
+                    print((datetime.now(timezone.utc) - oldPriceDate).days)
+                    if (datetime.now(timezone.utc) - oldPriceDate).days == 0:
+                        continue
                     price = ""
                     if game == 'yugioh':
                         url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -146,13 +151,13 @@ def create_app():
                         if resp.status_code == 200:
                             cardData = resp.json()
                             price = cardData['tcgplayer']['prices']['normal']['market']
-                    payload = {'userid' : userid, 'cardid' : cardId, 'setcode' : cardSetCode, 'game' : game, 'rarity' : res['rarity']}
+                    payload = {'cardid' : cardId, 'setcode' : cardSetCode, 'game' : game, 'rarity' : res['rarity']}
                     updateOp = updateOp = { '$set' : 
                                 { 'price' : price,
-                                  'pricedate' : datetime.utcnow()
+                                  'pricedate' : datetime.now(timezone.utc)
                                 }
                             }
-                    cardCollection.update_one(payload, updateOp)
+                    cardCollection.update_many(payload, updateOp)
                 return {'success' : 1}, 201
             else :
                 return {'error': 'Incorrect Password', 'success' : 0}, 415
@@ -266,21 +271,49 @@ def create_app():
                 payload['rarity'] = clientUserInfo['rarity']
             else :
                 payload['rarity'] = ''
-            results = collection.find_one(payload)
-            if results == None:
+            result = collection.find_one(payload)
+            if result == None:
                 payload['quantity'] = clientUserInfo['quantity']
                 payload['price'] = clientUserInfo['price']
                 payload['pricedate'] = datetime.now(tz=datetime.timezone.utc)
                 insertRes = collection.insert_one(payload)
                 return {'success' : insertRes.acknowledged}, 201
             else :
-                results = parse_json(results)
-                currCount = results['quantity']
+                currCount = result['quantity']
                 currCount += clientUserInfo['quantity']
                 updateOp = { '$set' : 
                                 { 'quantity' : currCount,
                                   'price' : clientUserInfo['price'],
                                   'pricedate' : datetime.now(tz=datetime.timezone.utc)}
+                            }
+                upRes = collection.update_one(payload, updateOp)
+                return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
+        return {'error': 'Request must be JSON'}, 415
+    
+    @app.post('/addToUserSubcollection')
+    def post_addToUserSubcollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['card_collection']
+            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode'], 'game' : clientUserInfo['game']}
+            if 'rarity' in clientUserInfo:
+                payload['rarity'] = clientUserInfo['rarity']
+            else :
+                payload['rarity'] = ''
+            result = collection.find_one(payload)
+            if result == None:
+                return {'error': 'You do not have this card'}, 415
+            else :
+                subColArr = []
+                if 'subcollections' in result:
+                    subColArr = result['subcollections']
+                subCol = clientUserInfo['subcollection']
+                if subCol in subColArr:
+                    return {'error': 'Already a part of subcollection'}, 415
+                subColArr.append(subCol)
+                updateOp = { '$set' : 
+                                { 'subcollections' : subColArr}
                             }
                 upRes = collection.update_one(payload, updateOp)
                 return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
