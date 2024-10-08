@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-﻿################################################################################
+################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
@@ -20,4 +19,3 @@ sample_images/
 .externalNativeBuild
 .cxx
 local.properties
->>>>>>> eb5037d (Adding in Kotlin and Android framework)
