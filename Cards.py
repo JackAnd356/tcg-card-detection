@@ -125,9 +125,9 @@ def preprocess_card(contour, frame, cardType):
     qCard["warp"] = flattener(frame, pts, w, h)
 
     if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp"])
-    elif cardType == 'mtg': (name, setCode) = get_mtg_card_details(qCard["warp"])
+    elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp"])
     qCard["name"] = name
-    if cardType == 'yugioh': qCard["cardid"] = id
+    qCard["cardid"] = id
     qCard["setcode"] = setCode
 
     return qCard
@@ -155,7 +155,7 @@ def get_yugioh_card_details(image):
     nameImg = image[5:60, 10:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("NameImg", nameImg)
-    cardName = pytesseract.image_to_string(nameImg, config='-c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+    cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
     
     # Extract card ID
     cardIDImg = image[585:598, 5:70]
@@ -180,15 +180,20 @@ def get_mtg_card_details(image):
     nameImg = image[20:60, 30:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("NameImg", nameImg)
-    cardName = pytesseract.image_to_string(nameImg, config='-c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+    cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
     
-    # Extract card ID
-    cardSetCodeImg = image[560:572, 0:70]
+    cardSetCodeImg = image[572:590, 0:70]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    cv2.imshow("cardIDImg", cardSetCodeImg)
-    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+    cv2.imshow("cardSetCodeImg", cardSetCodeImg)
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')
 
-    return (cardName, cardSetCode)
+    # Extract card ID
+    cardIDImg = image[560:572, 0:70]
+    cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    cv2.imshow("cardIDImg", cardIDImg)
+    cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')
+
+    return (cardName, cardID, cardSetCode)
 
 
 def flattener(image, pts, w, h):
