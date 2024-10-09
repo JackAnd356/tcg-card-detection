@@ -2,8 +2,17 @@ import requests
 import random
 import os
 import time
+import re
+import numpy as np
 import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import cv2
+from dotenv import load_dotenv, find_dotenv
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+load_dotenv(find_dotenv())
 
 def getYugiohSample(numCards):
     url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -19,18 +28,19 @@ def getYugiohSample(numCards):
         for i,card in enumerate(cards):
             img_url = card["card_images"][0]["image_url"]
             card_name = card["name"].replace(' ', '_').replace('/', '_')
+            card_name = sanitize_filename(card_name)
             filename = f'sample_images/yugioh/{card_name}.jpg'
 
             img = requests.get(img_url)
             if img.status_code == 200:
                 counter += 1
-                with open(filename) as img_file:
+                with open(filename, "wb") as img_file:
                     img_file.write(img.content)
                 print(f'Downloaded {card_name} Num: {i}/{numCards} Total Downloaded: {counter}')
             else:
                 print(f'Failed to get Image of: {card_name}')
             if counter >= numCards: break
-            time.sleep(0.2)
+            time.sleep(0.25)
     else:
         print(f'API Gave Error Status Code: {resp.status_code}')
 
@@ -47,14 +57,16 @@ def getMTGSample(numCards):
 
         if resp.status_code == 200:
             cardData = resp.json()
+            if not "image_uris" in cardData: continue
             img_url = cardData["image_uris"]["large"]
             card_name = cardData["name"].replace(' ', '_').replace('/', '_')
+            card_name = sanitize_filename(card_name)
             filename = f'sample_images/mtg/{card_name}.jpg'
 
             img = requests.get(img_url)
             if img.status_code == 200:
                 counter += 1
-                with open(filename) as img_file:
+                with open(filename, "wb") as img_file:
                     img_file.write(img.content)
                 print(f'Downloaded {card_name} Total Downloaded: {counter}')
             else:
@@ -62,7 +74,7 @@ def getMTGSample(numCards):
         else:
             print(f'API Gave Error Status Code: {resp.status_code}')
         
-        time.sleep(0.2)
+        time.sleep(0.25)
 
 def getPokemonSample(numCards):
     apikey = os.getenv('POKEMON_API_KEY')
@@ -82,13 +94,14 @@ def getPokemonSample(numCards):
         for i, card in enumerate(cards):
             image_url = card['images']['large']
             card_name = card['name'].replace(' ', '_').replace('/', '_')
-            image_filename = f"sample_images/pokemon/{card_name}.jpg"
+            card_name = sanitize_filename(card_name)
+            filename = f"sample_images/pokemon/{card_name}.jpg"
 
             img_response = requests.get(image_url)
 
             if img_response.status_code == 200:
                 counter += 1
-                with open(image_filename, "wb") as img_file:
+                with open(filename, "wb") as img_file:
                     img_file.write(img_response.content)
                 print(f"Downloaded: {card_name} Total Downloaded: {counter}")
             else:
@@ -99,35 +112,116 @@ def getPokemonSample(numCards):
 
 def getTrainingData():
     training_images = []
+    training_labels = []
     test_images = []
+    test_labels = []
 
-    getYugiohSample(200)
-    getMTGSample(200)
-    getPokemonSample(200)
+    "getYugiohSample(200)"
+    "getMTGSample(200)"
+    "getPokemonSample(200)"
 
-    for i, filename in enumerate(os.listdir("/sample_images/yugioh")):
-        filepath = os.path.join("/sample_images/yugioh", filename)
+    for i, filename in enumerate(os.listdir("./sample_images/yugioh")):
+        filepath = os.path.join("./sample_images/yugioh", filename)
         img = cv2.imread(filepath)
-        imgGray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        imgSmall = cv2.resize(imgGray, (300, 450), cv2.INTER_AREA)
-        if i < 150: training_images.append(imgSmall)
-        else: test_images.append(imgSmall)
+        imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
+        if i < 150: 
+            training_images.append(imgSmall)
+            training_labels.append(0)
+        else: 
+            test_images.append(imgSmall)
+            test_labels.append(0)
 
-    for i, filename in enumerate(os.listdir("/sample_images/mtg")):
-        filepath = os.path.join("/sample_images/mtg", filename)
+    for i, filename in enumerate(os.listdir("./sample_images/mtg")):
+        filepath = os.path.join("./sample_images/mtg", filename)
         img = cv2.imread(filepath)
-        imgGray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        imgSmall = cv2.resize(imgGray, (300, 450), cv2.INTER_AREA)
-        if i < 150: training_images.append(imgSmall)
-        else: test_images.append(imgSmall)
+        imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
+        if i < 150: 
+            training_images.append(imgSmall)
+            training_labels.append(1)
+        else: 
+            test_images.append(imgSmall)
+            test_labels.append(1)
 
-    for i, filename in enumerate(os.listdir("/sample_images/pokemon")):
-        filepath = os.path.join("/sample_images/pokemon", filename)
+    for i, filename in enumerate(os.listdir("./sample_images/pokemon")):
+        filepath = os.path.join("./sample_images/pokemon", filename)
+        print(filename)
         img = cv2.imread(filepath)
-        imgGray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        imgSmall = cv2.resize(imgGray, (300, 450), cv2.INTER_AREA)
-        if i < 150: training_images.append(imgSmall)
-        else: test_images.append(imgSmall)
+        imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
+        if i < 150: 
+            training_images.append(imgSmall)
+            training_labels.append(2)
+        else: 
+            test_images.append(imgSmall)
+            test_labels.append(2)
 
-    return training_images, test_images
+    training_images = np.array(training_images)
+    training_labels = np.array(training_labels)
+    test_images = np.array(test_images)
+    test_labels = np.array(test_labels)
 
+    return (training_images, training_labels), (test_images, test_labels)
+
+def sanitize_filename(filename):
+    # Remove invalid characters for Windows file names
+    return re.sub(r'[<>:"/\\|?*]', '', filename)
+
+def trainModel(training_data, test_data):
+    model = Sequential([
+        Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
+        MaxPooling2D(pool_size=(2, 2)),
+        
+        Conv2D(64, (3, 3), activation='relu'),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Conv2D(128, (3, 3), activation='relu'),
+        MaxPooling2D(pool_size=(2, 2)),
+
+        Flatten(),
+
+        Dense(128, activation='relu'),
+        Dropout(0.5),
+
+        Dense(3, activation='softmax')  # Output layer
+    ])
+
+    model.compile(optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['accuracy'])
+        
+    epochs = 10
+    history = model.fit(
+        training_data,
+        validation_data=test_data,
+        epochs=epochs
+    )
+
+    val_loss, val_acc = model.evaluate(test_data)
+    print(f"Validation Accuracy: {val_acc * 100:.2f}%")
+    return model, history
+
+def plot_training_history(history):
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+
+    epochs_range = range(epochs)
+
+    plt.figure(figsize=(8, 8))
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs_range, acc, label='Training Accuracy')
+    plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+    plt.legend(loc='lower right')
+    plt.title('Training and Validation Accuracy')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs_range, loss, label='Training Loss')
+    plt.plot(epochs_range, val_loss, label='Validation Loss')
+    plt.legend(loc='upper right')
+    plt.title('Training and Validation Loss')
+    plt.show()
+
+training_data, test_data = getTrainingData()
+model, history = trainModel(training_data, test_data)
+plot_training_history(history)
+model.save('card_classifier_model.h5')
