@@ -6,7 +6,7 @@ import re
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, Input
 import cv2
 from dotenv import load_dotenv, find_dotenv
 from sklearn.model_selection import train_test_split
@@ -144,10 +144,9 @@ def getTrainingData():
 
     for i, filename in enumerate(os.listdir("./sample_images/pokemon")):
         filepath = os.path.join("./sample_images/pokemon", filename)
-        print(filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
-        if i < 150: 
+        if i < 120: 
             training_images.append(imgSmall)
             training_labels.append(2)
         else: 
@@ -167,7 +166,8 @@ def sanitize_filename(filename):
 
 def trainModel(training_data, test_data):
     model = Sequential([
-        Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
+        Input(shape=(128, 128, 3)),
+        Conv2D(32, (3, 3), activation='relu'),
         MaxPooling2D(pool_size=(2, 2)),
         
         Conv2D(64, (3, 3), activation='relu'),
@@ -185,17 +185,18 @@ def trainModel(training_data, test_data):
     ])
 
     model.compile(optimizer='adam',
-        loss='categorical_crossentropy',
+        loss='sparse_categorical_crossentropy',
         metrics=['accuracy'])
         
     epochs = 10
     history = model.fit(
-        training_data,
-        validation_data=test_data,
+        training_data[0],
+        training_data[1],
+        validation_data=(test_data[0], test_data[1]),
         epochs=epochs
     )
 
-    val_loss, val_acc = model.evaluate(test_data)
+    val_loss, val_acc = model.evaluate(test_data[0], test_data[1])
     print(f"Validation Accuracy: {val_acc * 100:.2f}%")
     return model, history
 
@@ -205,6 +206,7 @@ def plot_training_history(history):
     loss = history.history['loss']
     val_loss = history.history['val_loss']
 
+    epochs = 10
     epochs_range = range(epochs)
 
     plt.figure(figsize=(8, 8))
@@ -222,6 +224,9 @@ def plot_training_history(history):
     plt.show()
 
 training_data, test_data = getTrainingData()
+print(f"Training data: {training_data[0].shape}, Training labels: {training_data[1].shape}")
+print(f"Test data: {test_data[0].shape}, Test labels: {test_data[1].shape}")
+print(test_data[1])
 model, history = trainModel(training_data, test_data)
 plot_training_history(history)
 model.save('card_classifier_model.h5')
