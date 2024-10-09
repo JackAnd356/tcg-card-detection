@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">TCG Card Detection App</string>
+    <string name="yugioh_collection">Yugioh</string>
+    <string name="mtg_collection">MTG</string>
+    <string name="pokemon_collection">Pokemon</string>
+    <string name="profile_page">Profile</string>
+    <string name="scan_page">Scan</string>
 </resources>
