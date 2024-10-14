@@ -1,5 +1,6 @@
 package com.example.tcgcarddetectionapp
 
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -58,39 +59,76 @@ fun CardDetectionBottomBar(
     )
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainApp(navController: NavHostController = rememberNavController()) {
-    Scaffold(
-        bottomBar = {
-            CardDetectionBottomBar(
-                navigateScan = { },
-                navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
-                navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
-                navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
-                navigateProfile = { navController.navigate(CardDetectionScreens.Profile.name) },
-            )
+    NavHost(
+        navController = navController,
+        startDestination = CardDetectionScreens.Login.name,
+    ) {
+        composable(route = CardDetectionScreens.Login.name) {
+            LoginScreen(onLoginNavigate = {navController.navigate(CardDetectionScreens.YugiohCollection.name)})
         }
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = CardDetectionScreens.Login.name,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(route = CardDetectionScreens.Login.name) {
-                LoginScreen(onLoginClick = {navController.navigate(CardDetectionScreens.YugiohCollection.name)})
-            }
-            composable(route = CardDetectionScreens.YugiohCollection.name) {
+        composable(route = CardDetectionScreens.YugiohCollection.name) {
+            Scaffold(
+                bottomBar = {
+                    CardDetectionBottomBar(
+                        navigateScan = { },
+                        navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                        navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
+                        navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
+                        navigateProfile = { navController.navigate(CardDetectionScreens.Profile.name) },
+                    )
+                }
+            ) {
                 CollectionScreen(gameName = "YuGiOh")
             }
-            composable(route = CardDetectionScreens.MagicCollection.name) {
+        }
+        composable(route = CardDetectionScreens.MagicCollection.name) {
+            Scaffold(
+                bottomBar = {
+                    CardDetectionBottomBar(
+                        navigateScan = { },
+                        navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                        navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
+                        navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
+                        navigateProfile = { navController.navigate(CardDetectionScreens.Profile.name) },
+                    )
+                }
+            ) {
                 CollectionScreen(gameName = "Magic")
             }
-            composable(route = CardDetectionScreens.PokemonCollection.name) {
+        }
+        composable(route = CardDetectionScreens.PokemonCollection.name) {
+            Scaffold(
+                bottomBar = {
+                    CardDetectionBottomBar(
+                        navigateScan = { },
+                        navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                        navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
+                        navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
+                        navigateProfile = { navController.navigate(CardDetectionScreens.Profile.name) },
+                    )
+                }
+            ) {
                 CollectionScreen(gameName = "Pokemon")
             }
-            composable(route = CardDetectionScreens.Profile.name) {
+        }
+        composable(route = CardDetectionScreens.Profile.name) {
+            Scaffold(
+                bottomBar = {
+                    CardDetectionBottomBar(
+                        navigateScan = { },
+                        navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                        navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
+                        navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
+                        navigateProfile = { navController.navigate(CardDetectionScreens.Profile.name) },
+                    )
+                }
+            ) {
                 ProfileScreen(username = "TestUser", email = "TestUser@void.com")
             }
         }
     }
+
 }
