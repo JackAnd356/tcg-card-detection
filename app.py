@@ -163,6 +163,24 @@ def create_app():
                 return {'error': 'Incorrect Password', 'success' : 0}, 415
         return {'error': 'Request must be JSON', 'success' : 0}, 415
     
+    @app.post('/saveUsername')
+    def post_saveUsername():
+        if request.is_json:
+            userPassInfo = request.get_json()
+            userid = userPassInfo['userid']
+            username = userPassInfo['username']
+            database = client['card_detection_info']
+            collection = database['user_data']
+            userData = collection.find_one({'userid' : userid})
+            if userData == None:
+                return {'error': 'Incorrect UserID', 'success' : 0}, 415
+            updateOp = { '$set' : 
+                                { 'username' : username }
+                            }
+            collection.update_one({'userid' : userid}, updateOp)
+            return {'success' : 1}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 415
+    
     @app.post('/saveUserPass')
     def post_saveUserPass():
         if request.is_json:
@@ -317,6 +335,37 @@ def create_app():
                             }
                 upRes = collection.update_one(payload, updateOp)
                 return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
+        return {'error': 'Request must be JSON'}, 415
+
+    @app.post('/removeFromUserSubcollection')
+    def post_removeFromUserSubcollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['card_collection']
+            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode'], 'game' : clientUserInfo['game']}
+            if 'rarity' in clientUserInfo:
+                payload['rarity'] = clientUserInfo['rarity']
+            else :
+                payload['rarity'] = ''
+            result = collection.find_one(payload)
+            if result == None:
+                return {'error': 'You do not have this card'}, 415
+            if 'subcollections' in result:
+                subColArr = result['subcollections']
+            else:
+                return {'error': 'This card is not in any subcollections'}, 415
+            subCol = clientUserInfo['subcollection']
+            if subCol in subColArr:
+                subColArr.remove(subCol)
+                updateOp = { '$set' : 
+                            { 'subcollections' : subColArr}
+                        }
+                upRes = collection.update_one(payload, updateOp)
+                return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
+            else:
+                return {'error': 'Not a part of that subcollection'}, 415
+            
         return {'error': 'Request must be JSON'}, 415
     
     @app.post('/removeFromUserCollection')
