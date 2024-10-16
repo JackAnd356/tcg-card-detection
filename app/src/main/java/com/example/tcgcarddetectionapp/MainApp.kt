@@ -76,6 +76,35 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
     var userid by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var storefront by remember { mutableIntStateOf(1) }
+    val subCol1 = SubcollectionInfo(
+        id = "1",
+        name = "Subcollection 1",
+        totalValue = 500.12,
+        location = "Mega Tin 2013",
+        cardCount = 42
+    )
+    val subCol2 = SubcollectionInfo(
+        id = "1",
+        name = "Subcollection 2",
+        totalValue = 12.13,
+        location = "Mega Tin 2013",
+        cardCount = 4
+    )
+    val subCol3 = SubcollectionInfo(
+        id = "1",
+        name = "Subcollection 3",
+        totalValue = 56.0,
+        location = "Mega Tin 2013",
+        cardCount = 7
+    )
+    val subCol4 = SubcollectionInfo(
+        id = "1",
+        name = "Subcollection 4",
+        totalValue = 1000.45,
+        location = "Binder",
+        cardCount = 67
+    )
+    val colList = listOf(subCol1, subCol2, subCol3, subCol4)
     NavHost(
         navController = navController,
         startDestination = CardDetectionScreens.Login.name,
@@ -102,7 +131,10 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
-                CollectionScreen(gameName = "YuGiOh")
+                CollectionScreen(
+                    gameName = "Yu-Gi-Oh!",
+                    subcollections = colList,
+                )
             }
         }
         composable(route = CardDetectionScreens.MagicCollection.name) {
@@ -117,7 +149,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
-                CollectionScreen(gameName = "Magic")
+                CollectionScreen(gameName = "Magic",
+                    subcollections = colList,)
             }
         }
         composable(route = CardDetectionScreens.PokemonCollection.name) {
@@ -132,7 +165,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
-                CollectionScreen(gameName = "Pokemon")
+                CollectionScreen(gameName = "Pokemon",
+                    subcollections = colList,)
             }
         }
         composable(route = CardDetectionScreens.Profile.name) {

@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -44,7 +45,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier.wrapContentWidth(Alignment.CenterHorizontally)) {
         Text(
-            text = "Login",
+            text = stringResource(R.string.login_label),
             fontSize = 100.sp,
             lineHeight = 116.sp,
             textAlign = TextAlign.Center
@@ -75,7 +76,7 @@ fun Logo(modifier: Modifier = Modifier) {
     val image = painterResource(R.drawable.templogo)
     Image(
         painter = image,
-        contentDescription = "Logo"
+        contentDescription = stringResource(R.string.logo_content_description)
     )
 }
 
@@ -84,7 +85,7 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
     TextField(
         value = username,
         onValueChange = onChange,
-        label = { Text("Username") }
+        label = { Text(stringResource(R.string.username_label)) }
     )
 }
 
@@ -93,7 +94,7 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
     TextField(
         value = password,
         onValueChange = onChange,
-        label = { Text("Password") },
+        label = { Text(stringResource(R.string.password_label)) },
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
     )
@@ -102,7 +103,7 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
 @Composable
 fun LoginButton(onClick: () -> Unit) {
     Button(onClick = { onClick()}) {
-        Text("Login")
+        Text(stringResource(R.string.login_label))
     }
 }
 
