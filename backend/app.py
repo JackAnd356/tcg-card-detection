@@ -397,7 +397,41 @@ def create_app():
             upRes = collection.update_one(payload, updateOp)
             return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
         return {'error': 'Request must be JSON'}, 201
+    
+    @app.post('/createUserSubcollection')
+    def post_createUserSubcollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['subcollection_info']
+            payload = {'userid' : clientUserInfo['userid'], 'name' : clientUserInfo['name'], 'isDeck' : clientUserInfo['isDeck'], 'game' : clientUserInfo['game'], 'physLoc' : clientUserInfo['physLoc']}
+            coreSubcollectionInfo = collection.find_one({'coresubcollection' : 1})
+            subcollectionid = str(int(coreSubcollectionInfo['currentmaxid']) + 1)
+            updateOp = { '$set' : 
+                                { 'currentmaxid' : subcollectionid }
+                            }
+            collection.update_one({'coresubcollection' : 1}, updateOp)
+            payload['subcollectionid'] = subcollectionid
+            insertRes = collection.insert_one(payload)
+            return {'success' : 1, 'subcollectionid' : subcollectionid}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 201
+    
+    @app.post('/deleteUserSubcollection')
+    def post_deleteUserSubcollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['subcollection_info']
+            subcollectionid = clientUserInfo['subcollectionid']
+            subCollectionInfo = collection.find_one({'subcollectionid' : subcollectionid})
+            if subCollectionInfo == None:
+                return {'error': 'Subcollection not found', 'success' : 0}
+            collection.delete_one({'subcollectionid' : subcollectionid})
+            return {'success' : 1}, 201
+        return {'error': 'Request must be JSON'}, 201
+
     return app
+
 
 #Methods
 
