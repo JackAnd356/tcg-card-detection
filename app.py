@@ -1,3 +1,4 @@
+from ast import List
 import bson
 import json
 import requests
@@ -113,7 +114,6 @@ def create_app():
                 results = cardCollection.find({'userid' : userid})
                 results = parse_json(results)
                 for res in results :
-                    print(res)
                     game = res['game']
                     cardId = res['cardid']
                     cardSetCode = res['setcode']
@@ -158,7 +158,10 @@ def create_app():
                                 }
                             }
                     cardCollection.update_many(payload, updateOp)
-                return {'success' : 1}, 201
+                userData['success'] = 1
+                userData.pop("password")
+                userData.pop("_id")
+                return userData, 201
             else :
                 print("Test")
                 return {'error': 'Incorrect Password', 'success' : 0}, 201
@@ -222,7 +225,7 @@ def create_app():
     def post_saveUserStorefront():
         if request.is_json:
             userStoreInfo = request.get_json()
-            username = userStoreInfo['username']
+            userid = userStoreInfo['userid']
             storefront = userStoreInfo['storefront']
             if type(storefront) != int:
                 return {'error': 'Incorrect Storefront Value Type', 'success' : 0}, 201
@@ -230,13 +233,13 @@ def create_app():
                 return {'error': 'Storefront Value Not Supported', 'success' : 0}, 201
             database = client['card_detection_info']
             collection = database['user_data']
-            userData = collection.find_one({'userid' : username})
+            userData = collection.find_one({'userid' : userid})
             if userData == None:
                 return {'error': 'Incorrect UserID', 'success' : 0}, 201
             updateOp = { '$set' : 
                                 { 'storefront' : storefront }
                             }
-            collection.update_one({'userid' : username}, updateOp)
+            collection.update_one({'userid' : userid}, updateOp)
             return {'success' : 1}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
 
