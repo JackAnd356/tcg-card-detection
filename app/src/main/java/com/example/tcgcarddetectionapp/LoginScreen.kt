@@ -1,5 +1,6 @@
 package com.example.tcgcarddetectionapp
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,11 +23,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.math.log
 
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit, modifier: Modifier = Modifier) {
+fun LoginScreen(onLoginNavigate: () -> Unit, modifier: Modifier = Modifier) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var loginError by remember { mutableStateOf("") }
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier.wrapContentWidth(Alignment.CenterHorizontally)) {
         Text(
@@ -37,8 +45,16 @@ fun LoginScreen(onLoginClick: () -> Unit, modifier: Modifier = Modifier) {
         )
         Logo(modifier = modifier)
         UsernameField(username = username, modifier = modifier, onChange = {username = it})
+        Text(
+            text = loginError,
+            fontSize = 20.sp,
+            lineHeight = 30.sp,
+            textAlign = TextAlign.Left
+        )
         PasswordField(password = password, modifier = modifier, onChange = {password = it})
-        LoginButton{ onLoginClick() }
+        LoginButton{
+            loginPost(username, password, setErrorMessage = {loginError = it}, onLoginNavigate)
+        }
     }
 }
 
@@ -84,4 +100,41 @@ fun LoginScreenPreview() {
     TCGCardDetectionAppTheme {
         LoginScreen({})
     }
+}
+
+fun loginPost(username: String, password: String, setErrorMessage: (String) -> Unit, onLoginNavigate: () -> Unit): Array<Any> {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = LoginRequestModel(username = username, authenticationToken = password)
+    var loginSuccess = false
+    var message = "Unexpected Error"
+    retrofitAPI.loginUser(requestData).enqueue(object: Callback<LoginResponseModel>{
+        override fun onResponse(
+            call: Call<LoginResponseModel>,
+            response: Response<LoginResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData?.success == 0) {
+                message = respData.error!!
+                setErrorMessage(message)
+            }
+            else {
+                loginSuccess = true
+                message = "Successful Login"
+                setErrorMessage(message)
+                onLoginNavigate()
+            }
+        }
+
+        override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
+            t.printStackTrace()
+            message = "Response returned error: " + t.message
+            setErrorMessage(message)
+        }
+    })
+    return arrayOf(loginSuccess, message)
 }

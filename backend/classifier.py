@@ -120,8 +120,8 @@ def getTrainingData():
     "getMTGSample(200)"
     "getPokemonSample(200)"
 
-    for i, filename in enumerate(os.listdir("./sample_images/yugioh")):
-        filepath = os.path.join("./sample_images/yugioh", filename)
+    for i, filename in enumerate(os.listdir("../sample_images/yugioh")):
+        filepath = os.path.join("../sample_images/yugioh", filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
         if i < 150: 
@@ -131,8 +131,8 @@ def getTrainingData():
             test_images.append(imgSmall)
             test_labels.append(0)
 
-    for i, filename in enumerate(os.listdir("./sample_images/mtg")):
-        filepath = os.path.join("./sample_images/mtg", filename)
+    for i, filename in enumerate(os.listdir("../sample_images/mtg")):
+        filepath = os.path.join("../sample_images/mtg", filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
         if i < 150: 
@@ -142,8 +142,8 @@ def getTrainingData():
             test_images.append(imgSmall)
             test_labels.append(1)
 
-    for i, filename in enumerate(os.listdir("./sample_images/pokemon")):
-        filepath = os.path.join("./sample_images/pokemon", filename)
+    for i, filename in enumerate(os.listdir("../sample_images/pokemon")):
+        filepath = os.path.join("../sample_images/pokemon", filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
         if i < 120: 

@@ -1,7 +1,7 @@
 import cv2
 import Cards
 
-frame = cv2.imread("./images/stardust_dragon_img.jpg")
+frame = cv2.imread("../images/stardust_dragon_img.jpg")
 
 frameCards = Cards.process_image(frame)
 for card in frameCards["cards"]:
