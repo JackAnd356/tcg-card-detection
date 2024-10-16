@@ -5,4 +5,10 @@
     <string name="pokemon_collection">Pokemon</string>
     <string name="profile_page">Profile</string>
     <string name="scan_page">Scan</string>
+    <string name="change_button_label">Change</string>
+    <string name="profile_screen_heading">Profile Screen</string>
+    <string name="username_label">Username</string>
+    <string name="password_label">Password</string>
+    <string name="storefront_label">TCG Storefront: </string>
+    <string name="email_label">Email</string>
 </resources>

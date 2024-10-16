@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,19 +42,30 @@ import androidx.compose.ui.unit.toSize
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 
 @Composable
-fun ProfileScreen(username: String, email: String, modifier: Modifier = Modifier) {
+fun ProfileScreen(username: String,
+                  email: String,
+                  storefront: Int,
+                  onUsernameChange: (String) -> Unit,
+                  onUserEmailChange: (String) -> Unit,
+                  onUserStorefrontChange: (Int) -> Unit,
+                  modifier: Modifier = Modifier) {
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier) {
         Text(
-            text = "Profile Screen",
+            text = stringResource(R.string.profile_screen_heading),
             fontSize = 50.sp,
             lineHeight = 100.sp,
             textAlign = TextAlign.Center
         )
-        UserDataComponent(label = "Username", data = username, modifier = modifier, onClick = {})
-        UserDataComponent(label = "Password", data = "******", modifier = modifier, onClick = {})
-        UserDropdownSelector(label = "TCG Storefront: ", options = listOf("TCGPlayer", "Card Market"))
-        UserDataComponent(label = "Email", data = email, modifier = modifier, onClick = {})
+        UserDataComponent(label = stringResource(R.string.username_label), data = username, modifier = modifier, onClick = {})
+        UserDataComponent(label = stringResource(R.string.password_label), data = "******", modifier = modifier, onClick = {})
+        UserDropdownSelector(
+            label = stringResource(R.string.storefront_label),
+            data = storefront,
+            options = listOf("TCGPlayer", "Card Market"),
+            onUserStorefrontChange = {onUserStorefrontChange(it)},
+        )
+        UserDataComponent(label = stringResource(R.string.email_label), data = email, modifier = modifier, onClick = {})
     }
 }
 
@@ -77,7 +89,7 @@ fun UserDataComponent(label: String, data: String, modifier: Modifier = Modifier
                 .align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "Change",
+                    text = stringResource(R.string.change_button_label),
                     fontSize = 15.sp,
                     lineHeight = 10.sp,
                     textAlign = TextAlign.Center
@@ -88,9 +100,9 @@ fun UserDataComponent(label: String, data: String, modifier: Modifier = Modifier
 }
 
 @Composable
-fun UserDropdownSelector(label: String, options: List<String>, modifier: Modifier = Modifier) {
+fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int) -> Unit, options: List<String>, modifier: Modifier = Modifier) {
     var mExpanded by remember { mutableStateOf(false) }
-    var mSelectedText by remember { mutableStateOf("") }
+    var mSelectedText by remember { mutableStateOf(options[data - 1]) }
     var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
     val icon = if (mExpanded)
         Icons.Filled.KeyboardArrowUp
@@ -129,10 +141,11 @@ fun UserDropdownSelector(label: String, options: List<String>, modifier: Modifie
                     expanded = mExpanded,
                     onDismissRequest = {mExpanded = false}
                 ) {
-                    options.forEach{ optionLabel ->
+                    options.forEachIndexed{ index, optionLabel ->
                         DropdownMenuItem(
                             onClick = {
                                 mSelectedText = optionLabel
+                                onUserStorefrontChange(index + 1)
                                 mExpanded = false
                             },
                             text = {Text(optionLabel)}
@@ -151,6 +164,12 @@ fun UserDropdownSelector(label: String, options: List<String>, modifier: Modifie
 @Composable
 fun ProfileScreenPreview(modifier: Modifier = Modifier) {
     TCGCardDetectionAppTheme {
-        ProfileScreen(username = "TestUser", email = "TestUser@void.com", modifier = modifier)
+        ProfileScreen(
+            username = "TestUser", email = "TestUser@void.com", modifier = modifier,
+            storefront = 1,
+            onUsernameChange = { },
+            onUserEmailChange = { },
+            onUserStorefrontChange = { }
+        )
     }
 }
