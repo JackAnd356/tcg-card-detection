@@ -7,4 +7,7 @@ import retrofit2.http.POST
 interface ApiService {
     @POST("authenticateUser")
     fun loginUser(@Body loginRequest: LoginRequestModel): Call<LoginResponseModel>
+
+    @POST("saveUserStorefront")
+    fun saveUserStorefront(@Body saveStorefrontRequestModel: SaveStorefrontRequestModel): Call<SaveStorefrontResponseModel>
 }

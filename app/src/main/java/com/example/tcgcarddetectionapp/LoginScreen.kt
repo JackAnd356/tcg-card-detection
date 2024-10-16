@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -31,20 +32,26 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.math.log
 
 @Composable
-fun LoginScreen(onLoginNavigate: () -> Unit, modifier: Modifier = Modifier) {
-    var username by remember { mutableStateOf("") }
+fun LoginScreen(onLoginNavigate: () -> Unit,
+                username: String,
+                onUsernameChange: (String) -> Unit,
+                onUserIdChange: (String) -> Unit,
+                onUserEmailChange: (String) -> Unit,
+                onUserStorefrontChange: (Int) -> Unit,
+                modifier: Modifier = Modifier) {
+
     var password by remember { mutableStateOf("") }
     var loginError by remember { mutableStateOf("") }
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier.wrapContentWidth(Alignment.CenterHorizontally)) {
         Text(
-            text = "Login",
+            text = stringResource(R.string.login_label),
             fontSize = 100.sp,
             lineHeight = 116.sp,
             textAlign = TextAlign.Center
         )
         Logo(modifier = modifier)
-        UsernameField(username = username, modifier = modifier, onChange = {username = it})
+        UsernameField(username = username, modifier = modifier, onChange = {onUsernameChange(it)})
         Text(
             text = loginError,
             fontSize = 20.sp,
@@ -53,7 +60,13 @@ fun LoginScreen(onLoginNavigate: () -> Unit, modifier: Modifier = Modifier) {
         )
         PasswordField(password = password, modifier = modifier, onChange = {password = it})
         LoginButton{
-            loginPost(username, password, setErrorMessage = {loginError = it}, onLoginNavigate)
+            loginPost(username,
+                password,
+                setErrorMessage = {loginError = it},
+                onLoginNavigate,
+                onUserIdChange,
+                onUserEmailChange,
+                onUserStorefrontChange)
         }
     }
 }
@@ -63,7 +76,7 @@ fun Logo(modifier: Modifier = Modifier) {
     val image = painterResource(R.drawable.templogo)
     Image(
         painter = image,
-        contentDescription = "Logo"
+        contentDescription = stringResource(R.string.logo_content_description)
     )
 }
 
@@ -72,7 +85,7 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
     TextField(
         value = username,
         onValueChange = onChange,
-        label = { Text("Username") }
+        label = { Text(stringResource(R.string.username_label)) }
     )
 }
 
@@ -81,7 +94,7 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
     TextField(
         value = password,
         onValueChange = onChange,
-        label = { Text("Password") },
+        label = { Text(stringResource(R.string.password_label)) },
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
     )
@@ -90,7 +103,7 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
 @Composable
 fun LoginButton(onClick: () -> Unit) {
     Button(onClick = { onClick()}) {
-        Text("Login")
+        Text(stringResource(R.string.login_label))
     }
 }
 
@@ -98,11 +111,22 @@ fun LoginButton(onClick: () -> Unit) {
 @Composable
 fun LoginScreenPreview() {
     TCGCardDetectionAppTheme {
-        LoginScreen({})
+        var username by remember { mutableStateOf("") }
+        LoginScreen(username = username, onUsernameChange = { username = it }, onLoginNavigate = {},
+            onUserIdChange = { },
+            onUserEmailChange = { },
+            onUserStorefrontChange = { },
+        )
     }
 }
 
-fun loginPost(username: String, password: String, setErrorMessage: (String) -> Unit, onLoginNavigate: () -> Unit): Array<Any> {
+fun loginPost(username: String,
+              password: String,
+              setErrorMessage: (String) -> Unit,
+              onLoginNavigate: () -> Unit,
+              onUserIdChange: (String) -> Unit,
+              onUserEmailChange: (String) -> Unit,
+              onUserStorefrontChange: (Int) -> Unit): Array<Any> {
     var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -126,6 +150,11 @@ fun loginPost(username: String, password: String, setErrorMessage: (String) -> U
                 loginSuccess = true
                 message = "Successful Login"
                 setErrorMessage(message)
+                if (respData != null) {
+                    onUserIdChange(respData.userid!!)
+                    onUserEmailChange(respData.email!!)
+                    onUserStorefrontChange(respData.storefront!!)
+                }
                 onLoginNavigate()
             }
         }
