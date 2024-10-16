@@ -32,7 +32,7 @@ def process_image(image):
 
     for i in range(len(ccs)):
         if isCard[i]:
-            cards.append(preprocess_card(ccs[i], image, "yugioh"))
+            cards.append(preprocess_card(ccs[i], image, "mtg"))
 
     frameCards = dict()
     frameCards["cards"] = cards
@@ -121,11 +121,13 @@ def preprocess_card(contour, frame, cardType):
     cent_y = int(average[0][1])
     qCard["centerpoint"] = [cent_x, cent_y]
 
-    # Warp card into 200x300 flattened image using perspective transform
-    qCard["warp"] = flattener(frame, pts, w, h)
+    # Warp card into 400x600 flattened image using perspective transform
+    (warp_rgb, warp_bgr) = flattener(frame, pts, w, h)
+    qCard["warp_rgb"] = warp_rgb
+    qCard["warp_bgr"] = warp_bgr
 
-    if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp"])
-    elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp"])
+    if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_rgb"])
+    elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp_rgb"])
     qCard["name"] = name
     qCard["cardid"] = id
     qCard["setcode"] = setCode
@@ -251,6 +253,6 @@ def flattener(image, pts, w, h):
     dst = np.array([[0,0],[maxWidth-1,0],[maxWidth-1,maxHeight-1],[0, maxHeight-1]], np.float32)
     M = cv2.getPerspectiveTransform(temp_rect,dst)
     warp = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
-    warp = cv2.cvtColor(warp,cv2.COLOR_BGR2RGB)
+    warp_rgb = cv2.cvtColor(warp,cv2.COLOR_BGR2RGB)
 
-    return warp
+    return (warp_rgb, warp)

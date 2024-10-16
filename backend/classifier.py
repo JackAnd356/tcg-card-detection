@@ -223,10 +223,30 @@ def plot_training_history(history):
     plt.title('Training and Validation Loss')
     plt.show()
 
-training_data, test_data = getTrainingData()
+def predict_card(model, img):
+    predictions = model.predict(img)
+    confidence = np.max(predictions)
+    category = np.argmax(predictions)
+
+    if confidence < 0.4:
+        return "Other", confidence
+    categories = ["Yugioh", "MagicTheGathering", "Pokemon"]
+    return categories[category], confidence
+
+"""training_data, test_data = getTrainingData()
 print(f"Training data: {training_data[0].shape}, Training labels: {training_data[1].shape}")
 print(f"Test data: {test_data[0].shape}, Test labels: {test_data[1].shape}")
 print(test_data[1])
 model, history = trainModel(training_data, test_data)
 plot_training_history(history)
-model.save('card_classifier_model.h5')
+model.save('card_classifier_model.h5')"""
+
+model = tf.keras.models.load_model('card_classifier_model.h5')
+img = cv2.imread("../images/xyris_the_writhing_storm.jpg")
+imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
+
+img_array = tf.expand_dims(imgSmall, 0) # Create a batch of size 1
+
+(predicted_class, confidence) = predict_card(model, img_array)
+print(predicted_class)
+print(confidence)

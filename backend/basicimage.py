@@ -1,10 +1,11 @@
 import cv2
 import Cards
 
-frame = cv2.imread("../images/stardust_dragon_img.jpg")
+frame = cv2.imread("../images/the_one_ring.webp")
 
 frameCards = Cards.process_image(frame)
 for card in frameCards["cards"]:
+    """cv2.imwrite("../images/stardust_dragon_warp.jpg", card["warp_bgr"])"""
     print("Name: " + card["name"] + "Set_Code: " + card["setcode"] + "ID: " + card["cardid"])
 
 
