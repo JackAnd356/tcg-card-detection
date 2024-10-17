@@ -32,7 +32,7 @@ def process_image(image):
 
     for i in range(len(ccs)):
         if isCard[i]:
-            cards.append(preprocess_card(ccs[i], image, "mtg"))
+            cards.append(preprocess_card(ccs[i], image, "yugioh"))
 
     frameCards = dict()
     frameCards["cards"] = cards
