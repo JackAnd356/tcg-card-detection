@@ -34,10 +34,13 @@ import kotlin.math.log
 @Composable
 fun LoginScreen(onLoginNavigate: () -> Unit,
                 username: String,
+                userid: String,
                 onUsernameChange: (String) -> Unit,
                 onUserIdChange: (String) -> Unit,
                 onUserEmailChange: (String) -> Unit,
                 onUserStorefrontChange: (Int) -> Unit,
+                onUserCollectionChange: (Array<Card>) -> Unit,
+                onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
                 modifier: Modifier = Modifier) {
 
     var password by remember { mutableStateOf("") }
@@ -66,7 +69,9 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onLoginNavigate,
                 onUserIdChange,
                 onUserEmailChange,
-                onUserStorefrontChange)
+                onUserStorefrontChange,
+                onUserCollectionChange,
+                onUserSubColInfoChange)
         }
     }
 }
@@ -112,10 +117,12 @@ fun LoginButton(onClick: () -> Unit) {
 fun LoginScreenPreview() {
     TCGCardDetectionAppTheme {
         var username by remember { mutableStateOf("") }
-        LoginScreen(username = username, onUsernameChange = { username = it }, onLoginNavigate = {},
+        LoginScreen(username = username, userid = "1", onUsernameChange = { username = it }, onLoginNavigate = {},
             onUserIdChange = { },
             onUserEmailChange = { },
             onUserStorefrontChange = { },
+            onUserCollectionChange = { },
+            onUserSubColInfoChange = { },
         )
     }
 }
@@ -126,7 +133,9 @@ fun loginPost(username: String,
               onLoginNavigate: () -> Unit,
               onUserIdChange: (String) -> Unit,
               onUserEmailChange: (String) -> Unit,
-              onUserStorefrontChange: (Int) -> Unit): Array<Any> {
+              onUserStorefrontChange: (Int) -> Unit,
+              onUserCollectionChange: (Array<Card>) -> Unit,
+              onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit): Array<Any> {
     var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -154,6 +163,8 @@ fun loginPost(username: String,
                     onUserIdChange(respData.userid!!)
                     onUserEmailChange(respData.email!!)
                     onUserStorefrontChange(respData.storefront!!)
+                    collectionPost(respData.userid!!, onUserCollectionChange)
+                    subcollectionPost(respData.userid!!, onUserSubColInfoChange)
                 }
                 onLoginNavigate()
             }
@@ -166,4 +177,56 @@ fun loginPost(username: String,
         }
     })
     return arrayOf(loginSuccess, message)
+}
+
+fun collectionPost(userid: String, onUserCollectionChange: (Array<Card>) -> Unit) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = UserCollectionRequestModel(userid = userid)
+    retrofitAPI.getUserCollection(requestData).enqueue(object: Callback<UserCollectionResponseModel>{
+        override fun onResponse(
+            call: Call<UserCollectionResponseModel>,
+            response: Response<UserCollectionResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                onUserCollectionChange(respData.collection)
+            }
+        }
+
+        override fun onFailure(call: Call<UserCollectionResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
+
+fun subcollectionPost(userid: String, onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = UserSubcollectionInfoRequestModel(userid = userid)
+    retrofitAPI.getUserSubcollectionInfo(requestData).enqueue(object: Callback<UserSubcollectionInfoResponseModel> {
+        override fun onResponse(
+            call: Call<UserSubcollectionInfoResponseModel>,
+            response: Response<UserSubcollectionInfoResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                onUserSubColInfoChange(respData.subcollections)
+            }
+        }
+
+        override fun onFailure(call: Call<UserSubcollectionInfoResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
 }

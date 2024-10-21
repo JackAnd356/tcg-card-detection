@@ -1,9 +1,12 @@
 package com.example.tcgcarddetectionapp
 
 data class SubcollectionInfo(
-    var id: String,
-    var name: String,
-    var totalValue: Double,
-    var location: String,
-    var cardCount: Int,
+    val subcollectionid: String,
+    val name: String,
+    val totalValue: Double?,
+    val physLoc: String,
+    val cardCount: Int?,
+    val game: String,
+    val isDeck: Boolean,
+    val userid: String,
 )

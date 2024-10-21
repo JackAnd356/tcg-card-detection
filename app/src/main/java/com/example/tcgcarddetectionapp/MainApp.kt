@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -76,35 +77,9 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
     var userid by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var storefront by remember { mutableIntStateOf(1) }
-    val subCol1 = SubcollectionInfo(
-        id = "1",
-        name = "Subcollection 1",
-        totalValue = 500.12,
-        location = "Mega Tin 2013",
-        cardCount = 42
-    )
-    val subCol2 = SubcollectionInfo(
-        id = "1",
-        name = "Subcollection 2",
-        totalValue = 12.13,
-        location = "Mega Tin 2013",
-        cardCount = 4
-    )
-    val subCol3 = SubcollectionInfo(
-        id = "1",
-        name = "Subcollection 3",
-        totalValue = 56.0,
-        location = "Mega Tin 2013",
-        cardCount = 7
-    )
-    val subCol4 = SubcollectionInfo(
-        id = "1",
-        name = "Subcollection 4",
-        totalValue = 1000.45,
-        location = "Binder",
-        cardCount = 67
-    )
-    val colList = listOf(subCol1, subCol2, subCol3, subCol4)
+    var collection by remember { mutableStateOf(arrayOf<Card>()) }
+    var subColInfo by remember { mutableStateOf(arrayOf<SubcollectionInfo>()) }
+
     NavHost(
         navController = navController,
         startDestination = CardDetectionScreens.Login.name,
@@ -113,10 +88,13 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             LoginScreen(
                 onLoginNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
                 username = username,
+                userid = userid,
                 onUsernameChange = { username = it },
                 onUserIdChange = { userid = it },
                 onUserEmailChange = { email = it },
                 onUserStorefrontChange = { storefront = it },
+                onUserCollectionChange = {collection = it},
+                onUserSubColInfoChange = {subColInfo = it},
             )
         }
         composable(route = CardDetectionScreens.YugiohCollection.name) {
@@ -133,7 +111,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             ) {
                 CollectionScreen(
                     gameName = "Yu-Gi-Oh!",
-                    subcollections = colList,
+                    subcollections = subColInfo,
+                    gameFilter = "yugioh",
                 )
             }
         }
@@ -149,8 +128,11 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
-                CollectionScreen(gameName = "Magic",
-                    subcollections = colList,)
+                CollectionScreen(
+                    gameName = "Magic",
+                    subcollections = subColInfo,
+                    gameFilter = "mtg"
+                )
             }
         }
         composable(route = CardDetectionScreens.PokemonCollection.name) {
@@ -165,8 +147,11 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
-                CollectionScreen(gameName = "Pokemon",
-                    subcollections = colList,)
+                CollectionScreen(
+                    gameName = "Pokemon",
+                    subcollections = subColInfo,
+                    gameFilter = "pokemon"
+                )
             }
         }
         composable(route = CardDetectionScreens.Profile.name) {
@@ -216,3 +201,4 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
     }
 
 }
+

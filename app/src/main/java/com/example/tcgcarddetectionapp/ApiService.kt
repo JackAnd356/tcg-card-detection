@@ -10,4 +10,10 @@ interface ApiService {
 
     @POST("saveUserStorefront")
     fun saveUserStorefront(@Body saveStorefrontRequestModel: SaveStorefrontRequestModel): Call<SaveStorefrontResponseModel>
+
+    @POST("getUserCollection")
+    fun getUserCollection(@Body userCollectionRequest: UserCollectionRequestModel): Call<UserCollectionResponseModel>
+
+    @POST("getUserSubcollectionInfo")
+    fun getUserSubcollectionInfo(@Body userSubcollectionInfoRequest: UserSubcollectionInfoRequestModel): Call<UserSubcollectionInfoResponseModel>
 }
