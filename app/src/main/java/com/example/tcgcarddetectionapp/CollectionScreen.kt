@@ -36,7 +36,10 @@ import java.math.BigDecimal
 import kotlin.math.round
 
 @Composable
-fun CollectionScreen(gameName: String, subcollections: List<SubcollectionInfo>, modifier: Modifier = Modifier) {
+fun CollectionScreen(gameName: String,
+                     subcollections: Array<SubcollectionInfo>,
+                     gameFilter: String,
+                     modifier: Modifier = Modifier) {
     var searchTerm by remember { mutableStateOf("") }
     val scrollstate = rememberScrollState()
     Box(
@@ -104,13 +107,15 @@ fun CollectionScreen(gameName: String, subcollections: List<SubcollectionInfo>, 
                 Text(stringResource(R.string.create_new_collection_label))
             }
             subcollections.forEach { subcollection ->
-                CollectionSummary(
-                    name = subcollection.name,
-                    cardCount = subcollection.cardCount,
-                    location = subcollection.location,
-                    totalValue = subcollection.totalValue,
-                    modifier = modifier
-                )
+                if (subcollection.game == gameFilter) {
+                    CollectionSummary(
+                        name = subcollection.name,
+                        cardCount = subcollection.cardCount ?: 0,
+                        location = subcollection.physLoc,
+                        totalValue = subcollection.totalValue ?: 0.0,
+                        modifier = modifier
+                    )
+                }
             }
         }
     }
@@ -157,31 +162,41 @@ fun CollectionSummary(name: String, cardCount: Int, location: String, totalValue
 @Composable
 fun CollectionScreenPreview() {
     val subCol1 = SubcollectionInfo(
-        id = "1",
+        subcollectionid = "1",
         name = "Subcollection 1",
         totalValue = 500.12,
-        location = "Mega Tin 2013",
-        cardCount = 42
+        physLoc = "Mega Tin 2013",
+        cardCount = 42,
+        game = "yugioh",
+        isDeck = false,
+        userid = "1"
     )
     val subCol2 = SubcollectionInfo(
-        id = "1",
+        subcollectionid = "1",
         name = "Subcollection 2",
         totalValue = 12.13,
-        location = "Mega Tin 2013",
-        cardCount = 4
+        physLoc = "Mega Tin 2012",
+        cardCount = 4,
+        game = "pokemon",
+        isDeck = false,
+        userid = "1"
     )
     val subCol3 = SubcollectionInfo(
-        id = "1",
+        subcollectionid = "1",
         name = "Subcollection 3",
         totalValue = 56.0,
-        location = "Mega Tin 2013",
-        cardCount = 7
+        physLoc = "Mega Tin 2014",
+        cardCount = 7,
+        game = "yugioh",
+        isDeck = false,
+        userid = "1"
     )
-    val colList = listOf(subCol1, subCol2, subCol3)
+    val colList = arrayOf(subCol1, subCol2, subCol3)
     TCGCardDetectionAppTheme {
         CollectionScreen(
             gameName = "Yu-Gi-Oh!",
             subcollections = colList,
+            gameFilter = "yugioh"
         )
     }
 }
