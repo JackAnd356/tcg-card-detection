@@ -1,4 +1,5 @@
 from ast import List
+from re import sub
 import bson
 import json
 import requests
@@ -119,7 +120,6 @@ def create_app():
                     cardSetCode = res['setcode']
                     oldPriceDate = datetime.strptime(res['pricedate']['$date'], "%Y-%m-%dT%H:%M:%S.%fZ")
                     oldPriceDate = oldPriceDate.replace(tzinfo=timezone.utc)
-                    print((datetime.now(timezone.utc) - oldPriceDate).days)
                     if (datetime.now(timezone.utc) - oldPriceDate).days == 0:
                         continue
                     price = ""
@@ -268,6 +268,9 @@ def create_app():
             collection = database['card_collection']
             results = collection.find({'userid' : clientUserInfo['userid']})
             results = parse_json(results)
+            for card in results:
+                card.pop('_id')
+                card.pop('pricedate')
             return results, 201
         return {'error': 'Request must be JSON'}, 201
     
@@ -397,6 +400,18 @@ def create_app():
             upRes = collection.update_one(payload, updateOp)
             return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
         return {'error': 'Request must be JSON'}, 201
+    
+    @app.post('/getUserSubcollectionInfo')
+    def post_getUserSubcollectionInfo():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['subcollection_info']
+            payload = {'userid' : clientUserInfo['userid']}
+            subCols = collection.find(payload)
+            subCols = parse_json(subCols)
+            return {'success' : 1, 'subcollections' : subCols}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 201
     
     @app.post('/createUserSubcollection')
     def post_createUserSubcollection():
