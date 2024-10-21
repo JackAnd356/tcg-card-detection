@@ -107,7 +107,7 @@ def create_app():
             collection = database['user_data']
             userData = collection.find_one({'username' : username})
             if userData == None:
-                return {'error': 'Incorrect Username', 'success' : 0}, 201
+                return {'error': 'Incorrect Username and/or Password', 'success' : 0}, 201
             if bcrypt.checkpw(authenticator.encode('UTF-8'), userData['password']):
                 cardCollection = database['card_collection']
                 userid = userData['userid']
@@ -164,7 +164,7 @@ def create_app():
                 return userData, 201
             else :
                 print("Test")
-                return {'error': 'Incorrect Password', 'success' : 0}, 201
+                return {'error': 'Incorrect Username and/or Password', 'success' : 0}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
     
     @app.post('/saveUsername')
