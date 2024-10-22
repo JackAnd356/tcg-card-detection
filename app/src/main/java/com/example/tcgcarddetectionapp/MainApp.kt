@@ -94,7 +94,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 onUserEmailChange = { email = it },
                 onUserStorefrontChange = { storefront = it },
                 onUserCollectionChange = {collection = it},
-                onUserSubColInfoChange = {subColInfo = it},
+                onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardCollection = collection, setSubColInfo = {subColInfo = it})},
             )
         }
         composable(route = CardDetectionScreens.YugiohCollection.name) {
@@ -202,3 +202,28 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
 
 }
 
+fun onUserSubColInfoChange(subColInfo: Array<SubcollectionInfo>, cardCollection: Array<Card>, setSubColInfo: (Array<SubcollectionInfo>) -> Unit) {
+    cardCollection.forEach {
+            card ->
+        if (card.subcollections != null) {
+            subColInfo.forEach {
+                    subCol ->
+                if (subCol.subcollectionid in card.subcollections) {
+                    if (subCol.cardCount == null) {
+                        subCol.cardCount = 1
+                    }
+                    else {
+                        subCol.cardCount = subCol.cardCount!! + 1
+                    }
+                    if (subCol.totalValue == null) {
+                        subCol.totalValue = card.price
+                    }
+                    else {
+                        subCol.totalValue = subCol.totalValue!! + card.price
+                    }
+                }
+            }
+        }
+    }
+    setSubColInfo(subColInfo)
+}

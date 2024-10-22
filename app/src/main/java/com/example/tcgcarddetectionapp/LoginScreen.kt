@@ -163,10 +163,9 @@ fun loginPost(username: String,
                     onUserIdChange(respData.userid!!)
                     onUserEmailChange(respData.email!!)
                     onUserStorefrontChange(respData.storefront!!)
-                    collectionPost(respData.userid!!, onUserCollectionChange)
-                    subcollectionPost(respData.userid!!, onUserSubColInfoChange)
+                    collectionPost(respData.userid!!, onUserCollectionChange, onUserSubColInfoChange, onLoginNavigate)
                 }
-                onLoginNavigate()
+
             }
         }
 
@@ -179,7 +178,10 @@ fun loginPost(username: String,
     return arrayOf(loginSuccess, message)
 }
 
-fun collectionPost(userid: String, onUserCollectionChange: (Array<Card>) -> Unit) {
+fun collectionPost(userid: String,
+                   onUserCollectionChange: (Array<Card>) -> Unit,
+                   onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
+                   onLoginNavigate: () -> Unit) {
     var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -187,25 +189,28 @@ fun collectionPost(userid: String, onUserCollectionChange: (Array<Card>) -> Unit
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
     val requestData = UserCollectionRequestModel(userid = userid)
-    retrofitAPI.getUserCollection(requestData).enqueue(object: Callback<UserCollectionResponseModel>{
+    retrofitAPI.getUserCollection(requestData).enqueue(object: Callback<Array<Card>>{
         override fun onResponse(
-            call: Call<UserCollectionResponseModel>,
-            response: Response<UserCollectionResponseModel>
+            call: Call<Array<Card>>,
+            response: Response<Array<Card>>
         ) {
             val respData = response.body()
             if (respData != null) {
-                onUserCollectionChange(respData.collection)
+                onUserCollectionChange(respData)
+                subcollectionPost(userid, onUserSubColInfoChange, onLoginNavigate)
             }
         }
 
-        override fun onFailure(call: Call<UserCollectionResponseModel>, t: Throwable) {
+        override fun onFailure(call: Call<Array<Card>>, t: Throwable) {
             t.printStackTrace()
         }
 
     })
 }
 
-fun subcollectionPost(userid: String, onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
+fun subcollectionPost(userid: String,
+                      onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
+                      onLoginNavigate: () -> Unit) {
     var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -221,6 +226,7 @@ fun subcollectionPost(userid: String, onUserSubColInfoChange: (Array<Subcollecti
             val respData = response.body()
             if (respData != null) {
                 onUserSubColInfoChange(respData.subcollections)
+                onLoginNavigate()
             }
         }
 
