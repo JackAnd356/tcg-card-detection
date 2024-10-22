@@ -1,6 +1,6 @@
 package com.example.tcgcarddetectionapp
 
-data class SaveStorefrontResponseModel(
+data class GenericSuccessErrorResponseModel(
     var error: String? = null,
     var success: Int,
 )

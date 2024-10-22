@@ -1,5 +1,6 @@
 package com.example.tcgcarddetectionapp
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,15 +42,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 @Composable
 fun ProfileScreen(username: String,
                   email: String,
                   storefront: Int,
+                  userid: String,
                   onUsernameChange: (String) -> Unit,
                   onUserEmailChange: (String) -> Unit,
                   onUserStorefrontChange: (Int) -> Unit,
                   modifier: Modifier = Modifier) {
+    var usernameEditFlag by remember { mutableStateOf(false) }
+    var passwordEditFlag by remember { mutableStateOf(false) }
+    var emailEditFlag by remember { mutableStateOf(false) }
+    var enteredPassword by remember { mutableStateOf("******")}
+
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier) {
         Text(
@@ -57,43 +70,113 @@ fun ProfileScreen(username: String,
             lineHeight = 100.sp,
             textAlign = TextAlign.Center
         )
-        UserDataComponent(label = stringResource(R.string.username_label), data = username, modifier = modifier, onClick = {})
-        UserDataComponent(label = stringResource(R.string.password_label), data = "******", modifier = modifier, onClick = {})
+        UserDataComponent(label = stringResource(R.string.username_label),
+            data = username,
+            modifier = modifier,
+            onChange = onUsernameChange,
+            flag = usernameEditFlag,
+            onClickEdit = {usernameEditFlag = !usernameEditFlag},
+            onClickSave = {
+                SaveUsernamePost(userid = userid, username = username)
+                usernameEditFlag = !usernameEditFlag
+            })
+        UserDataComponent(
+            label = stringResource(R.string.password_label),
+            data = enteredPassword,
+            modifier = modifier,
+            flag = passwordEditFlag,
+            onChange = {enteredPassword = it},
+            onClickEdit = {
+                passwordEditFlag = !passwordEditFlag
+            },
+            onClickSave = {
+                SavePasswordPost(userid = userid, password = enteredPassword)
+                enteredPassword = "******"
+                passwordEditFlag = !passwordEditFlag
+            }
+        )
         UserDropdownSelector(
             label = stringResource(R.string.storefront_label),
             data = storefront,
             options = listOf("TCGPlayer", "Card Market"),
             onUserStorefrontChange = {onUserStorefrontChange(it)},
         )
-        UserDataComponent(label = stringResource(R.string.email_label), data = email, modifier = modifier, onClick = {})
+        UserDataComponent(
+            label = stringResource(R.string.email_label),
+            data = email,
+            modifier = modifier,
+            flag = emailEditFlag,
+            onChange = onUserEmailChange,
+            onClickEdit = { emailEditFlag = !emailEditFlag },
+            onClickSave = {
+                SaveEmailPost(userid = userid, email = email)
+                emailEditFlag = !emailEditFlag
+            }
+        )
     }
 }
 
 @Composable
-fun UserDataComponent(label: String, data: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun UserDataComponent(label: String,
+                      data: String,
+                      modifier: Modifier = Modifier,
+                      flag: Boolean,
+                      onChange: (String) -> Unit,
+                      onClickEdit: () -> Unit,
+                      onClickSave: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.LightGray),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
-        modifier = modifier.fillMaxWidth().height(70.dp).requiredHeight(70.dp)) {
+        modifier = modifier
+            .fillMaxWidth()
+            .height(70.dp)
+            .requiredHeight(70.dp)) {
         Row {
-            Text(
-                text = "$label: $data",
-                fontSize = 20.sp,
-                lineHeight = 50.sp,
-                textAlign = TextAlign.Left
-            )
+            if (flag) {
+                TextField(
+                    value = data,
+                    onValueChange = onChange,
+                    label = { Text(stringResource(R.string.username_label)) }
+                )
+            }
+            else {
+                Text(
+                    text = "$label: $data",
+                    fontSize = 20.sp,
+                    lineHeight = 50.sp,
+                    textAlign = TextAlign.Left
+                )
+            }
+
             Spacer(Modifier.weight(1f))
-            Button(onClick = {onClick()}, modifier = Modifier
+            Button(onClick = {
+                if (flag) {
+                    onClickSave()
+                }
+                else {
+                    onClickEdit()
+                }
+            }, modifier = Modifier
                 .size(width = 100.dp, height = 40.dp)
                 .align(Alignment.CenterVertically)
             ) {
-                Text(
-                    text = stringResource(R.string.change_button_label),
-                    fontSize = 15.sp,
-                    lineHeight = 10.sp,
-                    textAlign = TextAlign.Center
-                )
+                if (flag) {
+                    Text(
+                        text = stringResource(R.string.save_button_label),
+                        fontSize = 15.sp,
+                        lineHeight = 10.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else {
+                    Text(
+                        text = stringResource(R.string.change_button_label),
+                        fontSize = 15.sp,
+                        lineHeight = 10.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
@@ -112,7 +195,10 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
         colors = CardDefaults.cardColors(containerColor = Color.LightGray),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
-        modifier = modifier.fillMaxWidth().height(70.dp).requiredHeight(70.dp)) {
+        modifier = modifier
+            .fillMaxWidth()
+            .height(70.dp)
+            .requiredHeight(70.dp)) {
         Row {
             Text(
                 text = label,
@@ -157,6 +243,90 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
     }
 }
 
+fun SaveUsernamePost(userid: String, username: String) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = SaveUsernameRequestModel(userid = userid, username = username)
+    retrofitAPI.saveUsername(requestData).enqueue(object: Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                if (respData.success == 0) {
+                    Log.d("ERROR", respData.error!!)
+                }
+            }
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
+
+fun SavePasswordPost(userid: String, password: String) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = SavePasswordRequestModel(userid = userid, authenticationToken = password)
+    retrofitAPI.saveUserPass(requestData).enqueue(object: Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                if (respData.success == 0) {
+                    Log.d("ERROR", respData.error!!)
+                }
+            }
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
+
+fun SaveEmailPost(userid: String, email: String) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = SaveEmailRequestModel(userid = userid, email = email)
+    retrofitAPI.saveUserEmail(requestData).enqueue(object: Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                if (respData.success == 0) {
+                    Log.d("ERROR", respData.error!!)
+                }
+            }
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
+
 
 
 
@@ -169,7 +339,8 @@ fun ProfileScreenPreview(modifier: Modifier = Modifier) {
             storefront = 1,
             onUsernameChange = { },
             onUserEmailChange = { },
-            onUserStorefrontChange = { }
+            onUserStorefrontChange = { },
+            userid = "1"
         )
     }
 }

@@ -2,7 +2,6 @@ package com.example.tcgcarddetectionapp
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Create
@@ -16,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -180,21 +178,28 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()
                         val retrofitAPI = retrofit.create(ApiService::class.java)
-                        val requestData = SaveStorefrontRequestModel(userid = userid, storefront = storefront)
+                        val requestData =
+                            SaveStorefrontRequestModel(userid = userid, storefront = storefront)
                         var saveSuccess = false
                         var message = "Unexpected Error"
-                        retrofitAPI.saveUserStorefront(requestData).enqueue(object: Callback<SaveStorefrontResponseModel> {
-                            override fun onResponse(
-                                call: Call<SaveStorefrontResponseModel>,
-                                response: Response<SaveStorefrontResponseModel>
-                            ) {
+                        retrofitAPI.saveUserStorefront(requestData)
+                            .enqueue(object : Callback<GenericSuccessErrorResponseModel> {
+                                override fun onResponse(
+                                    call: Call<GenericSuccessErrorResponseModel>,
+                                    response: Response<GenericSuccessErrorResponseModel>
+                                ) {
 
-                            }
+                                }
 
-                            override fun onFailure(call: Call<SaveStorefrontResponseModel>, t: Throwable) {
-                                t.printStackTrace()
-                            }
-                        })},
+                                override fun onFailure(
+                                    call: Call<GenericSuccessErrorResponseModel>,
+                                    t: Throwable
+                                ) {
+                                    t.printStackTrace()
+                                }
+                            })
+                    },
+                    userid = userid,
                 )
             }
         }
