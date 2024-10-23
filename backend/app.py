@@ -6,6 +6,8 @@ import requests
 import os
 import bcrypt
 import datetime
+import Cards
+import cv2
 from datetime import date, timezone
 from dotenv import load_dotenv, find_dotenv
 from pymongo import database
@@ -40,6 +42,8 @@ testCardContentData = [{'cardID': '46986414', 'card-name': 'Dark Magician', 'car
                        {'cardID': '74677422', 'card-name': 'Red-Eyes Black Dragon', 'card-text': 'A ferocious dragon with a deadly attack', 'atk': 2400, 'def': 2000}]
 
 
+UPLOAD_FOLDER = 'uploads/'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 #MongoDB Integration
     
@@ -66,11 +70,18 @@ def create_app():
     @app.post('/getCardInfo')
     def post_getCardInfo():
         if request.is_json:
-            clientCardInfo = request.get_json()
-            cards = processCardImage(clientCardInfo)
-            retData = {'cards' : cards}
-            return retData, 201
-        return {'error': 'Request must be JSON'}, 201
+            imageInfo = request.get_json()
+            if 'image' not in imageInfo.files:
+                    return jsonify({'error': 'No image part in the request'}), 400
+
+            image = imageInfo.files['image']
+
+            image_path = os.path.join(UPLOAD_FOLDER, image.filename)
+            image.save(image_path)
+
+            cards = processCardImage(image_path)
+            retData = {'cards': cards}
+            return jsonify(retData), 201
     
     @app.post('/createNewUser')
     def post_createNewUser():
@@ -450,10 +461,11 @@ def create_app():
 
 #Methods
 
-def processCardImage(cardImageData):
-    #Replace enclosed with actual card image parsing
+def processCardImage(cardImagePath):
+    cardImage = cv2.imread(cardImagePath)
+    cardImageData = Cards.process_image(cardImage)
     cards = cardImageData['cards']
-    #End dummy code
+
     scannedCards = []
     for card in cards:
         cardId = card['cardid']

@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.androidx.appcompat)
     implementation(libs.coil)
+    implementation(libs.androidx.ui.test.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -28,12 +28,18 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import android.graphics.BitmapFactory
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -92,6 +98,38 @@ fun Context.createImageFile(): File {
     return image
 }
 
+fun scanPhotoPost(imageUri: Uri) {
+    val url = "http://10.0.2.2:5000"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+
+    val file = File(imageUri.path ?: "")
+    val requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file)
+    val imagePart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+    val call = retrofitAPI.getCardInfo(imagePart)
+
+    call.enqueue(object : Callback<ResponseBody> {
+        override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+            if (response.isSuccessful) {
+                // Handle success
+                println("Image uploaded successfully!")
+            } else {
+                // Handle error response
+                println("Upload failed: ${response.code()}")
+            }
+        }
+
+        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+            // Handle failure
+            println("Upload error: ${t.message}")
+        }
+    })
+}
+
 @Composable
 fun ImageCaptureFromCamera() {
     val context = LocalContext.current
@@ -137,6 +175,8 @@ fun ImageCaptureFromCamera() {
             modifier = Modifier,
             contentDescription = "Captured Image"
         )
+
+        scanPhotoPost(capturedImageUri)
     } else {
         CameraPreview(modifier = Modifier.fillMaxSize())
     }
