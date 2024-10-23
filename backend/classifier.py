@@ -242,11 +242,13 @@ plot_training_history(history)
 model.save('card_classifier_model.h5')"""
 
 model = tf.keras.models.load_model('card_classifier_model.h5')
-img = cv2.imread("../images/fighting_spirit_warp.jpg")
+img = cv2.imread("../sample_images/other/Six_Of_Spades.png")
 imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
 
 img_array = tf.expand_dims(imgSmall, 0) # Create a batch of size 1
 
+predictions = model.predict(img_array)
 (predicted_class, confidence) = predict_card(model, img_array)
 print(predicted_class)
 print(confidence)
+print(predictions)

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import tensorflow as tf
 import pytesseract
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -10,6 +11,9 @@ THRESH_HIGH = 140
 
 CARD_MAX_AREA = 2000000
 CARD_MIN_AREA = 5000
+
+#Classification Model
+model = tf.keras.models.load_model('card_classifier_model.h5')
 
 
 """Processes the input image and returns a dictionary with a list of all cards in frame, 
@@ -32,13 +36,21 @@ def process_image(image):
 
     for i in range(len(ccs)):
         if isCard[i]:
-            cards.append(preprocess_card(ccs[i], image, "yugioh"))
+            cards.append(preprocess_card(ccs[i], image))
 
     frameCards = dict()
     frameCards["cards"] = cards
     return frameCards
                 
+def predict_card(model, img):
+    predictions = model.predict(img)
+    confidence = np.max(predictions)
+    category = np.argmax(predictions)
 
+    if confidence < 0.4:
+        return "other", confidence
+    categories = ["yugioh", "mtg", "pokemon"]
+    return categories[category], confidence
 
 def preprocess_image(image):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
@@ -102,7 +114,7 @@ def find_cards(thresh_image):
 
     return cnts_sort, cnt_is_card
 
-def preprocess_card(contour, frame, cardType):
+def preprocess_card(contour, frame):
     qCard = dict()
     qCard["contour"] = contour
 
@@ -125,6 +137,11 @@ def preprocess_card(contour, frame, cardType):
     (warp_rgb, warp_bgr) = flattener(frame, pts, w, h)
     qCard["warp_rgb"] = warp_rgb
     qCard["warp_bgr"] = warp_bgr
+
+    classifyImage = cv2.resize(warp_bgr, (128, 128), interpolation=cv2.INTER_AREA)
+    img_array = tf.expand_dims(classifyImage, 0) # Create a batch of size 1
+    cardType, confidence = predict_card(model, img_array)
+    qCard["game"] = cardType
 
     if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_rgb"])
     elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp_rgb"])
