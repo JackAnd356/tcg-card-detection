@@ -99,7 +99,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             Scaffold(
                 bottomBar = {
                     CardDetectionBottomBar(
-                        navigateScan = { },
+                        navigateScan = { navController.navigate(CardDetectionScreens.Scan.name) },
                         navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
                         navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
                         navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
@@ -118,7 +118,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             Scaffold(
                 bottomBar = {
                     CardDetectionBottomBar(
-                        navigateScan = { },
+                        navigateScan = { navController.navigate(CardDetectionScreens.Scan.name) },
                         navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
                         navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
                         navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
@@ -156,7 +156,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             Scaffold(
                 bottomBar = {
                     CardDetectionBottomBar(
-                        navigateScan = { },
+                        navigateScan = { navController.navigate(CardDetectionScreens.Scan.name) },
                         navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
                         navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
                         navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
@@ -201,6 +201,21 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     },
                     userid = userid,
                 )
+            }
+        }
+        composable(route = CardDetectionScreens.Scan.name) {
+            Scaffold(
+                bottomBar = {
+                    CardDetectionBottomBar(
+                        navigateScan = { navController.navigate(CardDetectionScreens.Scan.name)},
+                        navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                        navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
+                        navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
+                        navigateProfile = { navController.navigate(CardDetectionScreens.Profile.name) },
+                    )
+                }
+            ) {
+                ScanScreen()
             }
         }
     }
