@@ -171,10 +171,10 @@ def get_yugioh_card_details(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Extract card name
-    nameImg = image[5:60, 10:330]
+    nameImg = image[12:60, 17:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("NameImg", nameImg)
-    cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+    cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ')
     
     # Extract card ID
     cardIDImg = image[585:598, 5:70]
@@ -199,7 +199,7 @@ def get_mtg_card_details(image):
     nameImg = image[20:60, 30:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cv2.imshow("NameImg", nameImg)
-    cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+    cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ')
     
     cardSetCodeImg = image[572:590, 0:70]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)

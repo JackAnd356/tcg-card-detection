@@ -1,7 +1,7 @@
 import cv2
 import Cards
 
-frame = cv2.imread("../images/the_one_ring.webp")
+frame = cv2.imread("../images/fighting_spirit_img.jpg")
 
 frameCards = Cards.process_image(frame)
 for card in frameCards["cards"]:

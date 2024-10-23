@@ -14,6 +14,7 @@ navigationRuntimeKtx = "2.8.2"
 navigationCompose = "2.8.2"
 camerax = "1.5.0-alpha02"
 appcompat = "1.7.0"
+coilVer = "3.0.0-rc01"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,7 @@ camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", versi
 camera-video = { group = "androidx.camera", name = "camera-video", version.ref = "camerax" }
 camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilVer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
