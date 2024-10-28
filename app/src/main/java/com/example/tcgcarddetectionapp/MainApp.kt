@@ -36,6 +36,7 @@ enum class CardDetectionScreens(@StringRes val title: Int) {
     PokemonCollection(title = R.string.pokemon_collection),
     Profile(title = R.string.profile_page),
     Scan(title = R.string.scan_page),
+    NewUser(title = R.string.new_user_page),
 }
 
 @Composable
@@ -85,6 +86,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
         composable(route = CardDetectionScreens.Login.name) {
             LoginScreen(
                 onLoginNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                onNewUserNavigate = {navController.navigate((CardDetectionScreens.NewUser.name))},
                 username = username,
                 userid = userid,
                 onUsernameChange = { username = it },
@@ -217,6 +219,19 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             ) {
                 ScanScreen()
             }
+        }
+
+        composable(route = CardDetectionScreens.NewUser.name) {
+            NewUserRegistrationScreen(
+                username = username,
+                email = email,
+                storefront = storefront,
+                onUsernameChange = { username = it },
+                onUserEmailChange = { email = it },
+                onUserStorefrontChange = { storefront = it },
+                onUseridChange = { userid = it },
+                onLoginNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+            )
         }
     }
 

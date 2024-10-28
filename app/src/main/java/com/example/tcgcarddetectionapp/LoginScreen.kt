@@ -33,6 +33,7 @@ import kotlin.math.log
 
 @Composable
 fun LoginScreen(onLoginNavigate: () -> Unit,
+                onNewUserNavigate: () -> Unit,
                 username: String,
                 userid: String,
                 onUsernameChange: (String) -> Unit,
@@ -72,6 +73,15 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onUserStorefrontChange,
                 onUserCollectionChange,
                 onUserSubColInfoChange)
+        }
+        Button(
+            onClick = {
+                onNewUserNavigate()
+            }
+        ) {
+            Text(
+                stringResource(R.string.new_user_button_label)
+            )
         }
     }
 }
@@ -123,6 +133,7 @@ fun LoginScreenPreview() {
             onUserStorefrontChange = { },
             onUserCollectionChange = { },
             onUserSubColInfoChange = { },
+            onNewUserNavigate = { },
         )
     }
 }

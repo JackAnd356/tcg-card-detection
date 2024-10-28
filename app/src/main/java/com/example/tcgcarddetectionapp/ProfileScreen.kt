@@ -145,7 +145,7 @@ fun UserDataComponent(label: String,
                 TextField(
                     value = data,
                     onValueChange = onChange,
-                    label = { Text(stringResource(R.string.username_label)) }
+                    label = { Text(label) }
                 )
             }
             else {

@@ -5,13 +5,16 @@
     <string name="pokemon_collection">Pokemon</string>
     <string name="profile_page">Profile</string>
     <string name="scan_page">Scan</string>
+    <string name="new_user_page">NewUser</string>
     <string name="change_button_label">Change</string>
     <string name="save_button_label">Save</string>
     <string name="profile_screen_heading">Profile Screen</string>
+    <string name="new_user_registration_screen_heading">New User Registration Screen</string>
     <string name="username_label">Username</string>
     <string name="password_label">Password</string>
     <string name="storefront_label">TCG Storefront: </string>
     <string name="email_label">Email</string>
+    <string name="new_user_email_label">Email(optional)</string>
     <string name="collection_screen_heading">%1$s Collections</string>
     <string name="all_cards_label">All Cards: %1$d</string>
     <string name="total_value_label">Total Value: %2$s%1$.2f</string>
@@ -22,4 +25,6 @@
     <string name="cards_label">Cards: %1$d</string>
     <string name="location_label">Location: %1$s</string>
     <string name="cancel_button_label">Cancel</string>
+    <string name="new_user_button_label">Don\'t Have An Account? Click Here To Register</string>
+    <string name="register_button_label">Register</string>
 </resources>

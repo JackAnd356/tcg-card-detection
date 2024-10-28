@@ -30,6 +30,9 @@ interface ApiService {
     @POST("saveUserEmail")
     fun saveUserEmail(@Body saveEmailRequest: SaveEmailRequestModel): Call<GenericSuccessErrorResponseModel>
 
+    @POST("createNewUser")
+    fun saveNewUser(@Body saveNewUserRequest: SaveNewUserRequestModel): Call<SaveNewUserResponseModel>
+
     @Multipart
     @POST("getCardInfo")
     fun getCardInfo(@Part image: MultipartBody.Part): Call<ResponseBody>
