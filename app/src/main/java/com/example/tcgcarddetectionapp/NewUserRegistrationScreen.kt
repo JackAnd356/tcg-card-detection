@@ -253,6 +253,7 @@ fun NewUserRegistrationScreenPreview(modifier: Modifier = Modifier) {
             username = "",
             email = "",
             storefront = 1,
+            onLoginNavigate = {  },
         )
     }
 }
