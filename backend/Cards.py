@@ -13,7 +13,7 @@ CARD_MAX_AREA = 2000000
 CARD_MIN_AREA = 5000
 
 #Classification Model
-model = tf.keras.models.load_model('card_classifier_model.h5')
+model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
 
 
 """Processes the input image and returns a dictionary with a list of all cards in frame, 

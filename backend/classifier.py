@@ -29,7 +29,7 @@ def getYugiohSample(numCards):
             img_url = card["card_images"][0]["image_url"]
             card_name = card["name"].replace(' ', '_').replace('/', '_')
             card_name = sanitize_filename(card_name)
-            filename = f'sample_images/yugioh/{card_name}.jpg'
+            filename = f'../sample_images/yugioh/{card_name}.jpg'
 
             img = requests.get(img_url)
             if img.status_code == 200:
@@ -61,7 +61,7 @@ def getMTGSample(numCards):
             img_url = cardData["image_uris"]["large"]
             card_name = cardData["name"].replace(' ', '_').replace('/', '_')
             card_name = sanitize_filename(card_name)
-            filename = f'sample_images/mtg/{card_name}.jpg'
+            filename = f'../sample_images/mtg/{card_name}.jpg'
 
             img = requests.get(img_url)
             if img.status_code == 200:
@@ -82,33 +82,35 @@ def getPokemonSample(numCards):
     headers = {'X-Api-Key' : apikey}
     params = {'pageSize' : 250}
 
-    resp = requests.get(url, headers=headers, params=params)
+    while (numCards > 0):
+        resp = requests.get(url, headers=headers, params=params)
 
-    if resp.status_code == 200:
-        card_data = resp.json()
-        cards = card_data["data"]
+        if resp.status_code == 200:
+            card_data = resp.json()
+            cards = card_data["data"]
 
-        random.shuffle(cards)
-        counter = 0
+            random.shuffle(cards)
+            counter = 0
 
-        for i, card in enumerate(cards):
-            image_url = card['images']['large']
-            card_name = card['name'].replace(' ', '_').replace('/', '_')
-            card_name = sanitize_filename(card_name)
-            filename = f"sample_images/pokemon/{card_name}.jpg"
+            for i, card in enumerate(cards):
+                image_url = card['images']['large']
+                card_name = card['name'].replace(' ', '_').replace('/', '_')
+                card_name = sanitize_filename(card_name)
+                filename = f"../sample_images/pokemon/{card_name}.jpg"
 
-            img_response = requests.get(image_url)
+                img_response = requests.get(image_url)
 
-            if img_response.status_code == 200:
-                counter += 1
-                with open(filename, "wb") as img_file:
-                    img_file.write(img_response.content)
-                print(f"Downloaded: {card_name} Total Downloaded: {counter}")
-            else:
-                print(f"Failed to download image for card: {card_name}")
-            if counter >= numCards: break
-    else:
-        print(f'API Gave Error Status Code: {resp.status_code}')
+                if img_response.status_code == 200:
+                    counter += 1
+                    with open(filename, "wb") as img_file:
+                        img_file.write(img_response.content)
+                    print(f"Downloaded: {card_name} Total Downloaded: {counter}")
+                else:
+                    print(f"Failed to download image for card: {card_name}")
+                if counter >= numCards: break
+            numCards -= counter
+        else:
+            print(f'API Gave Error Status Code: {resp.status_code}')
 
 def getTrainingData():
     training_images = []
@@ -116,15 +118,15 @@ def getTrainingData():
     test_images = []
     test_labels = []
 
-    "getYugiohSample(200)"
-    "getMTGSample(200)"
-    "getPokemonSample(200)"
+    """getYugiohSample(1000)
+    getMTGSample(1000)
+    getPokemonSample(1000)"""
 
     for i, filename in enumerate(os.listdir("../sample_images/yugioh")):
         filepath = os.path.join("../sample_images/yugioh", filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
-        if i < 150: 
+        if i < 900: 
             training_images.append(imgSmall)
             training_labels.append(0)
         else: 
@@ -135,18 +137,19 @@ def getTrainingData():
         filepath = os.path.join("../sample_images/mtg", filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
-        if i < 150: 
+        if i < 900: 
             training_images.append(imgSmall)
             training_labels.append(1)
         else: 
             test_images.append(imgSmall)
             test_labels.append(1)
 
+    print(len(os.listdir("../sample_images/pokemon")))
     for i, filename in enumerate(os.listdir("../sample_images/pokemon")):
         filepath = os.path.join("../sample_images/pokemon", filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
-        if i < 120: 
+        if i < 900: 
             training_images.append(imgSmall)
             training_labels.append(2)
         else: 
@@ -239,10 +242,10 @@ print(f"Test data: {test_data[0].shape}, Test labels: {test_data[1].shape}")
 print(test_data[1])
 model, history = trainModel(training_data, test_data)
 plot_training_history(history)
-model.save('card_classifier_model.h5')"""
+model.save('card_classifier_model_ver2.h5')"""
 
-model = tf.keras.models.load_model('card_classifier_model.h5')
-img = cv2.imread("../sample_images/other/Six_Of_Spades.png")
+model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
+img = cv2.imread("../sample_images/other/Adley_Rutschman_Topps_Vintage.jpg")
 imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
 
 img_array = tf.expand_dims(imgSmall, 0) # Create a batch of size 1
