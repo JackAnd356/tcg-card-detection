@@ -61,6 +61,8 @@ fun ProfileScreen(username: String,
     var passwordEditFlag by remember { mutableStateOf(false) }
     var emailEditFlag by remember { mutableStateOf(false) }
     var enteredPassword by remember { mutableStateOf("******")}
+    var oldUsername by remember { mutableStateOf(username) }
+    var oldEmail by remember { mutableStateOf(email) }
 
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier) {
@@ -78,8 +80,10 @@ fun ProfileScreen(username: String,
             onClickEdit = {usernameEditFlag = !usernameEditFlag},
             onClickSave = {
                 SaveUsernamePost(userid = userid, username = username)
+                oldUsername = username
                 usernameEditFlag = !usernameEditFlag
-            })
+            },
+            oldData = oldUsername)
         UserDataComponent(
             label = stringResource(R.string.password_label),
             data = enteredPassword,
@@ -93,7 +97,8 @@ fun ProfileScreen(username: String,
                 SavePasswordPost(userid = userid, password = enteredPassword)
                 enteredPassword = "******"
                 passwordEditFlag = !passwordEditFlag
-            }
+            },
+            oldData = "******"
         )
         UserDropdownSelector(
             label = stringResource(R.string.storefront_label),
@@ -110,8 +115,10 @@ fun ProfileScreen(username: String,
             onClickEdit = { emailEditFlag = !emailEditFlag },
             onClickSave = {
                 SaveEmailPost(userid = userid, email = email)
+                oldEmail = email
                 emailEditFlag = !emailEditFlag
-            }
+            },
+            oldData = oldEmail
         )
     }
 }
@@ -123,7 +130,8 @@ fun UserDataComponent(label: String,
                       flag: Boolean,
                       onChange: (String) -> Unit,
                       onClickEdit: () -> Unit,
-                      onClickSave: () -> Unit) {
+                      onClickSave: () -> Unit,
+                      oldData: String? = null) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.LightGray),
         border = BorderStroke(1.dp, Color.Black),
@@ -151,7 +159,7 @@ fun UserDataComponent(label: String,
 
             Spacer(Modifier.weight(1f))
             Button(onClick = {
-                if (flag) {
+                if (flag && data != oldData) {
                     onClickSave()
                 }
                 else {
@@ -161,9 +169,17 @@ fun UserDataComponent(label: String,
                 .size(width = 100.dp, height = 40.dp)
                 .align(Alignment.CenterVertically)
             ) {
-                if (flag) {
+                if (flag && data != oldData) {
                     Text(
                         text = stringResource(R.string.save_button_label),
+                        fontSize = 15.sp,
+                        lineHeight = 10.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                else if (flag) {
+                    Text(
+                        text = stringResource(R.string.cancel_button_label),
                         fontSize = 15.sp,
                         lineHeight = 10.sp,
                         textAlign = TextAlign.Center
