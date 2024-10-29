@@ -106,7 +106,7 @@ def create_app():
             collection.update_one({'coreuser' : 1}, updateOp)
             payload = {'username' : username, 'userid' : userid, 'password' : bcrypt.hashpw(authenticator.encode('UTF-8'),bcrypt.gensalt(rounds=15)), 'email' : email, 'storefront' : storefront}
             insertRes = collection.insert_one(payload)
-            return {'success' : insertRes.acknowledged}, 201
+            return {'success' : insertRes.acknowledged, 'userid' : userid}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
     
     @app.post('/authenticateUser')
@@ -311,7 +311,7 @@ def create_app():
             if result == None:
                 payload['quantity'] = clientUserInfo['quantity']
                 payload['price'] = clientUserInfo['price']
-                payload['pricedate'] = datetime.now(tz=datetime.timezone.utc)
+                payload['pricedate'] = datetime.now(timezone.utc)
                 insertRes = collection.insert_one(payload)
                 return {'success' : insertRes.acknowledged}, 201
             else :
@@ -320,7 +320,7 @@ def create_app():
                 updateOp = { '$set' : 
                                 { 'quantity' : currCount,
                                   'price' : clientUserInfo['price'],
-                                  'pricedate' : datetime.now(tz=datetime.timezone.utc)}
+                                  'pricedate' : datetime.now(timezone.utc)}
                             }
                 upRes = collection.update_one(payload, updateOp)
                 return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
