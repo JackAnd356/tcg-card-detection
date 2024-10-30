@@ -302,7 +302,7 @@ def create_app():
             clientUserInfo = request.get_json()
             database = client['card_detection_info']
             collection = database['card_collection']
-            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode'], 'game' : clientUserInfo['game']}
+            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode'], 'game' : clientUserInfo['game'], 'cardname' : clientUserInfo['cardname']}
             if 'rarity' in clientUserInfo:
                 payload['rarity'] = clientUserInfo['rarity']
             else :
