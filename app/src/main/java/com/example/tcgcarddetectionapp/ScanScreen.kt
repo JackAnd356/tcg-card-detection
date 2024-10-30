@@ -4,13 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -24,10 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
@@ -44,14 +38,12 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.camera.core.Preview as CamPreview
 
 
 @Composable
 fun ScanScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     var cameraPermission by remember { mutableStateOf(false) }
-    var imgUri by remember { mutableStateOf<File?>(null)}
 
     LaunchedEffect(Unit) {
         // Check if camera permission is granted
@@ -91,14 +83,15 @@ fun ScanScreen(modifier: Modifier = Modifier) {
 
 // Create a temporary image file and return its URI
 fun Context.createImageFile(): File {
-    val timeStamp = SimpleDateFormat("yyyy_mm_dd_hh:mm:ss", Locale.US).format(Date())
+    val timeStamp = SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US).format(Date())
     val imageFileName = "JPEG_" + timeStamp + "_"
     val image = File.createTempFile(imageFileName, ".jpg", externalCacheDir)
-
+    /*println("Path on Creation" + image.path)
+    println("Abs Path On Creation" + image.absolutePath)*/
     return image
 }
 
-fun scanPhotoPost(imageUri: Uri) {
+fun scanPhotoPost(imageFile: File) {
     val url = "http://10.0.2.2:5000"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -106,9 +99,8 @@ fun scanPhotoPost(imageUri: Uri) {
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
 
-    val file = File(imageUri.path ?: "")
-    val requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file)
-    val imagePart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+    val requestFile = RequestBody.create(MediaType.parse("image/jpeg"), imageFile)
+    val imagePart = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
 
     val call = retrofitAPI.getCardInfo(imagePart)
 
@@ -133,7 +125,9 @@ fun scanPhotoPost(imageUri: Uri) {
 @Composable
 fun ImageCaptureFromCamera() {
     val context = LocalContext.current
-    val file = context.createImageFile()
+    val file by remember {
+        mutableStateOf(context.createImageFile())
+    }
     val uri = FileProvider.getUriForFile(
         context,
         context.packageName + ".provider",
@@ -165,7 +159,7 @@ fun ImageCaptureFromCamera() {
 
     if (capturedImageUri.path?.isNotEmpty() == true) {
         val painter = rememberAsyncImagePainter(
-            model = ImageRequest.Builder(LocalContext.current)
+            model = ImageRequest.Builder(context)
                 .data(capturedImageUri)
                 .build()
         )
@@ -176,9 +170,7 @@ fun ImageCaptureFromCamera() {
             contentDescription = "Captured Image"
         )
 
-        scanPhotoPost(capturedImageUri)
-    } else {
-        CameraPreview(modifier = Modifier.fillMaxSize())
+        scanPhotoPost(file)
     }
 }
 
@@ -190,6 +182,7 @@ fun ScanScreenPreview(modifier: Modifier = Modifier) {
     }
 }
 
+/*
 @Composable
 fun CameraPreview(modifier: Modifier = Modifier) {
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -234,4 +227,4 @@ fun CameraPreview(modifier: Modifier = Modifier) {
         },
         modifier = modifier
     )
-}
+}*/

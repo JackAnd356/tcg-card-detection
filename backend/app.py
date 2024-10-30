@@ -69,19 +69,17 @@ def create_app():
 
     @app.post('/getCardInfo')
     def post_getCardInfo():
-        if request.is_json:
-            imageInfo = request.get_json()
-            if 'image' not in imageInfo.files:
-                    return jsonify({'error': 'No image part in the request'}), 400
+        if 'image' not in request.files:
+            return {'error': 'No image part'}, 400
+    
+        image_file = request.files['image']
 
-            image = imageInfo.files['image']
+        image_path = os.path.join(UPLOAD_FOLDER, image_file.filename)
+        image_file.save(image_path)
 
-            image_path = os.path.join(UPLOAD_FOLDER, image.filename)
-            image.save(image_path)
-
-            cards = processCardImage(image_path)
-            retData = {'cards': cards}
-            return jsonify(retData), 201
+        cards = processCardImage(image_path)
+        retData = {'cards': cards}
+        return jsonify(retData), 201
     
     @app.post('/createNewUser')
     def post_createNewUser():
