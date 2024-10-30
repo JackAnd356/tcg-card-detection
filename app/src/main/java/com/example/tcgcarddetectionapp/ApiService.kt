@@ -16,7 +16,7 @@ interface ApiService {
     fun saveUserStorefront(@Body saveStorefrontRequestModel: SaveStorefrontRequestModel): Call<GenericSuccessErrorResponseModel>
 
     @POST("getUserCollection")
-    fun getUserCollection(@Body userCollectionRequest: UserCollectionRequestModel): Call<Array<Card>>
+    fun getUserCollection(@Body userCollectionRequest: UserCollectionRequestModel): Call<Array<CardData>>
 
     @POST("getUserSubcollectionInfo")
     fun getUserSubcollectionInfo(@Body userSubcollectionInfoRequest: UserSubcollectionInfoRequestModel): Call<UserSubcollectionInfoResponseModel>

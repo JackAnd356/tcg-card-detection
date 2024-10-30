@@ -1,6 +1,5 @@
 package com.example.tcgcarddetectionapp
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.math.log
 
 @Composable
 fun LoginScreen(onLoginNavigate: () -> Unit,
@@ -40,7 +38,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onUserIdChange: (String) -> Unit,
                 onUserEmailChange: (String) -> Unit,
                 onUserStorefrontChange: (Int) -> Unit,
-                onUserCollectionChange: (Array<Card>) -> Unit,
+                onUserCollectionChange: (Array<CardData>) -> Unit,
                 onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
                 modifier: Modifier = Modifier) {
 
@@ -145,7 +143,7 @@ fun loginPost(username: String,
               onUserIdChange: (String) -> Unit,
               onUserEmailChange: (String) -> Unit,
               onUserStorefrontChange: (Int) -> Unit,
-              onUserCollectionChange: (Array<Card>) -> Unit,
+              onUserCollectionChange: (Array<CardData>) -> Unit,
               onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit): Array<Any> {
     var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
@@ -190,7 +188,7 @@ fun loginPost(username: String,
 }
 
 fun collectionPost(userid: String,
-                   onUserCollectionChange: (Array<Card>) -> Unit,
+                   onUserCollectionChange: (Array<CardData>) -> Unit,
                    onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
                    onLoginNavigate: () -> Unit) {
     var url = "http://10.0.2.2:5000/"
@@ -200,10 +198,10 @@ fun collectionPost(userid: String,
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
     val requestData = UserCollectionRequestModel(userid = userid)
-    retrofitAPI.getUserCollection(requestData).enqueue(object: Callback<Array<Card>>{
+    retrofitAPI.getUserCollection(requestData).enqueue(object: Callback<Array<CardData>>{
         override fun onResponse(
-            call: Call<Array<Card>>,
-            response: Response<Array<Card>>
+            call: Call<Array<CardData>>,
+            response: Response<Array<CardData>>
         ) {
             val respData = response.body()
             if (respData != null) {
@@ -212,7 +210,7 @@ fun collectionPost(userid: String,
             }
         }
 
-        override fun onFailure(call: Call<Array<Card>>, t: Throwable) {
+        override fun onFailure(call: Call<Array<CardData>>, t: Throwable) {
             t.printStackTrace()
         }
 

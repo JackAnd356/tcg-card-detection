@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,6 +38,7 @@ enum class CardDetectionScreens(@StringRes val title: Int) {
     Profile(title = R.string.profile_page),
     Scan(title = R.string.scan_page),
     NewUser(title = R.string.new_user_page),
+    Subcollection(title = R.string.subcollection_page),
 }
 
 @Composable
@@ -76,7 +78,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
     var userid by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var storefront by remember { mutableIntStateOf(1) }
-    var collection by remember { mutableStateOf(arrayOf<Card>()) }
+    var collection by remember { mutableStateOf(arrayOf<CardData>()) }
     var subColInfo by remember { mutableStateOf(arrayOf<SubcollectionInfo>()) }
 
     NavHost(
@@ -94,7 +96,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 onUserEmailChange = { email = it },
                 onUserStorefrontChange = { storefront = it },
                 onUserCollectionChange = {collection = it},
-                onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardCollection = collection, setSubColInfo = {subColInfo = it})},
+                onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it})},
             )
         }
         composable(route = CardDetectionScreens.YugiohCollection.name) {
@@ -109,10 +111,22 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
+                var cardCount = 0
+                var cardPriceTotal = 0.0
+                collection.forEach {
+                    card ->
+                    if (card.game == "yugioh") {
+                        cardCount += card.quantity
+                        cardPriceTotal += (card.quantity * card.price)
+                    }
+                }
                 CollectionScreen(
                     gameName = "Yu-Gi-Oh!",
                     subcollections = subColInfo,
                     gameFilter = "yugioh",
+                    navController = navController,
+                    totalCardCount = cardCount,
+                    totalCardValue = cardPriceTotal,
                 )
             }
         }
@@ -128,10 +142,23 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
+                var cardCount = 0
+                var cardPriceTotal = 0.0
+                collection.forEach {
+                        card ->
+                    if (card.game == "mtg") {
+                        cardCount += card.quantity
+                        cardPriceTotal += (card.quantity * card.price)
+                    }
+                }
+
                 CollectionScreen(
                     gameName = "Magic",
                     subcollections = subColInfo,
-                    gameFilter = "mtg"
+                    gameFilter = "mtg",
+                    navController = navController,
+                    totalCardCount = cardCount,
+                    totalCardValue = cardPriceTotal,
                 )
             }
         }
@@ -147,10 +174,23 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
+                var cardCount = 0
+                var cardPriceTotal = 0.0
+                collection.forEach {
+                        card ->
+                    if (card.game == "pokemon") {
+                        cardCount += card.quantity
+                        cardPriceTotal += (card.quantity * card.price)
+                    }
+                }
+
                 CollectionScreen(
                     gameName = "Pokemon",
                     subcollections = subColInfo,
-                    gameFilter = "pokemon"
+                    gameFilter = "pokemon",
+                    navController = navController,
+                    totalCardCount = cardCount,
+                    totalCardValue = cardPriceTotal,
                 )
             }
         }
@@ -233,28 +273,85 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 onLoginNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
             )
         }
+
+        composable(route = CardDetectionScreens.Subcollection.name + "/{subColId}/{game}") {
+            navBackStackEntry ->
+            val subColId = navBackStackEntry.arguments?.getString("subColId")
+            val game = navBackStackEntry.arguments?.getString("game")
+            var thisSubCol: SubcollectionInfo? = null
+            var thisCardPool = mutableListOf<CardData>()
+
+            if (subColId == "all") {
+                thisSubCol = SubcollectionInfo(
+                    subcollectionid = "all",
+                    name = stringResource(R.string.all_cards_subcol_label),
+                    totalValue = 0.0,
+                    physLoc = "",
+                    cardCount = 0,
+                    game = game!!,
+                    isDeck = false,
+                    userid = userid
+                )
+                collection.forEach {
+                    card ->
+                    thisCardPool.add(card)
+                    thisSubCol!!.totalValue = thisSubCol!!.totalValue?.plus((card.quantity * card.price))
+                    thisSubCol!!.cardCount = thisSubCol!!.cardCount?.plus(card.quantity)
+                }
+            }
+            else {
+                subColInfo.forEach {
+                        subCol ->
+                    if (subCol.subcollectionid == subColId) {
+                        thisSubCol = subCol
+                    }
+                }
+                collection.forEach {
+                        card ->
+                    if (card.subcollections?.contains(subColId) == true) {
+                        thisCardPool.add(card)
+                    }
+                }
+            }
+
+            SubcollectionScreen(
+                subcolInfo = thisSubCol!!,
+                cardData = thisCardPool.toTypedArray(),
+                navBack = {
+                    if (game == "yugioh") {
+                        navController.navigate(CardDetectionScreens.YugiohCollection.name)
+                    }
+                    else if (game == "mtg") {
+                        navController.navigate(CardDetectionScreens.MagicCollection.name)
+                    }
+                    else if (game == "pokemon") {
+                        navController.navigate(CardDetectionScreens.PokemonCollection.name)
+                    }
+                },
+            )
+        }
     }
 
 }
 
-fun onUserSubColInfoChange(subColInfo: Array<SubcollectionInfo>, cardCollection: Array<Card>, setSubColInfo: (Array<SubcollectionInfo>) -> Unit) {
-    cardCollection.forEach {
+fun onUserSubColInfoChange(subColInfo: Array<SubcollectionInfo>, cardDataCollection: Array<CardData>, setSubColInfo: (Array<SubcollectionInfo>) -> Unit) {
+    cardDataCollection.forEach {
             card ->
         if (card.subcollections != null) {
             subColInfo.forEach {
                     subCol ->
                 if (subCol.subcollectionid in card.subcollections) {
                     if (subCol.cardCount == null) {
-                        subCol.cardCount = 1
+                        subCol.cardCount = card.quantity
                     }
                     else {
-                        subCol.cardCount = subCol.cardCount!! + 1
+                        subCol.cardCount = subCol.cardCount!! + card.quantity
                     }
                     if (subCol.totalValue == null) {
-                        subCol.totalValue = card.price
+                        subCol.totalValue = (card.price * card.quantity)
                     }
                     else {
-                        subCol.totalValue = subCol.totalValue!! + card.price
+                        subCol.totalValue = subCol.totalValue!! + (card.price * card.quantity)
                     }
                 }
             }

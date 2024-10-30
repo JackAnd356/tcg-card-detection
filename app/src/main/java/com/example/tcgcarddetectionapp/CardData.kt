@@ -1,6 +1,6 @@
 package com.example.tcgcarddetectionapp
 
-data class Card(
+data class CardData(
     val userid : String,
     val cardid: String,
     val setcode: String,

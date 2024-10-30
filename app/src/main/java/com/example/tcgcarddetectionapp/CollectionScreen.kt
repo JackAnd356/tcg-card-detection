@@ -31,6 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 import java.math.BigDecimal
 import kotlin.math.round
@@ -39,6 +41,9 @@ import kotlin.math.round
 fun CollectionScreen(gameName: String,
                      subcollections: Array<SubcollectionInfo>,
                      gameFilter: String,
+                     totalCardCount: Int,
+                     totalCardValue: Double,
+                     navController: NavController,
                      modifier: Modifier = Modifier) {
     var searchTerm by remember { mutableStateOf("") }
     val scrollstate = rememberScrollState()
@@ -70,12 +75,15 @@ fun CollectionScreen(gameName: String,
                 modifier = modifier
                     .fillMaxWidth(.8f)
                     .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 20.dp)
+                    .padding(vertical = 20.dp),
+                onClick = {
+                    navController.navigate(CardDetectionScreens.Subcollection.name + "/all/" + gameFilter)
+                }
             ) {
                 Text(
                     text = String.format(
                         stringResource(R.string.all_cards_label),
-                        200
+                        totalCardCount
                     ),
                     fontSize = 20.sp,
                     lineHeight = 25.sp,
@@ -84,7 +92,7 @@ fun CollectionScreen(gameName: String,
                 Text(
                     text = String.format(
                         stringResource(R.string.total_value_label),
-                        100000.0000,
+                        totalCardValue,
                         "$"
                     ),
                     fontSize = 20.sp,
@@ -113,6 +121,9 @@ fun CollectionScreen(gameName: String,
                         cardCount = subcollection.cardCount ?: 0,
                         location = subcollection.physLoc,
                         totalValue = subcollection.totalValue ?: 0.0,
+                        subColId = subcollection.subcollectionid,
+                        game = gameFilter,
+                        navController = navController,
                         modifier = modifier
                     )
                 }
@@ -122,11 +133,21 @@ fun CollectionScreen(gameName: String,
 }
 
 @Composable
-fun CollectionSummary(name: String, cardCount: Int, location: String, totalValue: Double, modifier: Modifier = Modifier) {
+fun CollectionSummary(name: String,
+                      cardCount: Int,
+                      location: String,
+                      totalValue: Double,
+                      subColId: String,
+                      game: String,
+                      navController: NavController,
+                      modifier: Modifier = Modifier) {
     Card(colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
             .fillMaxWidth(.8f)
-            .padding(vertical = 20.dp)
+            .padding(vertical = 20.dp),
+        onClick = {
+            navController.navigate(CardDetectionScreens.Subcollection.name + "/" + subColId + "/" + game)
+        }
     ) {
         Text(
             text = name,
@@ -196,7 +217,10 @@ fun CollectionScreenPreview() {
         CollectionScreen(
             gameName = "Yu-Gi-Oh!",
             subcollections = colList,
-            gameFilter = "yugioh"
+            gameFilter = "yugioh",
+            navController = rememberNavController(),
+            totalCardCount = 200,
+            totalCardValue = 1000000.00,
         )
     }
 }
