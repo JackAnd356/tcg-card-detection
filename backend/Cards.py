@@ -7,10 +7,10 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 
 # Threshold Levels
 THRESH_LOW = 0
-THRESH_HIGH = 140
+THRESH_HIGH = 100
 
 CARD_MAX_AREA = 2000000
-CARD_MIN_AREA = 5000
+CARD_MIN_AREA = 10000
 
 #Classification Model
 model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
@@ -36,7 +36,8 @@ def process_image(image):
 
     for i in range(len(ccs)):
         if isCard[i]:
-            cards.append(preprocess_card(ccs[i], image))
+            card = preprocess_card(ccs[i], image)
+            if card is not None: cards.append(card)
 
     frameCards = dict()
     frameCards["cards"] = cards
@@ -56,12 +57,12 @@ def preprocess_image(image):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
 
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray,(11,11),0)
+    blur = cv2.GaussianBlur(gray,(13,13),0)
 
     threshold1 = THRESH_LOW
     threshold2 = THRESH_HIGH
     imgCanny = cv2.Canny(blur, threshold1, threshold2)
-
+    cv2.imshow("Canny Img", imgCanny)
 
     kernel = np.ones((5, 5), np.uint8)
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
@@ -104,13 +105,14 @@ def find_cards(thresh_image):
         peri = cv2.arcLength(cnts_sort[i],True)
         approx = cv2.approxPolyDP(cnts_sort[i],0.01*peri,True)
 
-        "print(size)"
-        "print(hier_sort[i][3])"
-        "print(len(approx))"
-        
+        print(size)
+        print(hier_sort[i][3])
+        print(len(approx)) 
+
         if ((size < CARD_MAX_AREA) and (size > CARD_MIN_AREA)
             and (hier_sort[i][3] == -1) and (len(approx) == 4)):
                 cnt_is_card[i] = 1
+
 
     return cnts_sort, cnt_is_card
 
@@ -145,6 +147,7 @@ def preprocess_card(contour, frame):
 
     if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_rgb"])
     elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp_rgb"])
+    elif cardType == 'other': return None
     qCard["name"] = name
     qCard["cardid"] = id
     qCard["setcode"] = setCode
@@ -172,8 +175,10 @@ def get_yugioh_card_details(image):
 
     # Extract card name
     nameImg = image[12:60, 17:330]
-    nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    nameImgCubic = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_LINEAR)
     cv2.imshow("NameImg", nameImg)
+    cv2.imshow("NameImgCubic", nameImgCubic)
     cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ')
     
     # Extract card ID
