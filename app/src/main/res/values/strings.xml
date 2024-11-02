@@ -36,4 +36,5 @@
     <string name="card_price_label">Card Price: %2$s%1$.2f</string>
     <string name="all_cards_subcol_label">All Cards</string>
     <string name="card_quantity_label">Quantity: %1$d</string>
+    <string name="back_to_login_button_label">Back to Login</string>
 </resources>
