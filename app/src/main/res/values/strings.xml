@@ -32,8 +32,12 @@
     <string name="total_cards_label">Total Cards: %1$d</string>
     <string name="filter_button_label">Filter</string>
     <string name="card_id_label">Card ID: %1$s</string>
+    <string name="card_name_label">Name: %1$s</string>
     <string name="card_setcode_label">Set Code: %1$s</string>
     <string name="card_price_label">Card Price: %2$s%1$.2f</string>
     <string name="all_cards_subcol_label">All Cards</string>
     <string name="card_quantity_label">Quantity: %1$d</string>
+    <string name="back_to_login_button_label">Back to Login</string>
+    <string name="logout_button_label">Log Out</string>
+    <string name="delete_account_button_label">Delete Account</string>
 </resources>

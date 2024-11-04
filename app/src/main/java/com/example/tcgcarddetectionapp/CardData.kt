@@ -1,5 +1,6 @@
 package com.example.tcgcarddetectionapp
 
+
 data class CardData(
     val userid : String,
     val cardid: String,
@@ -9,4 +10,6 @@ data class CardData(
     val subcollections: Array<String>?,
     val game: String,
     val price: Double,
+    val image: String,
+    val cardname: String,
 )

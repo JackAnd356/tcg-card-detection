@@ -1,6 +1,8 @@
 package com.example.tcgcarddetectionapp
 
+import android.graphics.BitmapFactory
 import androidx.camera.video.internal.compat.quirk.ReportedVideoQualityNotSupportedQuirk
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,12 +29,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
@@ -118,14 +124,26 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             ) {
                 Text(stringResource(R.string.filter_button_label))
             }
-            for (i in 0..(cardData.size - 1) step 2) {
+            var filteredCardData = mutableListOf<CardData>()
+            cardData.forEach { card ->
+                if (searchTerm in card.cardname) {
+                    filteredCardData.add(card)
+                }
+            }
+            if (searchTerm == "") {
+                filteredCardData = cardData.toMutableList()
+            }
+            for (i in 0..(filteredCardData.size - 1) step 2) {
                 Row{
                     for (j in i..(i + 1).coerceAtMost(cardData.size - 1)) {
+                        val cardInfo = filteredCardData[j]
                         CardBase(
-                            cardid = cardData[j].cardid,
-                            setcode = cardData[j].setcode,
-                            price = cardData[j].price,
-                            quantity = cardData[j].quantity,
+                            cardid = cardInfo.cardid,
+                            setcode = cardInfo.setcode,
+                            cardname = cardInfo.cardname,
+                            price = cardInfo.price,
+                            quantity = cardInfo.quantity,
+                            image = cardInfo.image,
                             modifier = modifier
                                 .padding(vertical = 20.dp, horizontal = 15.dp)
                         )
@@ -137,53 +155,75 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     }
 }
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun CardBase(cardid: String,
              setcode: String,
+             cardname: String,
              price: Double,
              quantity: Int,
+             image: String,
              modifier: Modifier = Modifier) {
-    Card(colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = modifier
-    ) {
-        Column {
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_id_label),
-                    cardid
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_setcode_label),
-                    setcode
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_price_label),
-                    price,
-                    "$"
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_quantity_label),
-                    quantity
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
+    val decodedString = Base64.decode(image, 0)
+    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+    Column {
+        Image(
+            bitmap = img.asImageBitmap(),
+            contentDescription = "Card",
+            modifier.size(120.dp, 200.dp)
+        )
+        Card(
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            modifier = modifier
+        ) {
+            Column {
+                Text(
+                    text = String.format(
+                        stringResource(R.string.card_name_label),
+                        cardname
+                    ),
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = String.format(
+                        stringResource(R.string.card_id_label),
+                        cardid
+                    ),
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = String.format(
+                        stringResource(R.string.card_setcode_label),
+                        setcode
+                    ),
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = String.format(
+                        stringResource(R.string.card_price_label),
+                        price,
+                        "$"
+                    ),
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = String.format(
+                        stringResource(R.string.card_quantity_label),
+                        quantity
+                    ),
+                    fontSize = 15.sp,
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -211,6 +251,8 @@ fun SubollectionScreenPreview() {
         subcollections = arrayOf("1"),
         game = "yugioh",
         price = 10.91,
+        image = "",
+        cardname = "Dark Magician"
     )
 
     val card2 = CardData(
@@ -222,6 +264,8 @@ fun SubollectionScreenPreview() {
         subcollections = arrayOf("1"),
         game = "yugioh",
         price = 15.10,
+        image = "",
+        cardname = "Blue-Eyes White Dragon"
     )
 
     val card3 = CardData(
@@ -233,6 +277,8 @@ fun SubollectionScreenPreview() {
         subcollections = arrayOf("1"),
         game = "yugioh",
         price = 14.10,
+        image = "",
+        "Test Card"
     )
 
     val cards = arrayOf(card1, card2, card3)

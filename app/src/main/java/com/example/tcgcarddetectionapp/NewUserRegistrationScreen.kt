@@ -57,12 +57,18 @@ fun NewUserRegistrationScreen(username: String,
                               onUserStorefrontChange: (Int) -> Unit,
                               onUseridChange: (String) -> Unit,
                               onLoginNavigate: () -> Unit,
+                              onBackNavigate: () -> Unit,
                               modifier: Modifier = Modifier) {
     var enteredPassword by remember { mutableStateOf("")}
     var errorText by remember { mutableStateOf("")}
 
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier) {
+        Button(
+            onClick = {onBackNavigate()}
+        ) {
+            Text(stringResource(R.string.back_to_login_button_label))
+        }
         Text(
             text = stringResource(R.string.new_user_registration_screen_heading),
             fontSize = 50.sp,
@@ -99,7 +105,8 @@ fun NewUserRegistrationScreen(username: String,
                     storefront = storefront,
                     email = email,
                     onUseridChange = onUseridChange,
-                    setErrorText = {errorText = it}
+                    setErrorText = {errorText = it},
+                    onLoginNavigate = onLoginNavigate,
                 )
             },
             enabled = username != "" && enteredPassword != ""
@@ -204,6 +211,7 @@ fun SaveNewUserPost(
     email: String,
     onUseridChange: (String) -> Unit,
     setErrorText: (String) -> Unit,
+    onLoginNavigate: () -> Unit,
 ) {
     var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
@@ -225,6 +233,7 @@ fun SaveNewUserPost(
                 }
                 else {
                     onUseridChange(respData.userid!!)
+                    onLoginNavigate()
                 }
             }
         }
@@ -254,6 +263,7 @@ fun NewUserRegistrationScreenPreview(modifier: Modifier = Modifier) {
             email = "",
             storefront = 1,
             onLoginNavigate = {  },
+            onBackNavigate = { },
         )
     }
 }

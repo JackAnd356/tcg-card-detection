@@ -242,6 +242,15 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                             })
                     },
                     userid = userid,
+                    onLogout = {
+                        username = ""
+                        userid = ""
+                        email = ""
+                        storefront = 1
+                        collection = arrayOf<CardData>()
+                        subColInfo = arrayOf<SubcollectionInfo>()
+                        navController.navigate(CardDetectionScreens.Login.name)
+                    }
                 )
             }
         }
@@ -271,6 +280,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 onUserStorefrontChange = { storefront = it },
                 onUseridChange = { userid = it },
                 onLoginNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                onBackNavigate = { navController.navigate((CardDetectionScreens.Login.name))},
             )
         }
 
@@ -313,22 +323,33 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     }
                 }
             }
-
-            SubcollectionScreen(
-                subcolInfo = thisSubCol!!,
-                cardData = thisCardPool.toTypedArray(),
-                navBack = {
-                    if (game == "yugioh") {
-                        navController.navigate(CardDetectionScreens.YugiohCollection.name)
-                    }
-                    else if (game == "mtg") {
-                        navController.navigate(CardDetectionScreens.MagicCollection.name)
-                    }
-                    else if (game == "pokemon") {
-                        navController.navigate(CardDetectionScreens.PokemonCollection.name)
-                    }
-                },
-            )
+            Scaffold(
+                bottomBar = {
+                    CardDetectionBottomBar(
+                        navigateScan = { navController.navigate(CardDetectionScreens.Scan.name)},
+                        navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
+                        navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
+                        navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
+                        navigateProfile = { navController.navigate(CardDetectionScreens.Profile.name) },
+                    )
+                }
+            ) {
+                SubcollectionScreen(
+                    subcolInfo = thisSubCol!!,
+                    cardData = thisCardPool.toTypedArray(),
+                    navBack = {
+                        if (game == "yugioh") {
+                            navController.navigate(CardDetectionScreens.YugiohCollection.name)
+                        }
+                        else if (game == "mtg") {
+                            navController.navigate(CardDetectionScreens.MagicCollection.name)
+                        }
+                        else if (game == "pokemon") {
+                            navController.navigate(CardDetectionScreens.PokemonCollection.name)
+                        }
+                    },
+                )
+            }
         }
     }
 
