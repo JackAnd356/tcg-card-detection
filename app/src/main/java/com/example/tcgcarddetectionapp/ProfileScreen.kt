@@ -56,6 +56,7 @@ fun ProfileScreen(username: String,
                   onUsernameChange: (String) -> Unit,
                   onUserEmailChange: (String) -> Unit,
                   onUserStorefrontChange: (Int) -> Unit,
+                  onLogout: () -> Unit,
                   modifier: Modifier = Modifier) {
     var usernameEditFlag by remember { mutableStateOf(false) }
     var passwordEditFlag by remember { mutableStateOf(false) }
@@ -120,6 +121,16 @@ fun ProfileScreen(username: String,
             },
             oldData = oldEmail
         )
+        Button(
+            onClick = { onLogout() }
+        ) {
+            Text(stringResource(R.string.logout_button_label))
+        }
+        Button(
+            onClick = { }
+        ) {
+            Text(stringResource(R.string.delete_account_button_label))
+        }
     }
 }
 
@@ -356,7 +367,8 @@ fun ProfileScreenPreview(modifier: Modifier = Modifier) {
             onUsernameChange = { },
             onUserEmailChange = { },
             onUserStorefrontChange = { },
-            userid = "1"
+            userid = "1",
+            onLogout = { },
         )
     }
 }

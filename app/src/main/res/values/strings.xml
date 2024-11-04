@@ -37,4 +37,6 @@
     <string name="all_cards_subcol_label">All Cards</string>
     <string name="card_quantity_label">Quantity: %1$d</string>
     <string name="back_to_login_button_label">Back to Login</string>
+    <string name="logout_button_label">Log Out</string>
+    <string name="delete_account_button_label">Delete Account</string>
 </resources>

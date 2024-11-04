@@ -242,6 +242,15 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                             })
                     },
                     userid = userid,
+                    onLogout = {
+                        username = ""
+                        userid = ""
+                        email = ""
+                        storefront = 1
+                        collection = arrayOf<CardData>()
+                        subColInfo = arrayOf<SubcollectionInfo>()
+                        navController.navigate(CardDetectionScreens.Login.name)
+                    }
                 )
             }
         }
