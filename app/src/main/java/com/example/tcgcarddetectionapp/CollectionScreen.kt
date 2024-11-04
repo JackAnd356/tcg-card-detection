@@ -115,7 +115,7 @@ fun CollectionScreen(gameName: String,
                 Text(stringResource(R.string.create_new_collection_label))
             }
             subcollections.forEach { subcollection ->
-                if (subcollection.game == gameFilter) {
+                if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
                     CollectionSummary(
                         name = subcollection.name,
                         cardCount = subcollection.cardCount ?: 0,
