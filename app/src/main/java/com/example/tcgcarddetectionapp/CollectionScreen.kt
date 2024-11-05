@@ -6,16 +6,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
@@ -46,6 +51,7 @@ fun CollectionScreen(gameName: String,
                      navController: NavController,
                      modifier: Modifier = Modifier) {
     var searchTerm by remember { mutableStateOf("") }
+    var popUp by remember { mutableStateOf(false)}
     val scrollstate = rememberScrollState()
     Box(
         modifier
@@ -105,7 +111,9 @@ fun CollectionScreen(gameName: String,
                 onValueChange = { searchTerm = it },
                 label = { Text(stringResource(R.string.search_label)) }
             )
-            Button(onClick = { },
+            Button(onClick = {
+                popUp = true
+            },
                 colors = ButtonColors(
                     containerColor = colorResource(R.color.lightGreen),
                     contentColor = Color.Black,
@@ -114,6 +122,14 @@ fun CollectionScreen(gameName: String,
             ) {
                 Text(stringResource(R.string.create_new_collection_label))
             }
+
+            if (popUp) {
+                DialogTest(onDismissRequest = {
+                    popUp = false
+                },
+                onConfirmation = {})
+            }
+            
             subcollections.forEach { subcollection ->
                 if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
                     CollectionSummary(
@@ -174,6 +190,68 @@ fun CollectionSummary(name: String,
                 lineHeight = 25.sp,
                 textAlign = TextAlign.Left
             )
+        }
+    }
+}
+
+@Composable
+fun DialogTest(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+) {
+    var subColName by remember { mutableStateOf("Placeholder") }
+    var subColLocation by remember { mutableStateOf("Placeholder")}
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        // Draw a rectangle shape with rounded corners inside the dialog
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(375.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "This is a dialog with buttons and an image.",
+                    modifier = Modifier.padding(16.dp),
+                )
+
+                TextField(
+                    value = subColName,
+                    onValueChange = {subColName = it},
+                    label = {Text("Sub-Collection Name:")}
+                )
+
+                TextField(
+                    value = subColLocation,
+                    onValueChange = {subColLocation = it},
+                    label = {Text("Sub-Collection Physical Location:")}
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    TextButton(
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Dismiss")
+                    }
+                    TextButton(
+                        onClick = { onConfirmation() },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        Text("Confirm")
+                    }
+                }
+            }
         }
     }
 }

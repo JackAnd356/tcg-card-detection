@@ -8,18 +8,24 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil3.compose.rememberAsyncImagePainter
@@ -43,18 +49,6 @@ import java.util.Locale
 @Composable
 fun ScanScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    var cameraPermission by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        // Check if camera permission is granted
-        cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-    }
-
-    val cameraPermLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(), onResult = { isGranted ->
-        if (isGranted) {
-            cameraPermission = true
-        }
-    })
 
     Column(verticalArrangement = Arrangement.Top, modifier = modifier
         .fillMaxSize()
@@ -69,15 +63,11 @@ fun ScanScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(onClick = {
-            if (!cameraPermission) {
-                cameraPermLauncher.launch(Manifest.permission.CAMERA)
-            }
-        }) {
-            Text(text = "Camera Permission $cameraPermission")
+        Box(Modifier.height(650.dp).width(400.dp).background(Color.Black)) {
+            Text(text = "Make sure to include all of the card you are trying to scan", fontSize = 30.sp, color = Color.White)
         }
 
-        ImageCaptureFromCamera()
+        ImageCaptureFromCamera(Modifier.align(Alignment.CenterHorizontally))
     }
 }
 
@@ -123,8 +113,13 @@ fun scanPhotoPost(imageFile: File) {
 }
 
 @Composable
-fun ImageCaptureFromCamera() {
+fun ImageCaptureFromCamera(modifier: Modifier) {
     val context = LocalContext.current
+    var cameraPermission by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        // Check if camera permission is granted
+        cameraPermission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+    }
     val file by remember {
         mutableStateOf(context.createImageFile())
     }
@@ -142,13 +137,18 @@ fun ImageCaptureFromCamera() {
         capturedImageUri = uri
     }
 
+    val cameraPermLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(), onResult = { isGranted ->
+        if (isGranted) {
+            cameraPermission = true
+        }
+    })
+
     val image = painterResource(R.drawable.photo_button)
-    Button(onClick = {
-        val permResult = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-        if (permResult == PackageManager.PERMISSION_GRANTED) {
+    Button(modifier = modifier, onClick =  {
+        if (cameraPermission) {
             takePictureLauncher.launch(uri)
         } else {
-            Toast.makeText(context, "Camera Permission Required", Toast.LENGTH_SHORT).show()
+            cameraPermLauncher.launch(Manifest.permission.CAMERA)
         }
     }) {
         Image(

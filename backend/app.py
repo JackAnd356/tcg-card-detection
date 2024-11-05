@@ -11,7 +11,6 @@ import bcrypt
 import datetime
 import Cards
 import cv2
-import earthpy as et
 from datetime import date, timezone
 from dotenv import load_dotenv, find_dotenv
 from pymongo import database

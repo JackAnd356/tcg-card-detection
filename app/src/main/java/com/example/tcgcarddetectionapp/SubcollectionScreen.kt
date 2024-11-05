@@ -135,7 +135,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             }
             for (i in 0..(filteredCardData.size - 1) step 2) {
                 Row{
-                    for (j in i..(i + 1).coerceAtMost(cardData.size - 1)) {
+                    for (j in i..(i + 1).coerceAtMost(filteredCardData.size - 1)) {
                         val cardInfo = filteredCardData[j]
                         CardBase(
                             cardid = cardInfo.cardid,
