@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import androidx.camera.video.internal.compat.quirk.ReportedVideoQualityNotSupportedQuirk
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -45,6 +47,21 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         navBack: () -> Unit,
                         modifier: Modifier = Modifier) {
     var searchTerm by remember { mutableStateOf("") }
+    var showCardPopup by remember { mutableStateOf(false) }
+    var currentFocusedCard by remember { mutableStateOf<CardData>(
+        value = CardData(
+            userid = "",
+            cardid = "",
+            setcode = "",
+            quantity = 0,
+            rarity = "",
+            subcollections = arrayOf(),
+            game = "",
+            price = 0.0,
+            image = "",
+            cardname = ""
+        ),
+    ) }
     val scrollstate = rememberScrollState()
 
     Box(
@@ -124,6 +141,15 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             ) {
                 Text(stringResource(R.string.filter_button_label))
             }
+            if (showCardPopup) {
+                Dialog(
+                    onDismissRequest = { showCardPopup = !showCardPopup}
+                ) {
+                    CardPopup(
+                        cardData = currentFocusedCard,
+                    )
+                }
+            }
             var filteredCardData = mutableListOf<CardData>()
             cardData.forEach { card ->
                 if (searchTerm in card.cardname) {
@@ -137,13 +163,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 Row{
                     for (j in i..(i + 1).coerceAtMost(filteredCardData.size - 1)) {
                         val cardInfo = filteredCardData[j]
-                        CardBase(
-                            cardid = cardInfo.cardid,
-                            setcode = cardInfo.setcode,
-                            cardname = cardInfo.cardname,
-                            price = cardInfo.price,
-                            quantity = cardInfo.quantity,
-                            image = cardInfo.image,
+                        CardImage(
+                            cardData = cardInfo,
+                            setFocusedCard = {currentFocusedCard = it},
+                            showCardPopup = {showCardPopup = !showCardPopup},
                             modifier = modifier
                                 .padding(vertical = 20.dp, horizontal = 15.dp)
                         )
@@ -157,73 +180,79 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun CardBase(cardid: String,
-             setcode: String,
-             cardname: String,
-             price: Double,
-             quantity: Int,
-             image: String,
-             modifier: Modifier = Modifier) {
-    val decodedString = Base64.decode(image, 0)
+fun CardImage(cardData: CardData,
+              setFocusedCard: (CardData) -> Unit,
+              showCardPopup: () -> Unit,
+              modifier: Modifier) {
+    val decodedString = Base64.decode(cardData.image, 0)
     val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-    Column {
-        Image(
-            bitmap = img.asImageBitmap(),
-            contentDescription = "Card",
-            modifier.size(120.dp, 200.dp)
-        )
-        Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = modifier
-        ) {
-            Column {
-                Text(
-                    text = String.format(
-                        stringResource(R.string.card_name_label),
-                        cardname
-                    ),
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = String.format(
-                        stringResource(R.string.card_id_label),
-                        cardid
-                    ),
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = String.format(
-                        stringResource(R.string.card_setcode_label),
-                        setcode
-                    ),
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = String.format(
-                        stringResource(R.string.card_price_label),
-                        price,
-                        "$"
-                    ),
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = String.format(
-                        stringResource(R.string.card_quantity_label),
-                        quantity
-                    ),
-                    fontSize = 15.sp,
-                    lineHeight = 20.sp,
-                    textAlign = TextAlign.Center
-                )
+    Image(
+        bitmap = img.asImageBitmap(),
+        contentDescription = "Card",
+        modifier
+            .size(120.dp, 200.dp)
+            .clickable {
+                setFocusedCard(cardData)
+                showCardPopup()
             }
+    )
+}
+
+
+@Composable
+fun CardPopup(cardData: CardData,
+             modifier: Modifier = Modifier) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = modifier
+    ) {
+        Column {
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_name_label),
+                    cardData.cardname
+                ),
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_id_label),
+                    cardData.cardid
+                ),
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_setcode_label),
+                    cardData.setcode
+                ),
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_price_label),
+                    cardData.price,
+                    "$"
+                ),
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_quantity_label),
+                    cardData.quantity
+                ),
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
