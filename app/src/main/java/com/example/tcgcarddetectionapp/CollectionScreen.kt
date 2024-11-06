@@ -141,7 +141,7 @@ fun CollectionScreen(gameName: String,
                   popUp = false
                 },
                 userid = userid,
-                gameName = gameName)
+                gameName = gameFilter)
             }
             
             subcollections.forEach { subcollection ->
