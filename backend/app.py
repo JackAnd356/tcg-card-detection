@@ -338,7 +338,7 @@ def create_app():
                         resp = requests.get(url, headers=headers)
                         if resp.status_code == 200:
                             cardData = resp.json()
-                            image_url = cardData['images']['large']
+                            image_url = cardData['data']['images']['large']
                             
                             img_response = requests.get(image_url)
                             if img_response.status_code == 200:
