@@ -38,4 +38,7 @@ interface ApiService {
     @Multipart
     @POST("getCardInfo")
     fun getCardInfo(@Part image: MultipartBody.Part): Call<ResponseBody>
+
+    @POST("createUserSubcollection")
+    fun createUserSubcollection(@Body createSubcollectionRequest: CreateSubcollectionModel): Call<GenericSuccessErrorResponseModel>
 }

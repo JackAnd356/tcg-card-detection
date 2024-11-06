@@ -1,5 +1,7 @@
 package com.example.tcgcarddetectionapp
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -29,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +43,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.math.BigDecimal
 import kotlin.math.round
 
@@ -49,7 +58,8 @@ fun CollectionScreen(gameName: String,
                      totalCardCount: Int,
                      totalCardValue: Double,
                      navController: NavController,
-                     modifier: Modifier = Modifier) {
+                     modifier: Modifier = Modifier,
+                     userid: String) {
     var searchTerm by remember { mutableStateOf("") }
     var popUp by remember { mutableStateOf(false)}
     val scrollstate = rememberScrollState()
@@ -127,7 +137,11 @@ fun CollectionScreen(gameName: String,
                 DialogTest(onDismissRequest = {
                     popUp = false
                 },
-                onConfirmation = {})
+                onSubmitRequest = {
+                  popUp = false
+                },
+                userid = userid,
+                gameName = gameName)
             }
             
             subcollections.forEach { subcollection ->
@@ -197,10 +211,14 @@ fun CollectionSummary(name: String,
 @Composable
 fun DialogTest(
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
+    onSubmitRequest: () -> Unit,
+    userid: String,
+    gameName: String
 ) {
-    var subColName by remember { mutableStateOf("Placeholder") }
-    var subColLocation by remember { mutableStateOf("Placeholder")}
+    var subColName by remember { mutableStateOf("") }
+    var subColLocation by remember { mutableStateOf("")}
+    var isDeck by remember { mutableStateOf(false)}
+    var context = LocalContext.current
     Dialog(onDismissRequest = { onDismissRequest() }) {
         // Draw a rectangle shape with rounded corners inside the dialog
         Card(
@@ -217,7 +235,7 @@ fun DialogTest(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "This is a dialog with buttons and an image.",
+                    text = "Create A New Subcollection",
                     modifier = Modifier.padding(16.dp),
                 )
 
@@ -234,6 +252,18 @@ fun DialogTest(
                 )
 
                 Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = isDeck,
+                        onCheckedChange = { isDeck = it }
+                    )
+                    Text(
+                        "Is this collection a Deck?"
+                    )
+                }
+
+                Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -245,7 +275,14 @@ fun DialogTest(
                         Text("Dismiss")
                     }
                     TextButton(
-                        onClick = { onConfirmation() },
+                        onClick = {
+                            if (subColName != "") {
+                                createNewSubcollectionPost(gameName = gameName, userid = userid, isDeck = isDeck, subcolName = subColName, physLoc = subColLocation)
+                                onSubmitRequest()
+                            } else {
+                                Toast.makeText(context, "Fill out all required fields", Toast.LENGTH_SHORT).show()
+                            }
+                        },
                         modifier = Modifier.padding(8.dp),
                     ) {
                         Text("Confirm")
@@ -256,6 +293,35 @@ fun DialogTest(
     }
 }
 
+fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean, subcolName: String, physLoc: String) {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = CreateSubcollectionModel(userid = userid, name = subcolName, isDeck = isDeck, game = gameName, physLoc = physLoc)
+
+    retrofitAPI.createUserSubcollection(requestData).enqueue(object:
+        Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                if (respData.success == 0) {
+                    Log.d("ERROR", respData.error!!)
+                }
+            }
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -299,6 +365,7 @@ fun CollectionScreenPreview() {
             navController = rememberNavController(),
             totalCardCount = 200,
             totalCardValue = 1000000.00,
+            userid = "1"
         )
     }
 }

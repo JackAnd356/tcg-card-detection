@@ -127,6 +127,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     navController = navController,
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
+                    userid = userid
                 )
             }
         }
@@ -159,6 +160,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     navController = navController,
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
+                    userid = userid
                 )
             }
         }
@@ -191,6 +193,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     navController = navController,
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
+                    userid = userid
                 )
             }
         }

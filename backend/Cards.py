@@ -7,7 +7,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 
 # Threshold Levels
 THRESH_LOW = 0
-THRESH_HIGH = 100
+THRESH_HIGH = 120
 
 CARD_MAX_AREA = 2000000
 CARD_MIN_AREA = 10000
@@ -18,7 +18,7 @@ model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
 
 """Processes the input image and returns a dictionary with a list of all cards in frame, 
 card info is provided as a dictionary within each card"""
-def process_image(image, thresh_low, thresh_high):
+def process_image(image, thresh_low=THRESH_LOW, thresh_high=THRESH_HIGH):
     height, width = image.shape[:2]
     cards = []
 
