@@ -1,19 +1,42 @@
 import cv2
+import os
 import Cards
 
-frame = cv2.imread("../images/A-Assault_Core.jpg")
+maxFound = 0
+maxThreshLow = -1
+maxThreshHigh = -1
+for i in range(20):
+    for j in range(i+1, 20):
+        print(f'i: {i}, j: {j}')
+        totalFiles = 0
+        cardsFound = 0
+        for k, filename in enumerate(os.listdir("../images")):
+            filepath = os.path.join("../images", filename)
+            img = cv2.imread(filepath)
+            
+            img_cards = Cards.process_image(img, i*10, j*10)
+            totalFiles += 1
+            for card in img_cards["cards"]:
+                if "name" in card:
+                    cardsFound += 1
+                    print("Actual: " + filename + ", Detected: " + card["name"])
+                else:
+                    print("Card Detected but not properly")
 
-frameCards = Cards.process_image(frame)
-for card in frameCards["cards"]:
-    """cv2.imwrite("../images/stardust_dragon_warp.jpg", card["warp_bgr"])"""
-    print("Name: " + card["name"] + "Set_Code: " + card["setcode"] + "ID: " + card["cardid"])
-
-
-cam = 0
-while cam == 0:
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord("q"):
-        cam = 1
+            if len(img_cards["cards"]) == 0:
+                print(f'No Cards Found: {filename}')
+            """else:
+                cam = 0
+                while cam == 0:
+                    key = cv2.waitKey(1) & 0xFF
+                    if key == ord("q"):
+                        cam = 1
+                cv2.destroyAllWindows()"""
+        if cardsFound > maxFound:
+            maxFound = cardsFound
+            maxThreshLow = i
+            maxThreshHigh = j
+        print(f'Total Files: {totalFiles}, Cards Found: {cardsFound}')
         
+print(f'Max Found: {maxFound}, Thresh_Low: {maxThreshLow}, Thresh_High: {maxThreshHigh}')
 
-cv2.destroyAllWindows()

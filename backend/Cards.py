@@ -18,7 +18,7 @@ model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
 
 """Processes the input image and returns a dictionary with a list of all cards in frame, 
 card info is provided as a dictionary within each card"""
-def process_image(image):
+def process_image(image, thresh_low, thresh_high):
     height, width = image.shape[:2]
     cards = []
 
@@ -29,7 +29,7 @@ def process_image(image):
     # Resize the image
     image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
-    thresh = preprocess_image(image)
+    thresh = preprocess_image(image, thresh_low, thresh_high)
     ccs, isCard = find_cards(thresh)
 
     if len(ccs) == 0: return None
@@ -53,16 +53,16 @@ def predict_card(model, img):
     categories = ["yugioh", "mtg", "pokemon"]
     return categories[category], confidence
 
-def preprocess_image(image):
+def preprocess_image(image, thresh_low, thresh_high):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
 
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray,(13,13),0)
 
-    threshold1 = THRESH_LOW
-    threshold2 = THRESH_HIGH
+    threshold1 = thresh_low
+    threshold2 = thresh_high
     imgCanny = cv2.Canny(blur, threshold1, threshold2)
-    cv2.imshow("Canny Img", imgCanny)
+    """cv2.imshow("Canny Img", imgCanny)"""
 
     kernel = np.ones((5, 5), np.uint8)
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
@@ -105,9 +105,9 @@ def find_cards(thresh_image):
         peri = cv2.arcLength(cnts_sort[i],True)
         approx = cv2.approxPolyDP(cnts_sort[i],0.01*peri,True)
 
-        print(size)
+        """print(size)
         print(hier_sort[i][3])
-        print(len(approx)) 
+        print(len(approx)) """
 
         if ((size < CARD_MAX_AREA) and (size > CARD_MIN_AREA)
             and (hier_sort[i][3] == -1) and (len(approx) == 4)):
@@ -140,6 +140,8 @@ def preprocess_card(contour, frame):
     qCard["warp_rgb"] = warp_rgb
     qCard["warp_bgr"] = warp_bgr
 
+    """cv2.imshow("Warp", warp_bgr)"""
+
     classifyImage = cv2.resize(warp_bgr, (128, 128), interpolation=cv2.INTER_AREA)
     img_array = tf.expand_dims(classifyImage, 0) # Create a batch of size 1
     cardType, confidence = predict_card(model, img_array)
@@ -147,7 +149,7 @@ def preprocess_card(contour, frame):
 
     if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_rgb"])
     elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp_rgb"])
-    elif cardType == 'other': return None
+    else: return None
     qCard["name"] = name
     qCard["cardid"] = id
     qCard["setcode"] = setCode
@@ -161,8 +163,8 @@ def draw_on_card(qCard, frame):
     y = qCard["centerpoint"][1]
     cv2.circle(frame,(x,y),5,(255,0,0),-1)
 
-    card_info = qCard["name"] + ", " + qCard["cardid"] + ", " + qCard["setcode"]
-    print(card_info)
+    """card_info = qCard["name"] + ", " + qCard["cardid"] + ", " + qCard["setcode"]
+    print(card_info)"""
 
     "cv2.putText(frame, card_info, (x,y), font, 1, (255, 0, 0), 2, cv2.LINE_AA)"
 
@@ -171,26 +173,23 @@ def draw_on_card(qCard, frame):
 def get_yugioh_card_details(image):
     """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
        See https://pypi.org/project/pytesseract/"""
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Extract card name
     nameImg = image[12:60, 17:330]
-    nameImgCubic = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_LINEAR)
-    cv2.imshow("NameImg", nameImg)
-    cv2.imshow("NameImgCubic", nameImgCubic)
-    cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ')
-    
+    nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
+    """cv2.imshow("NameImg", nameImg)"""
+    cardName = pytesseract.image_to_string(nameImg)
+
     # Extract card ID
     cardIDImg = image[585:598, 5:70]
     cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    cv2.imshow("cardIDImg", cardIDImg)
+    """cv2.imshow("cardIDImg", cardIDImg)"""
     cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789')
     
     # Extract card set code
     cardSetCodeImg = image[435:450, 285:380]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    cv2.imshow("setCodeImg", cardSetCodeImg)
+    """cv2.imshow("setCodeImg", cardSetCodeImg)"""
     cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
 
     return (cardName, cardID, cardSetCode)
@@ -203,18 +202,18 @@ def get_mtg_card_details(image):
     # Extract card name
     nameImg = image[20:60, 30:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    cv2.imshow("NameImg", nameImg)
+    """cv2.imshow("NameImg", nameImg)"""
     cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ')
     
     cardSetCodeImg = image[572:590, 0:70]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    cv2.imshow("cardSetCodeImg", cardSetCodeImg)
+    """cv2.imshow("cardSetCodeImg", cardSetCodeImg)"""
     cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')
 
     # Extract card ID
     cardIDImg = image[560:572, 0:70]
     cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    cv2.imshow("cardIDImg", cardIDImg)
+    """cv2.imshow("cardIDImg", cardIDImg)"""
     cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')
 
     return (cardName, cardID, cardSetCode)
