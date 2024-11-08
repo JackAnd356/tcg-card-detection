@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import pytesseract
+import os
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -13,7 +14,8 @@ CARD_MAX_AREA = 2000000
 CARD_MIN_AREA = 10000
 
 #Classification Model
-model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
+model_path = os.path.join(os.path.dirname(__file__), 'card_classifier_model_ver2.h5')
+model = tf.keras.models.load_model(model_path)
 
 
 """Processes the input image and returns a dictionary with a list of all cards in frame, 
