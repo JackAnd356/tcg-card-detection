@@ -129,13 +129,15 @@ fun ImageCaptureFromCamera(modifier: Modifier) {
         file
     )
 
-    var capturedImageUri by remember {
-        mutableStateOf<Uri>(Uri.EMPTY)
-    }
+    var picTaken by remember { mutableStateOf(false) }
 
-    val takePictureLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.TakePicture()) {
-        capturedImageUri = uri
-    }
+    val takePictureLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.TakePicture(),
+        onResult = { isPictureTaken ->
+            if (isPictureTaken) {
+                scanPhotoPost(file)
+                picTaken = true
+            }
+        })
 
     val cameraPermLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(), onResult = { isGranted ->
         if (isGranted) {
@@ -157,10 +159,11 @@ fun ImageCaptureFromCamera(modifier: Modifier) {
         )
     }
 
-    if (capturedImageUri.path?.isNotEmpty() == true) {
+    if (picTaken) {
+        println("Picture Taken")
         val painter = rememberAsyncImagePainter(
             model = ImageRequest.Builder(context)
-                .data(capturedImageUri)
+                .data(uri)
                 .build()
         )
 
@@ -169,8 +172,6 @@ fun ImageCaptureFromCamera(modifier: Modifier) {
             modifier = Modifier,
             contentDescription = "Captured Image"
         )
-
-        scanPhotoPost(file)
     }
 }
 
