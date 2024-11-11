@@ -40,4 +40,7 @@
     <string name="back_to_login_button_label">Back to Login</string>
     <string name="logout_button_label">Log Out</string>
     <string name="delete_account_button_label">Delete Account</string>
+    <string name="delete_account_confirmation_message">Are You Sure You Want To Delete Your Account?</string>
+    <string name="yes_label">Yes</string>
+    <string name="no_label">No</string>
 </resources>

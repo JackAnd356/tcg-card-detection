@@ -227,7 +227,7 @@ fun SaveNewUserPost(
         ) {
             val respData = response.body()
             if (respData != null) {
-                if (respData.success == 0) {
+                if (!respData.success) {
                     Log.d("ERROR", respData.error!!)
                     setErrorText(respData.error)
                 }

@@ -1,9 +1,11 @@
 package com.example.tcgcarddetectionapp
 
+import androidx.compose.ui.window.Dialog
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -64,6 +67,7 @@ fun ProfileScreen(username: String,
     var enteredPassword by remember { mutableStateOf("******")}
     var oldUsername by remember { mutableStateOf(username) }
     var oldEmail by remember { mutableStateOf(email) }
+    var showDeletePopup by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier) {
@@ -73,6 +77,13 @@ fun ProfileScreen(username: String,
             lineHeight = 100.sp,
             textAlign = TextAlign.Center
         )
+        if(showDeletePopup) {
+            DeleteUserWarningPopup(
+                userid = userid,
+                onDismiss = { showDeletePopup = !showDeletePopup},
+                navLogin = onLogout
+            )
+        }
         UserDataComponent(label = stringResource(R.string.username_label),
             data = username,
             modifier = modifier,
@@ -127,7 +138,7 @@ fun ProfileScreen(username: String,
             Text(stringResource(R.string.logout_button_label))
         }
         Button(
-            onClick = { }
+            onClick = { showDeletePopup = !showDeletePopup}
         ) {
             Text(stringResource(R.string.delete_account_button_label))
         }
@@ -270,6 +281,47 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
     }
 }
 
+@Composable
+fun DeleteUserWarningPopup(
+    userid: String,
+    onDismiss: () -> Unit,
+    navLogin: () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Card {
+            Text(stringResource(R.string.delete_account_confirmation_message))
+            Row {
+                Button(
+                    onClick = {
+                        deleteUserPost(userid = userid, navLogin = navLogin)
+                    },
+                    colors = ButtonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Red,
+                        disabledContentColor = Color.White
+                    )
+                ) {
+                    Text(stringResource(R.string.yes_label))
+                }
+                Button(
+                    onClick = { onDismiss() },
+                    colors = ButtonColors(
+                        containerColor = Color.Gray,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
+                    )
+                ) {
+                    Text(stringResource(R.string.no_label))
+                }
+            }
+        }
+    }
+}
+
 fun SaveUsernamePost(userid: String, username: String) {
     var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
@@ -354,7 +406,36 @@ fun SaveEmailPost(userid: String, email: String) {
     })
 }
 
+fun deleteUserPost(userid: String, navLogin: () -> Unit) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = UserCollectionRequestModel(userid = userid)
+    retrofitAPI.deleteUser(requestData).enqueue(object: Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                if (respData.success == 0) {
+                    Log.d("ERROR", respData.error!!)
+                }
+                else {
+                    navLogin()
+                }
+            }
+        }
 
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    } )
+}
 
 
 @Preview(showBackground = true)
