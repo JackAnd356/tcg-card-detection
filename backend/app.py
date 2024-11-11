@@ -162,7 +162,13 @@ def create_app():
                         resp = requests.get(url, headers=headers)
                         if resp.status_code == 200:
                             cardData = resp.json()
-                            price = cardData['tcgplayer']['prices']['normal']['market']
+                            if res['rarity'] in list(cardData['data']['tcgplayer']['prices'].keys()):
+                                price = cardData['data']['tcgplayer']['prices'][res['rarirty']]['market']
+                            elif "normal" in list(cardData['data']['tcgplayer']['prices'].keys()):
+                                price = cardData['data']['tcgplayer']['prices']['normal']['market']
+                            else:
+                                dictKey = list(cardData['data']['tcgplayer']['prices'].keys())[0]
+                                price = cardData['data']['tcgplayer']['prices'][dictKey]['market']
                     payload = {'cardid' : cardId, 'setcode' : cardSetCode, 'game' : game, 'rarity' : res['rarity']}
                     updateOp = updateOp = { '$set' : 
                                 { 'price' : price,
@@ -269,7 +275,7 @@ def create_app():
             payload = {'userid' : userid}
             userDel = userCollection.delete_one(payload)
             cardDel = cardCollection.delete_many(payload)
-            return {'Message' : 'User removed', 'remUserCnt' : userDel.deleted_count, 'remCardCnt' : cardDel.deleted_count}, 201
+            return {'Message' : 'User removed', 'remUserCnt' : userDel.deleted_count, 'remCardCnt' : cardDel.deleted_count, 'success' : 1}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
     
     @app.post('/getUserCollection')
@@ -376,6 +382,25 @@ def create_app():
             else :
                 payload['rarity'] = ''
             result = collection.find_one(payload)
+            if payload['game'] == 'yugioh':
+                payload['level'] = clientUserInfo['level']
+                payload['attribute'] = clientUserInfo['attribute']
+                payload['type'] = clientUserInfo['type']
+                payload['description'] = clientUserInfo['description']
+                payload['atk'] = clientUserInfo['atk']
+                payload['def'] = clientUserInfo['def']
+            elif payload['game'] == 'mtg':
+                payload['cost'] = clientUserInfo['cost']
+                payload['type'] = clientUserInfo['type']
+                payload['description'] = clientUserInfo['description'] #This is the effect text
+                payload['attribute'] = clientUserInfo['attribute'] #This is the color
+            else:
+                payload['attribute'] = clientUserInfo['attribute'] #This is the energy type
+                payload['type'] = clientUserInfo['type'] #This is the stage
+                payload['attacks'] = clientUserInfo['attacks']
+                payload['weakenesses'] = clientUserInfo['weaknesses']
+                payload['hp'] = clientUserInfo['hp']
+                payload['retreat'] = clientUserInfo['retreat']
             if result == None:
                 payload['quantity'] = clientUserInfo['quantity']
                 payload['price'] = clientUserInfo['price']
