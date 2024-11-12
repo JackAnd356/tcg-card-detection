@@ -59,7 +59,8 @@ fun CollectionScreen(gameName: String,
                      totalCardValue: Double,
                      navController: NavController,
                      modifier: Modifier = Modifier,
-                     userid: String) {
+                     userid: String,
+                     onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
     var searchTerm by remember { mutableStateOf("") }
     var popUp by remember { mutableStateOf(false)}
     val scrollstate = rememberScrollState()
@@ -141,7 +142,8 @@ fun CollectionScreen(gameName: String,
                   popUp = false
                 },
                 userid = userid,
-                gameName = gameFilter)
+                gameName = gameFilter,
+                onUserSubColInfoChange = onUserSubColInfoChange)
             }
             
             subcollections.forEach { subcollection ->
@@ -213,7 +215,8 @@ fun DialogTest(
     onDismissRequest: () -> Unit,
     onSubmitRequest: () -> Unit,
     userid: String,
-    gameName: String
+    gameName: String,
+    onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit
 ) {
     var subColName by remember { mutableStateOf("") }
     var subColLocation by remember { mutableStateOf("")}
@@ -277,7 +280,7 @@ fun DialogTest(
                     TextButton(
                         onClick = {
                             if (subColName != "") {
-                                createNewSubcollectionPost(gameName = gameName, userid = userid, isDeck = isDeck, subcolName = subColName, physLoc = subColLocation)
+                                createNewSubcollectionPost(gameName = gameName, userid = userid, isDeck = isDeck, subcolName = subColName, physLoc = subColLocation, onUserSubColInfoChange = onUserSubColInfoChange)
                                 onSubmitRequest()
                             } else {
                                 Toast.makeText(context, "Fill out all required fields", Toast.LENGTH_SHORT).show()
@@ -293,7 +296,7 @@ fun DialogTest(
     }
 }
 
-fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean, subcolName: String, physLoc: String) {
+fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean, subcolName: String, physLoc: String, onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -312,6 +315,8 @@ fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean
             if (respData != null) {
                 if (respData.success == 0) {
                     Log.d("ERROR", respData.error!!)
+                } else {
+                    subcollectionPost(userid = userid, onUserSubColInfoChange, {})
                 }
             }
         }
@@ -365,7 +370,8 @@ fun CollectionScreenPreview() {
             navController = rememberNavController(),
             totalCardCount = 200,
             totalCardValue = 1000000.00,
-            userid = "1"
+            userid = "1",
+            onUserSubColInfoChange = {}
         )
     }
 }
