@@ -272,7 +272,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
-                ScanScreen()
+                ScanScreen(userid = userid, collectionNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) })
             }
         }
 

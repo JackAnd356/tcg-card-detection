@@ -1,17 +1,14 @@
 package com.example.tcgcarddetectionapp
 
-
-data class CardData(
-    val userid : String,
-    val cardid: String,
-    val setcode: String,
-    val quantity: Int,
-    val rarity: String,
-    val subcollections: Array<String>?,
+data class AddToCollectionModel (
+    val userid: String,
     val game: String,
-    val price: Double,
-    var image: String?,
+    val cardid: String,
+    val setcode : String,
     val cardname: String,
+    val quantity: Int,
+    val rarity: String? = null,
+    val price: Double,
     val attribute: String? = null,
     val level: String? = null,
     val type: String? = null,
@@ -23,17 +20,4 @@ data class CardData(
     val retreat: Array<String>? = null,
     val weaknesses: Array<Weakness>? = null,
     val attacks: Array<Attack>? = null,
-    var added: Boolean = true
-)
-
-data class Weakness(
-    val type: String,
-    val value: String,
-)
-
-data class Attack(
-    val name: String,
-    val cost: Array<String>,
-    val damage: String,
-    val text: String?,
 )
