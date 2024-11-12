@@ -127,7 +127,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     navController = navController,
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
-                    userid = userid
+                    userid = userid,
+                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) }
                 )
             }
         }
@@ -160,7 +161,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     navController = navController,
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
-                    userid = userid
+                    userid = userid,
+                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) }
                 )
             }
         }
@@ -193,7 +195,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     navController = navController,
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
-                    userid = userid
+                    userid = userid,
+                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) }
                 )
             }
         }
