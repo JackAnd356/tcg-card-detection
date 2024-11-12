@@ -11,18 +11,15 @@ import retrofit2.http.Part
 
 interface ApiService {
 
-    @Headers("Connection: close")
     @POST("authenticateUser")
     fun loginUser(@Body loginRequest: LoginRequestModel): Call<LoginResponseModel>
 
     @POST("saveUserStorefront")
     fun saveUserStorefront(@Body saveStorefrontRequestModel: SaveStorefrontRequestModel): Call<GenericSuccessErrorResponseModel>
 
-    @Headers("Connection: close")
     @POST("getUserCollection")
     fun getUserCollection(@Body userCollectionRequest: UserCollectionRequestModel): Call<Array<CardData>>
 
-    @Headers("Connection: close")
     @POST("getUserSubcollectionInfo")
     fun getUserSubcollectionInfo(@Body userSubcollectionInfoRequest: UserSubcollectionInfoRequestModel): Call<UserSubcollectionInfoResponseModel>
 
@@ -47,4 +44,8 @@ interface ApiService {
 
     @POST("deleteUser")
     fun deleteUser(@Body deleteUserRequest: UserCollectionRequestModel): Call<GenericSuccessErrorResponseModel>
+
+    @Headers("Connection: close")
+    @POST("getCardImage")
+    fun getCardImage(@Body getCardImageRequest: GetCardImageRequestModel): Call<GetCardImageResponseModel>
 }

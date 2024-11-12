@@ -1,7 +1,6 @@
 package com.example.tcgcarddetectionapp
 
 import android.graphics.BitmapFactory
-import androidx.camera.video.internal.compat.quirk.ReportedVideoQualityNotSupportedQuirk
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,6 +42,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
+                        storefront: Int,
                         cardData: Array<CardData>,
                         navBack: () -> Unit,
                         modifier: Modifier = Modifier) {
@@ -147,6 +147,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 ) {
                     CardPopup(
                         cardData = currentFocusedCard,
+                        storefront = storefront,
                     )
                 }
             }
@@ -165,8 +166,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         val cardInfo = filteredCardData[j]
                         CardImage(
                             cardData = cardInfo,
-                            setFocusedCard = {currentFocusedCard = it},
-                            showCardPopup = {showCardPopup = !showCardPopup},
+                            setFocusedCard = { currentFocusedCard = it },
+                            showCardPopup = { showCardPopup = !showCardPopup },
                             modifier = modifier
                                 .padding(vertical = 20.dp, horizontal = 15.dp)
                         )
@@ -184,7 +185,7 @@ fun CardImage(cardData: CardData,
               setFocusedCard: (CardData) -> Unit,
               showCardPopup: () -> Unit,
               modifier: Modifier) {
-    val decodedString = Base64.decode(cardData.image, 0)
+    val decodedString = Base64.decode(cardData.image!!, 0)
     val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     Image(
         bitmap = img.asImageBitmap(),
@@ -199,61 +200,209 @@ fun CardImage(cardData: CardData,
 }
 
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun CardPopup(cardData: CardData,
+              storefront: Int,
              modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
     ) {
-        Column {
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_name_label),
-                    cardData.cardname
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_id_label),
-                    cardData.cardid
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_setcode_label),
-                    cardData.setcode
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_price_label),
-                    cardData.price,
-                    "$"
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_quantity_label),
-                    cardData.quantity
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
+        if (cardData.game == "yugioh") {
+            Row {
+                Column {
+                    val decodedString = Base64.decode(cardData.image!!, 0)
+                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    Image(
+                        bitmap = img.asImageBitmap(),
+                        contentDescription = "Card",
+                        modifier
+                            .size(120.dp, 200.dp)
+                    )
+                    Text(cardData.cardname)
+                    Text(
+                        text = String.format(stringResource(R.string.card_id_label), cardData.cardid),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    Text(
+                        text = String.format(stringResource(R.string.card_setcode_label), cardData.setcode),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                }
+                Column {
+                    Text(stringResource(R.string.price_header))
+                    Text(
+                        String.format(
+                            stringResource(R.string.card_price_label),
+                            cardData.price,
+                            "$"
+                        )
+                    )
+                    Button(
+                        onClick = {}
+                    ) {
+                        if (storefront == 1) {
+                            Text(stringResource(R.string.tcgplayer_label))
+                        } else if (storefront == 2) {
+                            Text(stringResource(R.string.card_market_label))
+                        }
+                    }
+                    Row {
+                        Text(String.format(stringResource(R.string.level_label), cardData.level))
+                        Text(String.format(stringResource(R.string.attribute_label), cardData.attribute))
+                    }
+                    Text(String.format(stringResource(R.string.type_label), cardData.type))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Gray)
+                    ) {
+                        Text(cardData.description!!.replace("\\n", "\n"))
+                    }
+                    Row {
+                        Text(String.format(stringResource(R.string.atk_label), cardData.atk))
+                        Text(String.format(stringResource(R.string.def_label), cardData.def))
+                    }
+                }
+            }
         }
+        else if (cardData.game == "mtg") {
+            Row {
+                Column {
+                    val decodedString = Base64.decode(cardData.image!!, 0)
+                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    Image(
+                        bitmap = img.asImageBitmap(),
+                        contentDescription = "Card",
+                        modifier
+                            .size(120.dp, 200.dp)
+                    )
+                    Text(cardData.cardname)
+                    Text(
+                        text = String.format(stringResource(R.string.card_setcode_label), cardData.setcode),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                }
+                Column {
+                    Text(stringResource(R.string.price_header))
+                    Text(
+                        String.format(
+                            stringResource(R.string.card_price_label),
+                            cardData.price,
+                            "$"
+                        )
+                    )
+                    Button(
+                        onClick = {}
+                    ) {
+                        if (storefront == 1) {
+                            Text(stringResource(R.string.tcgplayer_label))
+                        } else if (storefront == 2) {
+                            Text(stringResource(R.string.card_market_label))
+                        }
+                    }
+                    Row {
+                        Text(String.format(stringResource(R.string.cost_label), cardData.cost))
+                        Text(String.format(stringResource(R.string.color_label), cardData.attribute))
+                    }
+                    Text(String.format(stringResource(R.string.type_label), cardData.type))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Gray)
+                    ) {
+                        Text(cardData.description!!.replace("\\n", "\n"))
+                    }
+                    if(cardData.atk != null) {
+                        Row {
+                            Text(String.format(stringResource(R.string.power_label), cardData.atk))
+                            Text(String.format(stringResource(R.string.toughness_label), cardData.def))
+                        }
+                    }
+                }
+            }
+        }
+        else { //Pokemon
+            Row {
+                Column {
+                    val decodedString = Base64.decode(cardData.image!!, 0)
+                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    Image(
+                        bitmap = img.asImageBitmap(),
+                        contentDescription = "Card",
+                        modifier
+                            .size(120.dp, 200.dp)
+                    )
+                    Text(cardData.cardname)
+                    Text(
+                        text = String.format(stringResource(R.string.card_id_label), cardData.cardid),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    Text(
+                        text = String.format(stringResource(R.string.card_setcode_label), cardData.setcode),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    Text(
+                        text = String.format(stringResource(R.string.hp), cardData.hp),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    cardData.weaknesses!!.forEach {
+                        weakness ->
+                        Text(
+                            text = String.format(stringResource(R.string.weakness_label), weakness.type, weakness.value),
+                            fontSize = 10.sp,
+                            lineHeight = 15.sp,
+                        )
+                    }
+                    Text(
+                        text = String.format(stringResource(R.string.retreat), arrToPrintableString(cardData.retreat!!)),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+
+                }
+                Column {
+                    Text(stringResource(R.string.price_header))
+                    Text(
+                        String.format(
+                            stringResource(R.string.card_price_label),
+                            cardData.price,
+                            "$"
+                        )
+                    )
+                    Button(
+                        onClick = {}
+                    ) {
+                        if (storefront == 1) {
+                            Text(stringResource(R.string.tcgplayer_label))
+                        } else if (storefront == 2) {
+                            Text(stringResource(R.string.card_market_label))
+                        }
+                    }
+
+                    Text(String.format(stringResource(R.string.attribute_label), cardData.attribute))
+
+                    Text(String.format(stringResource(R.string.type_label), cardData.type))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Gray)
+                    ) {
+                        cardData.attacks!!.forEach {
+                            attack ->
+                            Text(String.format(stringResource(R.string.cost_label), arrToPrintableString(attack.cost)))
+                            Text(String.format(stringResource(R.string.card_name_label), attack.name))
+                            Text(String.format(stringResource(R.string.damage_label), attack.damage))
+                            if (attack.text != null) {
+                                Text(String.format(stringResource(R.string.effect_label), attack.text))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
 
@@ -314,8 +463,18 @@ fun SubollectionScreenPreview() {
     TCGCardDetectionAppTheme {
         SubcollectionScreen(
             subcolInfo = subCol1,
+            storefront = 1,
             cardData = cards,
             navBack = {  },
         )
     }
+}
+
+fun arrToPrintableString(arr: Array<String>): String {
+    var str = ""
+    arr.forEach {
+            itm ->
+        str += itm + ","
+    }
+    return str
 }

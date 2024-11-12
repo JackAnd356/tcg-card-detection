@@ -341,6 +341,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             ) {
                 SubcollectionScreen(
                     subcolInfo = thisSubCol!!,
+                    storefront = storefront,
                     cardData = thisCardPool.toTypedArray(),
                     navBack = {
                         if (game == "yugioh") {
