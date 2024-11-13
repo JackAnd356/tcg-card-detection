@@ -296,6 +296,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             val game = navBackStackEntry.arguments?.getString("game")
             var thisSubCol: SubcollectionInfo? = null
             var thisCardPool = mutableListOf<CardData>()
+            var allCardsFlag = false
 
             if (subColId == "all") {
                 thisSubCol = SubcollectionInfo(
@@ -316,6 +317,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                         thisSubCol!!.cardCount = thisSubCol!!.cardCount?.plus(card.quantity)
                     }
                 }
+                allCardsFlag = true
             }
             else {
                 subColInfo.forEach {
@@ -346,6 +348,11 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     subcolInfo = thisSubCol!!,
                     storefront = storefront,
                     cardData = thisCardPool.toTypedArray(),
+                    allCardsFlag = allCardsFlag,
+                    fullCardPool = collection,
+                    subcollections = subColInfo,
+                    game = game!!,
+                    userid = userid,
                     navBack = {
                         if (game == "yugioh") {
                             navController.navigate(CardDetectionScreens.YugiohCollection.name)
@@ -370,7 +377,7 @@ fun onUserSubColInfoChange(subColInfo: Array<SubcollectionInfo>, cardDataCollect
         if (card.subcollections != null) {
             subColInfo.forEach {
                     subCol ->
-                if (subCol.subcollectionid in card.subcollections) {
+                if (subCol.subcollectionid in card.subcollections!!) {
                     if (subCol.cardCount == null) {
                         subCol.cardCount = card.quantity
                     }

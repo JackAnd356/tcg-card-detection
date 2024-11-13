@@ -48,4 +48,7 @@ interface ApiService {
     @Headers("Connection: close")
     @POST("getCardImage")
     fun getCardImage(@Body getCardImageRequest: GetCardImageRequestModel): Call<GetCardImageResponseModel>
+
+    @POST("addToUserSubcollection")
+    fun addToUserSubcollection(@Body addToUserSubcollectionRequest: SaveToSubcollectionRequestModel): Call<SaveToSubcollectionResponseModel>
 }

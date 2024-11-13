@@ -7,7 +7,7 @@ data class CardData(
     val setcode: String,
     val quantity: Int,
     val rarity: String,
-    val subcollections: Array<String>?,
+    var subcollections: Array<String>?,
     val game: String,
     val price: Double,
     var image: String?,

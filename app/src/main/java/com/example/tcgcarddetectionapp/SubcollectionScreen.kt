@@ -37,6 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -45,6 +50,11 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         storefront: Int,
                         cardData: Array<CardData>,
                         navBack: () -> Unit,
+                        allCardsFlag: Boolean,
+                        fullCardPool: Array<CardData>,
+                        game: String,
+                        userid: String,
+                        subcollections: Array<SubcollectionInfo>,
                         modifier: Modifier = Modifier) {
     var searchTerm by remember { mutableStateOf("") }
     var showCardPopup by remember { mutableStateOf(false) }
@@ -63,6 +73,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         ),
     ) }
     val scrollstate = rememberScrollState()
+    val refreshFlag by remember { mutableStateOf(false) }
 
     Box(
         modifier
@@ -148,6 +159,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     CardPopup(
                         cardData = currentFocusedCard,
                         storefront = storefront,
+                        subcollections = subcollections,
+                        game = game,
+                        userid = userid,
+                        allCardsFlag = allCardsFlag,
                     )
                 }
             }
@@ -204,7 +219,19 @@ fun CardImage(cardData: CardData,
 @Composable
 fun CardPopup(cardData: CardData,
               storefront: Int,
-             modifier: Modifier = Modifier) {
+              subcollections: Array<SubcollectionInfo>,
+              game: String,
+              userid: String,
+              allCardsFlag: Boolean,
+              modifier: Modifier = Modifier) {
+    val optionInfo = subcollections.filter( predicate = {
+        it.game == game
+    })
+    val optionList = subcollections.map { it.name }
+    var selectedOption by remember { mutableStateOf("") }
+    var selectedIndex by remember { mutableStateOf(1) }
+    var responseText by remember { mutableStateOf("")}
+    val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
@@ -250,9 +277,11 @@ fun CardPopup(cardData: CardData,
                             Text(stringResource(R.string.card_market_label))
                         }
                     }
-                    Row {
-                        Text(String.format(stringResource(R.string.level_label), cardData.level))
-                        Text(String.format(stringResource(R.string.attribute_label), cardData.attribute))
+                    if (cardData.level != null) {
+                        Row {
+                            Text(String.format(stringResource(R.string.level_label), cardData.level))
+                            Text(String.format(stringResource(R.string.attribute_label), cardData.attribute))
+                        }
                     }
                     Text(String.format(stringResource(R.string.type_label), cardData.type))
                     Card(
@@ -260,9 +289,11 @@ fun CardPopup(cardData: CardData,
                     ) {
                         Text(cardData.description!!.replace("\\n", "\n"))
                     }
-                    Row {
-                        Text(String.format(stringResource(R.string.atk_label), cardData.atk))
-                        Text(String.format(stringResource(R.string.def_label), cardData.def))
+                    if (cardData.atk != null) {
+                        Row {
+                            Text(String.format(stringResource(R.string.atk_label), cardData.atk))
+                            Text(String.format(stringResource(R.string.def_label), cardData.def))
+                        }
                     }
                 }
             }
@@ -402,8 +433,89 @@ fun CardPopup(cardData: CardData,
                 }
             }
         }
+        if(allCardsFlag) {
+            UserDropdownSelector(
+                label = stringResource(R.string.subcollection_page),
+                data = 1,
+                onUserStorefrontChange = {
+                    selectedOption = optionInfo.get(it - 1).subcollectionid
+                    selectedIndex = it - 1
+                },
+                options = optionList,
+            )
+            Button(
+                onClick = {
+                    saveToSubcollectionPost(
+                        card = cardData,
+                        userid = userid,
+                        subcollection = selectedOption,
+                        subcolInfo = optionInfo.get(selectedIndex)
+                    )
+                    responseText = staticResponseText
+                },
+                enabled = selectedOption != ""
+            ) {
+                Text(stringResource(R.string.add_to_subcollection_button_label))
+            }
 
+        }
     }
+}
+
+fun arrToPrintableString(arr: Array<String>): String {
+    var str = ""
+    arr.forEach {
+            itm ->
+        str += itm + ","
+    }
+    return str
+}
+
+fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: String, subcolInfo: SubcollectionInfo) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = SaveToSubcollectionRequestModel(
+        userid = userid,
+        cardid = card.cardid,
+        setcode = card.setcode,
+        game = card.game,
+        rarity = card.rarity,
+        subcollection = subcollection,
+    )
+    retrofitAPI.addToUserSubcollection(requestData).enqueue(object : Callback<SaveToSubcollectionResponseModel> {
+        override fun onResponse(
+            call: Call<SaveToSubcollectionResponseModel>,
+            response: Response<SaveToSubcollectionResponseModel>
+        ) {
+            if (card.subcollections == null) {
+                card.subcollections = arrayOf(subcollection)
+            }
+            else {
+                card.subcollections = card.subcollections!!.plus(subcollection)
+            }
+            if (subcolInfo.cardCount == null) {
+                subcolInfo.cardCount = card.quantity
+            }
+            else {
+                subcolInfo.cardCount = subcolInfo.cardCount!! + card.quantity
+            }
+            if (subcolInfo.totalValue == null) {
+                subcolInfo.totalValue = card.quantity * card.price
+            }
+            else {
+                subcolInfo.totalValue = subcolInfo.totalValue!! + (card.quantity * card.price)
+            }
+        }
+
+        override fun onFailure(call: Call<SaveToSubcollectionResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
 }
 
 
@@ -465,16 +577,13 @@ fun SubollectionScreenPreview() {
             subcolInfo = subCol1,
             storefront = 1,
             cardData = cards,
-            navBack = {  },
+            navBack = { },
+            allCardsFlag = false,
+            fullCardPool = cards,
+            subcollections = arrayOf(subCol1),
+            userid = "1",
+            game = "yugioh"
         )
     }
 }
 
-fun arrToPrintableString(arr: Array<String>): String {
-    var str = ""
-    arr.forEach {
-            itm ->
-        str += itm + ","
-    }
-    return str
-}

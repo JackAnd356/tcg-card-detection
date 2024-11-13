@@ -60,4 +60,6 @@
     <string name="weakness_label">Weakness: %1$s %2$s</string>
     <string name="hp">HP: %1$s</string>
     <string name="retreat">Retreat: %1$s</string>
+    <string name="add_to_subcollection_button_label">Add</string>
+    <string name="card_added_to_subcollection_message">Card Added To Subcollection!</string>
 </resources>
