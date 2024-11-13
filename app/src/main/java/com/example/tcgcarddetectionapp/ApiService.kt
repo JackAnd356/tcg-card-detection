@@ -51,4 +51,7 @@ interface ApiService {
 
     @POST("addToUserCollection")
     fun addToCollection(@Body addToCollectionRequest: AddToCollectionModel): Call<GenericSuccessErrorResponseModel>
+
+    @POST("addToUserSubcollection")
+    fun addToUserSubcollection(@Body addToUserSubcollection: SaveToSubcollectionRequestModel): Call<SaveToSubcollectionResponseModel>
 }
