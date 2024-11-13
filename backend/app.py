@@ -81,8 +81,7 @@ def create_app():
         image_file.save(image_path)
 
         cards = processCardImage(image_path)
-        retData = {'cards': cards}
-        return jsonify(retData), 201
+        return jsonify(cards), 201
     
     @app.post('/createNewUser')
     def post_createNewUser():
