@@ -31,12 +31,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -215,9 +218,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         game = game,
                         userid = userid,
                         allCardsFlag = allCardsFlag,
-                        collection = cardData,
                         onCollectionChange = onCollectionChange,
-                        subcolInfo = subcolInfo
+                        subcolInfo = subcolInfo,
+                        updateCards = {cardData = it.toMutableStateList()},
+                        fullCardPool = fullCardPool
                     )
                 }
             }
@@ -278,10 +282,15 @@ fun CardPopup(cardData: CardData,
               game: String,
               userid: String,
               allCardsFlag: Boolean,
-              modifier: Modifier = Modifier) {
+              fullCardPool: Array<CardData>,
+              modifier: Modifier = Modifier,
+              subcolInfo: SubcollectionInfo,
+              onCollectionChange: (Array<CardData>) -> Unit,
+              updateCards: (ArrayList<CardData>) -> Unit) {
     val optionInfo = subcollections.filter( predicate = {
         it.game == game
     })
+    val context = LocalContext.current
     val optionList = subcollections.map { it.name }
     var selectedOption by remember { mutableStateOf("") }
     var selectedIndex by remember { mutableStateOf(1) }
@@ -516,7 +525,7 @@ fun CardPopup(cardData: CardData,
 
             Column {
                 Button(onClick = {
-                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, collection = collection, onCollectionChange = onCollectionChange)
+                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, updateCards = updateCards)
                     if (successful) Toast.makeText(context, "Card Successfully Removed", Toast.LENGTH_SHORT).show()
                 }, modifier = Modifier.align(Alignment.End)) {
                     Text(text="Delete")
@@ -593,7 +602,7 @@ fun arrToPrintableString(arr: Array<String>): String {
     return str
 }
 
-fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, collection: Array<CardData>, onCollectionChange: (Array<CardData>) -> Unit): Boolean {
+fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>, onCollectionChange: (Array<CardData>) -> Unit, updateCards: (ArrayList<CardData>) -> Unit): Boolean {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -609,10 +618,15 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
         ) {
             if (card.quantity <= 1) {
                 val cardsWithoutRemoved = ArrayList<CardData>()
-                for (cardData in collection) {
-                    if (card != cardData) cardsWithoutRemoved.add(cardData)
+                val cardsFromGameWithoutRemoved = ArrayList<CardData>()
+                for (cardData in fullCardPool) {
+                    if (card != cardData) {
+                        if (cardData.game == game) cardsFromGameWithoutRemoved.add(cardData)
+                        cardsWithoutRemoved.add(cardData)
+                    }
                 }
                 onCollectionChange(cardsWithoutRemoved.toTypedArray())
+                updateCards(cardsFromGameWithoutRemoved)
             } else {
                 card.quantity--
             }
@@ -652,7 +666,7 @@ fun removeFromSubcollectionPost(card: CardData, userid: String, subcollection: S
     return successful
 }
 
-fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: String, subcolInfo: SubcollectionInfo) {
+fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: String, subcolInfo: SubcollectionInfo, refreshUI: () -> Unit) {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
