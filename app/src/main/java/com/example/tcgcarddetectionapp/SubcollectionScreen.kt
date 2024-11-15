@@ -1,5 +1,6 @@
 package com.example.tcgcarddetectionapp
 
+import android.app.Dialog
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -20,11 +21,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,7 +55,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         storefront: Int,
-                        cardData: Array<CardData>,
                         navBack: () -> Unit,
                         allCardsFlag: Boolean,
                         fullCardPool: Array<CardData>,
@@ -62,6 +65,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         onCollectionChange: (Array<CardData>) -> Unit) {
     var searchTerm by remember { mutableStateOf("") }
     var showCardPopup by remember { mutableStateOf(false) }
+    var showAllCardAddToSubcollection by remember { mutableStateOf(false) }
     var currentFocusedCard by remember { mutableStateOf<CardData>(
         value = CardData(
             userid = "",
@@ -77,7 +81,27 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         ),
     ) }
     val scrollstate = rememberScrollState()
-    val refreshFlag by remember { mutableStateOf(false) }
+    var refreshFlag by remember { mutableStateOf(false) }
+    var cardData = remember { mutableStateListOf<CardData>() }
+
+    if (subcolInfo.subcollectionid == "all") {
+        fullCardPool.forEach {
+                card ->
+            if (!cardData.contains(card) && card.game == game) {
+                cardData.add(card)
+                subcolInfo!!.totalValue = subcolInfo!!.totalValue?.plus((card.quantity * card.price))
+                subcolInfo!!.cardCount = subcolInfo!!.cardCount?.plus(card.quantity)
+            }
+        }
+    }
+    else {
+        fullCardPool.forEach {
+                card ->
+            if (!cardData.contains(card) && card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
+                cardData.add(card)
+            }
+        }
+    }
 
     Box(
         modifier
@@ -156,6 +180,30 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             ) {
                 Text(stringResource(R.string.filter_button_label))
             }
+            if(!allCardsFlag) {
+                Button(
+                    onClick = {
+                        showAllCardAddToSubcollection = !showAllCardAddToSubcollection
+                    }
+                ) {
+                    Text(stringResource(R.string.add_from_all_cards_button_label))
+                }
+            }
+            if (showAllCardAddToSubcollection) {
+                Dialog(
+                    onDismissRequest = {showAllCardAddToSubcollection = !showAllCardAddToSubcollection}
+                ) {
+                    AddFromAllCardsPopup(
+                        allCards = fullCardPool,
+                        game = game,
+                        subcollection = subcolInfo.subcollectionid,
+                        userid = userid,
+                        subcolInfo = subcolInfo,
+                        modifier = modifier,
+                        refreshUI = { refreshFlag = !refreshFlag }
+                    )
+                }
+            }
             if (showCardPopup) {
                 Dialog(
                     onDismissRequest = { showCardPopup = !showCardPopup}
@@ -230,18 +278,14 @@ fun CardPopup(cardData: CardData,
               game: String,
               userid: String,
               allCardsFlag: Boolean,
-              modifier: Modifier = Modifier,
-              collection: Array<CardData>,
-              onCollectionChange: (Array<CardData>) -> Unit,
-              subcolInfo: SubcollectionInfo) {
+              modifier: Modifier = Modifier) {
     val optionInfo = subcollections.filter( predicate = {
         it.game == game
     })
     val optionList = subcollections.map { it.name }
     var selectedOption by remember { mutableStateOf("") }
-    var selectedIndex by remember { mutableIntStateOf(1) }
+    var selectedIndex by remember { mutableStateOf(1) }
     var responseText by remember { mutableStateOf("")}
-    val context = LocalContext.current
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -460,7 +504,8 @@ fun CardPopup(cardData: CardData,
                         card = cardData,
                         userid = userid,
                         subcollection = selectedOption,
-                        subcolInfo = optionInfo.get(selectedIndex)
+                        subcolInfo = optionInfo.get(selectedIndex),
+                        refreshUI = { }
                     )
                     responseText = staticResponseText
                 },
@@ -485,6 +530,56 @@ fun CardPopup(cardData: CardData,
                     Text(text = "Remove")
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AddFromAllCardsPopup(allCards: Array<CardData>,
+                         game: String,
+                         subcollection: String,
+                         userid: String,
+                         subcolInfo: SubcollectionInfo,
+                         refreshUI: () -> Unit,
+                         modifier: Modifier = Modifier) {
+    val scrollstate = rememberScrollState()
+    val cardList = allCards.filter {
+        it.game == game && (it.subcollections == null || !it.subcollections!!.contains(subcollection))
+    }
+    var checkedStates = remember { mutableStateListOf<Boolean>() }
+    repeat(cardList.size) {
+        checkedStates.add(false)
+    }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = modifier
+    ) {
+        Column(
+             modifier = modifier.verticalScroll(scrollstate)
+        ) {
+            cardList.forEachIndexed { index, card ->
+                Row {
+                    Text(card.cardname)
+                    Checkbox(
+                        checked = checkedStates[index],
+                        onCheckedChange = {
+                            isChecked ->
+                            checkedStates[index] = isChecked
+                        }
+                    )
+                }
+            }
+        }
+        Button(
+            onClick = {
+                cardList.forEachIndexed { index, card ->
+                    if (checkedStates[index]) {
+                        saveToSubcollectionPost(card = card, userid = userid, subcollection = subcollection, subcolInfo = subcolInfo, refreshUI = refreshUI)
+                    }
+                }
+            }
+        ) {
+            Text(stringResource(R.string.add_to_subcollection_button_label))
         }
     }
 }
@@ -595,6 +690,7 @@ fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: Strin
             else {
                 subcolInfo.totalValue = subcolInfo.totalValue!! + (card.quantity * card.price)
             }
+            refreshUI()
         }
 
         override fun onFailure(call: Call<SaveToSubcollectionResponseModel>, t: Throwable) {
@@ -662,7 +758,6 @@ fun SubollectionScreenPreview() {
         SubcollectionScreen(
             subcolInfo = subCol1,
             storefront = 1,
-            cardData = cards,
             navBack = { },
             allCardsFlag = false,
             fullCardPool = cards,

@@ -295,7 +295,6 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             val subColId = navBackStackEntry.arguments?.getString("subColId")
             val game = navBackStackEntry.arguments?.getString("game")
             var thisSubCol: SubcollectionInfo? = null
-            var thisCardPool = mutableListOf<CardData>()
             var allCardsFlag = false
 
             if (subColId == "all") {
@@ -309,14 +308,6 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     isDeck = false,
                     userid = userid
                 )
-                collection.forEach {
-                    card ->
-                    if (card.game == game) {
-                        thisCardPool.add(card)
-                        thisSubCol!!.totalValue = thisSubCol!!.totalValue?.plus((card.quantity * card.price))
-                        thisSubCol!!.cardCount = thisSubCol!!.cardCount?.plus(card.quantity)
-                    }
-                }
                 allCardsFlag = true
             }
             else {
@@ -324,12 +315,6 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                         subCol ->
                     if (subCol.subcollectionid == subColId) {
                         thisSubCol = subCol
-                    }
-                }
-                collection.forEach {
-                        card ->
-                    if (card.subcollections?.contains(subColId) == true) {
-                        thisCardPool.add(card)
                     }
                 }
             }
@@ -347,7 +332,6 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 SubcollectionScreen(
                     subcolInfo = thisSubCol!!,
                     storefront = storefront,
-                    cardData = thisCardPool.toTypedArray(),
                     allCardsFlag = allCardsFlag,
                     fullCardPool = collection,
                     subcollections = subColInfo,
