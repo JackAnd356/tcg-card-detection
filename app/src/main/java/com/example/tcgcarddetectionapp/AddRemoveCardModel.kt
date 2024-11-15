@@ -1,6 +1,6 @@
 package com.example.tcgcarddetectionapp
 
-data class AddToCollectionModel (
+data class AddRemoveCardModel (
     val userid: String,
     val game: String,
     val cardid: String,
@@ -20,4 +20,5 @@ data class AddToCollectionModel (
     val retreat: Array<String>? = null,
     val weaknesses: Array<Weakness>? = null,
     val attacks: Array<Attack>? = null,
+    val subcollection: String? = null
 )

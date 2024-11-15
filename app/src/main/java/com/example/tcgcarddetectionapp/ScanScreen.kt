@@ -204,7 +204,7 @@ fun addToCollectionPost(userid: String, card: CardData) {
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
 
-    val requestData = AddToCollectionModel(userid = userid, game = card.game, cardid = card.cardid, setcode = card.setcode,
+    val requestData = AddRemoveCardModel(userid = userid, game = card.game, cardid = card.cardid, setcode = card.setcode,
         cardname = card.cardname, price = card.price, quantity = card.quantity, level = card.level, attribute = card.attribute,
         type = card.type, atk = card.atk, def = card.def, description = card.description, cost = card.cost, attacks = card.attacks,
         weaknesses = card.weaknesses, hp = card.hp, retreat = card.retreat, rarity = card.rarity)

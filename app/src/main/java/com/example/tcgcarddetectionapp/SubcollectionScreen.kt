@@ -1,6 +1,7 @@
 package com.example.tcgcarddetectionapp
 
 import android.graphics.BitmapFactory
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +58,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         game: String,
                         userid: String,
                         subcollections: Array<SubcollectionInfo>,
-                        modifier: Modifier = Modifier) {
+                        modifier: Modifier = Modifier,
+                        onCollectionChange: (Array<CardData>) -> Unit) {
     var searchTerm by remember { mutableStateOf("") }
     var showCardPopup by remember { mutableStateOf(false) }
     var currentFocusedCard by remember { mutableStateOf<CardData>(
@@ -163,6 +167,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         game = game,
                         userid = userid,
                         allCardsFlag = allCardsFlag,
+                        collection = cardData,
+                        onCollectionChange = onCollectionChange,
+                        subcolInfo = subcolInfo
                     )
                 }
             }
@@ -223,14 +230,18 @@ fun CardPopup(cardData: CardData,
               game: String,
               userid: String,
               allCardsFlag: Boolean,
-              modifier: Modifier = Modifier) {
+              modifier: Modifier = Modifier,
+              collection: Array<CardData>,
+              onCollectionChange: (Array<CardData>) -> Unit,
+              subcolInfo: SubcollectionInfo) {
     val optionInfo = subcollections.filter( predicate = {
         it.game == game
     })
     val optionList = subcollections.map { it.name }
     var selectedOption by remember { mutableStateOf("") }
-    var selectedIndex by remember { mutableStateOf(1) }
+    var selectedIndex by remember { mutableIntStateOf(1) }
     var responseText by remember { mutableStateOf("")}
+    val context = LocalContext.current
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -458,6 +469,22 @@ fun CardPopup(cardData: CardData,
                 Text(stringResource(R.string.add_to_subcollection_button_label))
             }
 
+            Column {
+                Button(onClick = {
+                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, collection = collection, onCollectionChange = onCollectionChange)
+                    if (successful) Toast.makeText(context, "Card Successfully Removed", Toast.LENGTH_SHORT).show()
+                }, modifier = Modifier.align(Alignment.End)) {
+                    Text(text="Delete")
+                }
+            }
+        } else {
+            Column {
+                Button(onClick = {
+                    removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcollection = subcolInfo.name)
+                }) {
+                    Text(text = "Remove")
+                }
+            }
         }
     }
 }
@@ -471,8 +498,67 @@ fun arrToPrintableString(arr: Array<String>): String {
     return str
 }
 
+fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, collection: Array<CardData>, onCollectionChange: (Array<CardData>) -> Unit): Boolean {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = quantity, rarity = card.rarity)
+    var successful = false
+    retrofitAPI.removeFromCollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            if (card.quantity <= 1) {
+                val cardsWithoutRemoved = ArrayList<CardData>()
+                for (cardData in collection) {
+                    if (card != cardData) cardsWithoutRemoved.add(cardData)
+                }
+                onCollectionChange(cardsWithoutRemoved.toTypedArray())
+            } else {
+                card.quantity--
+            }
+            successful = true
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+    })
+    return successful
+}
+
+fun removeFromSubcollectionPost(card: CardData, userid: String, subcollection: String, game: String): Boolean {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = card.quantity, rarity = card.rarity, subcollection = subcollection)
+    var successful = false
+
+    retrofitAPI.removeFromSubcollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            card.subcollections
+            successful = true
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+    })
+    return successful
+}
+
 fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: String, subcolInfo: SubcollectionInfo) {
-    var url = "http://10.0.2.2:5000/"
+    val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
         .addConverterFactory(GsonConverterFactory.create())
@@ -582,7 +668,8 @@ fun SubollectionScreenPreview() {
             fullCardPool = cards,
             subcollections = arrayOf(subCol1),
             userid = "1",
-            game = "yugioh"
+            game = "yugioh",
+            onCollectionChange = {},
         )
     }
 }
