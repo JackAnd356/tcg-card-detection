@@ -272,7 +272,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     )
                 }
             ) {
-                ScanScreen()
+                ScanScreen(userid = userid, collectionNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) })
             }
         }
 
@@ -295,7 +295,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             val subColId = navBackStackEntry.arguments?.getString("subColId")
             val game = navBackStackEntry.arguments?.getString("game")
             var thisSubCol: SubcollectionInfo? = null
-            var thisCardPool = mutableListOf<CardData>()
+            var allCardsFlag = false
 
             if (subColId == "all") {
                 thisSubCol = SubcollectionInfo(
@@ -308,26 +308,13 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     isDeck = false,
                     userid = userid
                 )
-                collection.forEach {
-                    card ->
-                    if (card.game == game) {
-                        thisCardPool.add(card)
-                        thisSubCol!!.totalValue = thisSubCol!!.totalValue?.plus((card.quantity * card.price))
-                        thisSubCol!!.cardCount = thisSubCol!!.cardCount?.plus(card.quantity)
-                    }
-                }
+                allCardsFlag = true
             }
             else {
                 subColInfo.forEach {
                         subCol ->
                     if (subCol.subcollectionid == subColId) {
                         thisSubCol = subCol
-                    }
-                }
-                collection.forEach {
-                        card ->
-                    if (card.subcollections?.contains(subColId) == true) {
-                        thisCardPool.add(card)
                     }
                 }
             }
@@ -344,7 +331,12 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             ) {
                 SubcollectionScreen(
                     subcolInfo = thisSubCol!!,
-                    cardData = thisCardPool.toTypedArray(),
+                    storefront = storefront,
+                    allCardsFlag = allCardsFlag,
+                    fullCardPool = collection,
+                    subcollections = subColInfo,
+                    game = game!!,
+                    userid = userid,
                     navBack = {
                         if (game == "yugioh") {
                             navController.navigate(CardDetectionScreens.YugiohCollection.name)
@@ -356,6 +348,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                             navController.navigate(CardDetectionScreens.PokemonCollection.name)
                         }
                     },
+                    onCollectionChange = {collection = it}
                 )
             }
         }
@@ -369,7 +362,7 @@ fun onUserSubColInfoChange(subColInfo: Array<SubcollectionInfo>, cardDataCollect
         if (card.subcollections != null) {
             subColInfo.forEach {
                     subCol ->
-                if (subCol.subcollectionid in card.subcollections) {
+                if (subCol.subcollectionid in card.subcollections!!) {
                     if (subCol.cardCount == null) {
                         subCol.cardCount = card.quantity
                     }

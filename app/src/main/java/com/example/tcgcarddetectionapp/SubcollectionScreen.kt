@@ -1,7 +1,8 @@
 package com.example.tcgcarddetectionapp
 
+import android.app.Dialog
 import android.graphics.BitmapFactory
-import androidx.camera.video.internal.compat.quirk.ReportedVideoQualityNotSupportedQuirk
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,17 +21,25 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,16 +47,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
-                        cardData: Array<CardData>,
+                        storefront: Int,
                         navBack: () -> Unit,
-                        modifier: Modifier = Modifier) {
+                        allCardsFlag: Boolean,
+                        fullCardPool: Array<CardData>,
+                        game: String,
+                        userid: String,
+                        subcollections: Array<SubcollectionInfo>,
+                        modifier: Modifier = Modifier,
+                        onCollectionChange: (Array<CardData>) -> Unit) {
     var searchTerm by remember { mutableStateOf("") }
     var showCardPopup by remember { mutableStateOf(false) }
+    var showAllCardAddToSubcollection by remember { mutableStateOf(false) }
     var currentFocusedCard by remember { mutableStateOf<CardData>(
         value = CardData(
             userid = "",
@@ -63,6 +84,27 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         ),
     ) }
     val scrollstate = rememberScrollState()
+    var refreshFlag by remember { mutableStateOf(false) }
+    var cardData = remember { mutableStateListOf<CardData>() }
+
+    if (subcolInfo.subcollectionid == "all") {
+        fullCardPool.forEach {
+                card ->
+            if (!cardData.contains(card) && card.game == game) {
+                cardData.add(card)
+                subcolInfo!!.totalValue = subcolInfo!!.totalValue?.plus((card.quantity * card.price))
+                subcolInfo!!.cardCount = subcolInfo!!.cardCount?.plus(card.quantity)
+            }
+        }
+    }
+    else {
+        fullCardPool.forEach {
+                card ->
+            if (!cardData.contains(card) && card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
+                cardData.add(card)
+            }
+        }
+    }
 
     Box(
         modifier
@@ -141,12 +183,45 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             ) {
                 Text(stringResource(R.string.filter_button_label))
             }
+            if(!allCardsFlag) {
+                Button(
+                    onClick = {
+                        showAllCardAddToSubcollection = !showAllCardAddToSubcollection
+                    }
+                ) {
+                    Text(stringResource(R.string.add_from_all_cards_button_label))
+                }
+            }
+            if (showAllCardAddToSubcollection) {
+                Dialog(
+                    onDismissRequest = {showAllCardAddToSubcollection = !showAllCardAddToSubcollection}
+                ) {
+                    AddFromAllCardsPopup(
+                        allCards = fullCardPool,
+                        game = game,
+                        subcollection = subcolInfo.subcollectionid,
+                        userid = userid,
+                        subcolInfo = subcolInfo,
+                        modifier = modifier,
+                        refreshUI = { refreshFlag = !refreshFlag }
+                    )
+                }
+            }
             if (showCardPopup) {
                 Dialog(
                     onDismissRequest = { showCardPopup = !showCardPopup}
                 ) {
                     CardPopup(
                         cardData = currentFocusedCard,
+                        storefront = storefront,
+                        subcollections = subcollections,
+                        game = game,
+                        userid = userid,
+                        allCardsFlag = allCardsFlag,
+                        onCollectionChange = onCollectionChange,
+                        subcolInfo = subcolInfo,
+                        updateCards = {cardData = it.toMutableStateList()},
+                        fullCardPool = fullCardPool
                     )
                 }
             }
@@ -165,8 +240,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         val cardInfo = filteredCardData[j]
                         CardImage(
                             cardData = cardInfo,
-                            setFocusedCard = {currentFocusedCard = it},
-                            showCardPopup = {showCardPopup = !showCardPopup},
+                            setFocusedCard = { currentFocusedCard = it },
+                            showCardPopup = { showCardPopup = !showCardPopup },
                             modifier = modifier
                                 .padding(vertical = 20.dp, horizontal = 15.dp)
                         )
@@ -184,7 +259,7 @@ fun CardImage(cardData: CardData,
               setFocusedCard: (CardData) -> Unit,
               showCardPopup: () -> Unit,
               modifier: Modifier) {
-    val decodedString = Base64.decode(cardData.image, 0)
+    val decodedString = Base64.decode(cardData.image!!, 0)
     val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     Image(
         bitmap = img.asImageBitmap(),
@@ -199,62 +274,444 @@ fun CardImage(cardData: CardData,
 }
 
 
+@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun CardPopup(cardData: CardData,
-             modifier: Modifier = Modifier) {
+              storefront: Int,
+              subcollections: Array<SubcollectionInfo>,
+              game: String,
+              userid: String,
+              allCardsFlag: Boolean,
+              fullCardPool: Array<CardData>,
+              modifier: Modifier = Modifier,
+              subcolInfo: SubcollectionInfo,
+              onCollectionChange: (Array<CardData>) -> Unit,
+              updateCards: (ArrayList<CardData>) -> Unit) {
+    val optionInfo = subcollections.filter( predicate = {
+        it.game == game
+    })
+    val context = LocalContext.current
+    val optionList = subcollections.map { it.name }
+    var selectedOption by remember { mutableStateOf("") }
+    var selectedIndex by remember { mutableStateOf(1) }
+    var responseText by remember { mutableStateOf("")}
+    val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
     ) {
-        Column {
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_name_label),
-                    cardData.cardname
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
+        if (cardData.game == "yugioh") {
+            Row {
+                Column {
+                    val decodedString = Base64.decode(cardData.image!!, 0)
+                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    Image(
+                        bitmap = img.asImageBitmap(),
+                        contentDescription = "Card",
+                        modifier
+                            .size(120.dp, 200.dp)
+                    )
+                    Text(cardData.cardname)
+                    Text(
+                        text = String.format(stringResource(R.string.card_id_label), cardData.cardid),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    Text(
+                        text = String.format(stringResource(R.string.card_setcode_label), cardData.setcode),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                }
+                Column {
+                    Text(stringResource(R.string.price_header))
+                    Text(
+                        String.format(
+                            stringResource(R.string.card_price_label),
+                            cardData.price,
+                            "$"
+                        )
+                    )
+                    Button(
+                        onClick = {}
+                    ) {
+                        if (storefront == 1) {
+                            Text(stringResource(R.string.tcgplayer_label))
+                        } else if (storefront == 2) {
+                            Text(stringResource(R.string.card_market_label))
+                        }
+                    }
+                    if (cardData.level != null) {
+                        Row {
+                            Text(String.format(stringResource(R.string.level_label), cardData.level))
+                            Text(String.format(stringResource(R.string.attribute_label), cardData.attribute))
+                        }
+                    }
+                    Text(String.format(stringResource(R.string.type_label), cardData.type))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Gray)
+                    ) {
+                        Text(cardData.description!!.replace("\\n", "\n"))
+                    }
+                    if (cardData.atk != null) {
+                        Row {
+                            Text(String.format(stringResource(R.string.atk_label), cardData.atk))
+                            Text(String.format(stringResource(R.string.def_label), cardData.def))
+                        }
+                    }
+                }
+            }
+        }
+        else if (cardData.game == "mtg") {
+            Row {
+                Column {
+                    val decodedString = Base64.decode(cardData.image!!, 0)
+                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    Image(
+                        bitmap = img.asImageBitmap(),
+                        contentDescription = "Card",
+                        modifier
+                            .size(120.dp, 200.dp)
+                    )
+                    Text(cardData.cardname)
+                    Text(
+                        text = String.format(stringResource(R.string.card_setcode_label), cardData.setcode),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                }
+                Column {
+                    Text(stringResource(R.string.price_header))
+                    Text(
+                        String.format(
+                            stringResource(R.string.card_price_label),
+                            cardData.price,
+                            "$"
+                        )
+                    )
+                    Button(
+                        onClick = {}
+                    ) {
+                        if (storefront == 1) {
+                            Text(stringResource(R.string.tcgplayer_label))
+                        } else if (storefront == 2) {
+                            Text(stringResource(R.string.card_market_label))
+                        }
+                    }
+                    Row {
+                        Text(String.format(stringResource(R.string.cost_label), cardData.cost))
+                        Text(String.format(stringResource(R.string.color_label), cardData.attribute))
+                    }
+                    Text(String.format(stringResource(R.string.type_label), cardData.type))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Gray)
+                    ) {
+                        Text(cardData.description!!.replace("\\n", "\n"))
+                    }
+                    if(cardData.atk != null) {
+                        Row {
+                            Text(String.format(stringResource(R.string.power_label), cardData.atk))
+                            Text(String.format(stringResource(R.string.toughness_label), cardData.def))
+                        }
+                    }
+                }
+            }
+        }
+        else { //Pokemon
+            Row {
+                Column {
+                    val decodedString = Base64.decode(cardData.image!!, 0)
+                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                    Image(
+                        bitmap = img.asImageBitmap(),
+                        contentDescription = "Card",
+                        modifier
+                            .size(120.dp, 200.dp)
+                    )
+                    Text(cardData.cardname)
+                    Text(
+                        text = String.format(stringResource(R.string.card_id_label), cardData.cardid),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    Text(
+                        text = String.format(stringResource(R.string.card_setcode_label), cardData.setcode),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    Text(
+                        text = String.format(stringResource(R.string.hp), cardData.hp),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+                    cardData.weaknesses!!.forEach {
+                        weakness ->
+                        Text(
+                            text = String.format(stringResource(R.string.weakness_label), weakness.type, weakness.value),
+                            fontSize = 10.sp,
+                            lineHeight = 15.sp,
+                        )
+                    }
+                    Text(
+                        text = String.format(stringResource(R.string.retreat), arrToPrintableString(cardData.retreat!!)),
+                        fontSize = 10.sp,
+                        lineHeight = 15.sp,
+                    )
+
+                }
+                Column {
+                    Text(stringResource(R.string.price_header))
+                    Text(
+                        String.format(
+                            stringResource(R.string.card_price_label),
+                            cardData.price,
+                            "$"
+                        )
+                    )
+                    Button(
+                        onClick = {}
+                    ) {
+                        if (storefront == 1) {
+                            Text(stringResource(R.string.tcgplayer_label))
+                        } else if (storefront == 2) {
+                            Text(stringResource(R.string.card_market_label))
+                        }
+                    }
+
+                    Text(String.format(stringResource(R.string.attribute_label), cardData.attribute))
+
+                    Text(String.format(stringResource(R.string.type_label), cardData.type))
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color.Gray)
+                    ) {
+                        cardData.attacks!!.forEach {
+                            attack ->
+                            Text(String.format(stringResource(R.string.cost_label), arrToPrintableString(attack.cost)))
+                            Text(String.format(stringResource(R.string.card_name_label), attack.name))
+                            Text(String.format(stringResource(R.string.damage_label), attack.damage))
+                            if (attack.text != null) {
+                                Text(String.format(stringResource(R.string.effect_label), attack.text))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if(allCardsFlag) {
+            UserDropdownSelector(
+                label = stringResource(R.string.subcollection_page),
+                data = 1,
+                onUserStorefrontChange = {
+                    selectedOption = optionInfo.get(it - 1).subcollectionid
+                    selectedIndex = it - 1
+                },
+                options = optionList,
             )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_id_label),
-                    cardData.cardid
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_setcode_label),
-                    cardData.setcode
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_price_label),
-                    cardData.price,
-                    "$"
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_quantity_label),
-                    cardData.quantity
-                ),
-                fontSize = 15.sp,
-                lineHeight = 20.sp,
-                textAlign = TextAlign.Center
-            )
+            Button(
+                onClick = {
+                    saveToSubcollectionPost(
+                        card = cardData,
+                        userid = userid,
+                        subcollection = selectedOption,
+                        subcolInfo = optionInfo.get(selectedIndex),
+                        refreshUI = { }
+                    )
+                    responseText = staticResponseText
+                },
+                enabled = selectedOption != ""
+            ) {
+                Text(stringResource(R.string.add_to_subcollection_button_label))
+            }
+
+            Column {
+                Button(onClick = {
+                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, updateCards = updateCards)
+                    if (successful) Toast.makeText(context, "Card Successfully Removed", Toast.LENGTH_SHORT).show()
+                }, modifier = Modifier.align(Alignment.End)) {
+                    Text(text="Delete")
+                }
+            }
+        } else {
+            Column {
+                Button(onClick = {
+                    removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcollection = subcolInfo.name)
+                }) {
+                    Text(text = "Remove")
+                }
+            }
         }
     }
+}
+
+@Composable
+fun AddFromAllCardsPopup(allCards: Array<CardData>,
+                         game: String,
+                         subcollection: String,
+                         userid: String,
+                         subcolInfo: SubcollectionInfo,
+                         refreshUI: () -> Unit,
+                         modifier: Modifier = Modifier) {
+    val scrollstate = rememberScrollState()
+    val cardList = allCards.filter {
+        it.game == game && (it.subcollections == null || !it.subcollections!!.contains(subcollection))
+    }
+    var checkedStates = remember { mutableStateListOf<Boolean>() }
+    repeat(cardList.size) {
+        checkedStates.add(false)
+    }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = modifier
+    ) {
+        Column(
+             modifier = modifier.verticalScroll(scrollstate)
+        ) {
+            cardList.forEachIndexed { index, card ->
+                Row {
+                    Text(card.cardname)
+                    Checkbox(
+                        checked = checkedStates[index],
+                        onCheckedChange = {
+                            isChecked ->
+                            checkedStates[index] = isChecked
+                        }
+                    )
+                }
+            }
+        }
+        Button(
+            onClick = {
+                cardList.forEachIndexed { index, card ->
+                    if (checkedStates[index]) {
+                        saveToSubcollectionPost(card = card, userid = userid, subcollection = subcollection, subcolInfo = subcolInfo, refreshUI = refreshUI)
+                    }
+                }
+            }
+        ) {
+            Text(stringResource(R.string.add_to_subcollection_button_label))
+        }
+    }
+}
+
+fun arrToPrintableString(arr: Array<String>): String {
+    var str = ""
+    arr.forEach {
+            itm ->
+        str += itm + ","
+    }
+    return str
+}
+
+fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>, onCollectionChange: (Array<CardData>) -> Unit, updateCards: (ArrayList<CardData>) -> Unit): Boolean {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = quantity, rarity = card.rarity)
+    var successful = false
+    retrofitAPI.removeFromCollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            if (card.quantity <= 1) {
+                val cardsWithoutRemoved = ArrayList<CardData>()
+                val cardsFromGameWithoutRemoved = ArrayList<CardData>()
+                for (cardData in fullCardPool) {
+                    if (card != cardData) {
+                        if (cardData.game == game) cardsFromGameWithoutRemoved.add(cardData)
+                        cardsWithoutRemoved.add(cardData)
+                    }
+                }
+                onCollectionChange(cardsWithoutRemoved.toTypedArray())
+                updateCards(cardsFromGameWithoutRemoved)
+            } else {
+                card.quantity--
+            }
+            successful = true
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+    })
+    return successful
+}
+
+fun removeFromSubcollectionPost(card: CardData, userid: String, subcollection: String, game: String): Boolean {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = card.quantity, rarity = card.rarity, subcollection = subcollection)
+    var successful = false
+
+    retrofitAPI.removeFromSubcollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            card.subcollections
+            successful = true
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+    })
+    return successful
+}
+
+fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: String, subcolInfo: SubcollectionInfo, refreshUI: () -> Unit) {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = SaveToSubcollectionRequestModel(
+        userid = userid,
+        cardid = card.cardid,
+        setcode = card.setcode,
+        game = card.game,
+        rarity = card.rarity,
+        subcollection = subcollection,
+    )
+    retrofitAPI.addToUserSubcollection(requestData).enqueue(object : Callback<SaveToSubcollectionResponseModel> {
+        override fun onResponse(
+            call: Call<SaveToSubcollectionResponseModel>,
+            response: Response<SaveToSubcollectionResponseModel>
+        ) {
+            if (card.subcollections == null) {
+                card.subcollections = arrayOf(subcollection)
+            }
+            else {
+                card.subcollections = card.subcollections!!.plus(subcollection)
+            }
+            if (subcolInfo.cardCount == null) {
+                subcolInfo.cardCount = card.quantity
+            }
+            else {
+                subcolInfo.cardCount = subcolInfo.cardCount!! + card.quantity
+            }
+            if (subcolInfo.totalValue == null) {
+                subcolInfo.totalValue = card.quantity * card.price
+            }
+            else {
+                subcolInfo.totalValue = subcolInfo.totalValue!! + (card.quantity * card.price)
+            }
+            refreshUI()
+        }
+
+        override fun onFailure(call: Call<SaveToSubcollectionResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
 }
 
 
@@ -314,8 +771,15 @@ fun SubollectionScreenPreview() {
     TCGCardDetectionAppTheme {
         SubcollectionScreen(
             subcolInfo = subCol1,
-            cardData = cards,
-            navBack = {  },
+            storefront = 1,
+            navBack = { },
+            allCardsFlag = false,
+            fullCardPool = cards,
+            subcollections = arrayOf(subCol1),
+            userid = "1",
+            game = "yugioh",
+            onCollectionChange = {},
         )
     }
 }
+

@@ -1,5 +1,6 @@
 package com.example.tcgcarddetectionapp
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -206,6 +207,10 @@ fun collectionPost(userid: String,
             val respData = response.body()
             if (respData != null) {
                 onUserCollectionChange(respData)
+                respData.forEach {
+                    cardData ->
+                    cardImagePost(cardData.cardid, cardData.game, {cardData.image = it})
+                }
                 subcollectionPost(userid, onUserSubColInfoChange, onLoginNavigate)
             }
         }
@@ -244,4 +249,31 @@ fun subcollectionPost(userid: String,
         }
 
     })
+}
+
+fun cardImagePost(cardid: String, game: String, setCardImage: (String) -> Unit) {
+    var url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = GetCardImageRequestModel(cardid = cardid, game = game)
+    retrofitAPI.getCardImage(requestData).enqueue(object: Callback<GetCardImageResponseModel> {
+        override fun onResponse(
+            call: Call<GetCardImageResponseModel>,
+            response: Response<GetCardImageResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null && respData.image != null) {
+                setCardImage(respData.image)
+            }
+        }
+
+        override fun onFailure(call: Call<GetCardImageResponseModel>, t: Throwable) {
+            t.printStackTrace()
+            Log.d("ERROR", "Card " + cardid + " not loaded in")
+        }
+
+    } )
 }

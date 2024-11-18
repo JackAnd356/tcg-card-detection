@@ -115,7 +115,7 @@ fun ProfileScreen(username: String,
         UserDropdownSelector(
             label = stringResource(R.string.storefront_label),
             data = storefront,
-            options = listOf("TCGPlayer", "Card Market"),
+            options = listOf(stringResource(R.string.tcgplayer_label), stringResource(R.string.card_market_label)),
             onUserStorefrontChange = {onUserStorefrontChange(it)},
         )
         UserDataComponent(

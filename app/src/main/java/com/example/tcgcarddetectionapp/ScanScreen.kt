@@ -3,8 +3,7 @@ package com.example.tcgcarddetectionapp
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.widget.Toast
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -13,8 +12,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +33,6 @@ import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,11 +43,34 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+var cards = arrayOf<CardData>()
+
+enum class Stages(val title: Int) {
+    Home(title = 0),
+    Confirmation(title = 1),
+    PostConfirmation(title = 2),
+}
 
 @Composable
-fun ScanScreen(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+fun ScanScreen(modifier: Modifier = Modifier, userid: String, collectionNavigate: () -> Unit) {
+    val stage = remember { mutableStateOf(Stages.Home) }
 
+    when (stage.value) {
+        Stages.Home -> {
+            ScanHome(modifier, stage)
+        }
+        Stages.Confirmation -> {
+            ScanConfirmation(modifier, userid, stage)
+        }
+        Stages.PostConfirmation -> {
+            ScanPostConfirmation(modifier, stage, collectionNavigate)
+        }
+    }
+}
+
+@Composable
+fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
+    val error = remember { mutableIntStateOf(0) }
     Column(verticalArrangement = Arrangement.Top, modifier = modifier
         .fillMaxSize()
         .wrapContentWidth(Alignment.CenterHorizontally)) {
@@ -63,12 +84,150 @@ fun ScanScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Box(Modifier.height(650.dp).width(400.dp).background(Color.Black)) {
+        Box(
+            Modifier
+                .height(550.dp)
+                .width(400.dp)
+                .background(Color.Black)) {
             Text(text = "Make sure to include all of the card you are trying to scan", fontSize = 30.sp, color = Color.White)
         }
 
-        ImageCaptureFromCamera(Modifier.align(Alignment.CenterHorizontally))
+        ImageCaptureFromCamera(Modifier.align(Alignment.CenterHorizontally), stage = stage, err = error)
+
+        if (error.intValue > 0) {
+            Dialog(onDismissRequest = { error.intValue = 0 }) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(375.dp)
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    if (error.intValue == 1) {
+                        Text(text = "Cards could not be found within the image, try taking an image in better lighting or closer up")
+                    } else {
+                        Text(text = "There was a network error in processing your image, try again")
+                    }
+                }
+            }
+        }
     }
+}
+
+@Composable
+fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Stages>) {
+    Column(verticalArrangement = Arrangement.Top, modifier = modifier
+        .fillMaxSize()
+        .wrapContentWidth(Alignment.CenterHorizontally)) {
+        val map = cards.groupBy { it.game }
+        map.forEach({ entry ->
+            val game = entry.key
+            Text(text = game, fontSize = 32.sp)
+            for (cardData in entry.value) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(
+                        checked = true,
+                        onCheckedChange = { cardData.added = it }
+                    )
+                    Text(
+                        text = "x${cardData.quantity} ${cardData.cardname}"
+                    )
+                }
+            }
+        })
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = {
+                stage.value = Stages.Home
+            }) {
+                Text(text = "Cancel")
+            }
+
+            Button(onClick = {
+                cards.forEach { card ->
+                    if (card.added) {
+                        addToCollectionPost(userid = userid, card = card)
+                    }
+                }
+                stage.value = Stages.PostConfirmation
+            }) {
+                Text(text = "Submit")
+            }
+        }
+    }
+}
+
+@Composable
+fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collectionNavigate: () -> Unit) {
+    Column(verticalArrangement = Arrangement.Top, modifier = modifier
+        .fillMaxSize()
+        .wrapContentWidth(Alignment.CenterHorizontally)) {
+
+        Text(text = "Added Cards: ", fontSize = 36.sp)
+
+        val map = cards.groupBy { it.game }
+        map.forEach({ entry ->
+            val game = entry.key
+            Text(text = game, fontSize = 32.sp)
+            for (cardData in entry.value) {
+                Text(
+                    text = "x${cardData.quantity} ${cardData.cardname}"
+                )
+            }
+        })
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = { stage.value = Stages.Home }
+            ) {
+                Text(text = "Take Another Photo")
+            }
+
+            Button(onClick = collectionNavigate) {
+                Text(text = "Go To Yu-Gi-Oh Collection")
+            }
+        }
+    }
+}
+
+fun addToCollectionPost(userid: String, card: CardData) {
+    val url = "http://10.0.2.2:5000"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+
+    val requestData = AddRemoveCardModel(userid = userid, game = card.game, cardid = card.cardid, setcode = card.setcode,
+        cardname = card.cardname, price = card.price, quantity = card.quantity, level = card.level, attribute = card.attribute,
+        type = card.type, atk = card.atk, def = card.def, description = card.description, cost = card.cost, attacks = card.attacks,
+        weaknesses = card.weaknesses, hp = card.hp, retreat = card.retreat, rarity = card.rarity)
+
+    retrofitAPI.addToCollection(requestData).enqueue(object:
+        Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                if (respData.success == 0) {
+                    Log.d("ERROR", respData.error!!)
+                }
+            }
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
 }
 
 // Create a temporary image file and return its URI
@@ -81,7 +240,7 @@ fun Context.createImageFile(): File {
     return image
 }
 
-fun scanPhotoPost(imageFile: File) {
+fun scanPhotoPost(imageFile: File, stage: MutableState<Stages>, err : MutableIntState) {
     val url = "http://10.0.2.2:5000"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -94,26 +253,34 @@ fun scanPhotoPost(imageFile: File) {
 
     val call = retrofitAPI.getCardInfo(imagePart)
 
-    call.enqueue(object : Callback<ResponseBody> {
-        override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-            if (response.isSuccessful) {
-                // Handle success
-                println("Image uploaded successfully!")
+
+    call.enqueue(object : Callback<Array<CardData>> {
+        override fun onResponse(
+            call: Call<Array<CardData>>,
+            response: Response<Array<CardData>>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                cards = respData
+                if (cards.isNotEmpty()) stage.value = Stages.Confirmation
+                else err.intValue = 1
             } else {
                 // Handle error response
+                err.intValue = 2
                 println("Upload failed: ${response.code()}")
             }
         }
 
-        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+        override fun onFailure(call: Call<Array<CardData>>, t: Throwable) {
             // Handle failure
+            err.intValue = 2
             println("Upload error: ${t.message}")
         }
     })
 }
 
 @Composable
-fun ImageCaptureFromCamera(modifier: Modifier) {
+fun ImageCaptureFromCamera(modifier: Modifier, stage: MutableState<Stages>, err: MutableIntState) {
     val context = LocalContext.current
     var cameraPermission by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -134,7 +301,7 @@ fun ImageCaptureFromCamera(modifier: Modifier) {
     val takePictureLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.TakePicture(),
         onResult = { isPictureTaken ->
             if (isPictureTaken) {
-                scanPhotoPost(file)
+                scanPhotoPost(file, stage, err)
                 picTaken = true
             }
         })
@@ -179,7 +346,7 @@ fun ImageCaptureFromCamera(modifier: Modifier) {
 @Composable
 fun ScanScreenPreview(modifier: Modifier = Modifier) {
     TCGCardDetectionAppTheme {
-        ScanScreen(modifier = modifier)
+        ScanScreen(modifier = modifier, userid = "2", {})
     }
 }
 
