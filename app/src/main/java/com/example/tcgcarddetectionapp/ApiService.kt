@@ -50,8 +50,14 @@ interface ApiService {
     fun getCardImage(@Body getCardImageRequest: GetCardImageRequestModel): Call<GetCardImageResponseModel>
 
     @POST("addToUserCollection")
-    fun addToCollection(@Body addToCollectionRequest: AddToCollectionModel): Call<GenericSuccessErrorResponseModel>
+    fun addToCollection(@Body addToCollectionRequest: AddRemoveCardModel): Call<GenericSuccessErrorResponseModel>
 
     @POST("addToUserSubcollection")
     fun addToUserSubcollection(@Body addToUserSubcollection: SaveToSubcollectionRequestModel): Call<SaveToSubcollectionResponseModel>
+
+    @POST("removeFromUserCollection")
+    fun removeFromCollection(@Body removeFromCollectionRequest: AddRemoveCardModel): Call <GenericSuccessErrorResponseModel>
+
+    @POST("removeFromUserSubcollection")
+    fun removeFromSubcollection(@Body removeFromSubcollectionRequest: AddRemoveCardModel): Call<GenericSuccessErrorResponseModel>
 }

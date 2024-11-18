@@ -355,6 +355,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                             navController.navigate(CardDetectionScreens.PokemonCollection.name)
                         }
                     },
+                    onCollectionChange = {collection = it}
                 )
             }
         }

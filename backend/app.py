@@ -268,13 +268,15 @@ def create_app():
             database = client['card_detection_info']
             userCollection = database['user_data']
             cardCollection = database['card_collection']
+            subcolCollection = database['subcollection_info']
             userData = userCollection.find_one({'userid' : userid})
             if userData == None:
                 return {'error': 'Incorrect UserID', 'success' : 0}, 201
             payload = {'userid' : userid}
             userDel = userCollection.delete_one(payload)
             cardDel = cardCollection.delete_many(payload)
-            return {'Message' : 'User removed', 'remUserCnt' : userDel.deleted_count, 'remCardCnt' : cardDel.deleted_count, 'success' : 1}, 201
+            subDel = subcolCollection.delete_many(payload)
+            return {'Message' : 'User removed', 'remUserCnt' : userDel.deleted_count, 'remCardCnt' : cardDel.deleted_count, 'remSubcolCount': subDel.deleted_count, 'success' : 1}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
     
     @app.post('/getUserCollection')
@@ -288,76 +290,83 @@ def create_app():
             for card in results:
                 card.pop('_id')
                 card.pop('pricedate')
-                game = card['game']
-                cardId = card['cardid']
-                cardSetCode = card['setcode']
-                if game == 'yugioh':
-                    filename = './cardImages/' + cardId + '_yugioh.jpg'
-                    if not os.path.isfile(filename):
-                        url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
-                        payload = {'id': cardId, 'tcgplayer_data': None}
-                        payload = '&'.join([k if v is None else f'{k}={v}' for k, v in payload.items()])
-                        resp = requests.get(url, params=payload)
-                        if resp.status_code == 200:
-                            cardData = resp.json()
-                            print(filename)
-                            img = requests.get(cardData['data'][0]['card_images'][0]['image_url'])
-                            if img.status_code == 200:
-                                with open(filename, 'wb') as img_file:
-                                    img_file.write(img.content)
-                                card['image'] = base64.b64encode(img.content).decode()
-                            else:
-                                print(f'Failed to get Image of: {cardId}')
-                    else:
-                        with open(filename, "rb") as image_file:
-                            card['image'] = base64.b64encode(image_file.read()).decode()
-                elif game == 'mtg':
-                    filename = './cardImages/' + cardId + '_mtg.jpg'
-                    if not os.path.isfile(filename):
-                        url = 'https://api.scryfall.com/cards/'
-                        headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
-                        url += cardId
-                        resp = requests.get(url, headers=headers)
-                        if resp.status_code == 200:
-                            cardData = resp.json()
-                            if not 'image_uris' in cardData: continue
+            return results, 201
+        return {'error': 'Request must be JSON'}, 201
+    
+    @app.post('/getCardImage')
+    def post_getCardImage():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            game = clientUserInfo['game']
+            cardId = clientUserInfo['cardid']
+            response = {}
+            if game == 'yugioh':
+                filename = './backend/cardImages/' + cardId + '_yugioh.jpg'
+                if not os.path.isfile(filename):
+                    url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
+                    payload = {'id': cardId, 'tcgplayer_data': None}
+                    payload = '&'.join([k if v is None else f'{k}={v}' for k, v in payload.items()])
+                    resp = requests.get(url, params=payload)
+                    if resp.status_code == 200:
+                        cardData = resp.json()
+                        print(filename)
+                        img = requests.get(cardData['data'][0]['card_images'][0]['image_url'])
+                        if img.status_code == 200:
+                            with open(filename, 'wb') as img_file:
+                                img_file.write(img.content)
+                            response['image'] = base64.b64encode(img.content).decode()
+                        else:
+                            print(f'Failed to get Image of: {cardId}')
+                else:
+                    with open(filename, "rb") as image_file:
+                        response['image'] = base64.b64encode(image_file.read()).decode()
+            elif game == 'mtg':
+                filename = './backend/cardImages/' + cardId + '_mtg.jpg'
+                if not os.path.isfile(filename):
+                    url = 'https://api.scryfall.com/cards/'
+                    headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+                    url += cardId
+                    resp = requests.get(url, headers=headers)
+                    if resp.status_code == 200:
+                        cardData = resp.json()
+                        if 'image_uris' in cardData:
                             img_url = cardData['image_uris']['large']
                             
                             img = requests.get(img_url)
                             if img.status_code == 200:
                                 with open(filename, "wb") as img_file:
                                     img_file.write(img.content)
-                                    card['image'] = base64.b64encode(img.content).decode()
+                                    response['image'] = base64.b64encode(img.content).decode()
                             else:
                                 print(f'Failed to get Image of: {cardId}')
-                    else:
-                        with open(filename, "rb") as image_file:
-                            card['image'] = base64.b64encode(image_file.read()).decode()
-                elif game == 'pokemon':
-                    filename = './cardImages/' + cardId + '_pokemon.jpg'
-                    if not os.path.isfile(filename):
-                        apikey = os.getenv('POKEMON_API_KEY')
-                        url = 'https://api.pokemontcg.io/v2/cards/'
-                        headers = {'X-Api-Key' : apikey}
-                        url += cardId
-                        resp = requests.get(url, headers=headers)
-                        if resp.status_code == 200:
-                            cardData = resp.json()
-                            image_url = cardData['data']['images']['large']
+                else:
+                    with open(filename, "rb") as image_file:
+                        response['image'] = base64.b64encode(image_file.read()).decode()
+            elif game == 'pokemon':
+                filename = './backend/cardImages/' + cardId + '_pokemon.jpg'
+                if not os.path.isfile(filename):
+                    apikey = os.getenv('POKEMON_API_KEY')
+                    url = 'https://api.pokemontcg.io/v2/cards/'
+                    headers = {'X-Api-Key' : apikey}
+                    url += cardId
+                    resp = requests.get(url, headers=headers)
+                    if resp.status_code == 200:
+                        cardData = resp.json()
+                        image_url = cardData['data']['images']['large']
                             
-                            img_response = requests.get(image_url)
-                            if img_response.status_code == 200:
-                                with open(filename, "wb") as img_file:
-                                    img_file.write(img_response.content)
-                                    card['image'] = base64.b64encode(img_response.content).decode()
-                            else:
-                                print(f"Failed to download image for card: {cardId}")
-                    else:
-                        with open(filename, "rb") as image_file:
-                            card['image'] = base64.b64encode(image_file.read()).decode()
-            return results, 201
+                        img_response = requests.get(image_url)
+                        if img_response.status_code == 200:
+                            with open(filename, "wb") as img_file:
+                                img_file.write(img_response.content)
+                                response['image'] = base64.b64encode(img_response.content).decode()
+                        else:
+                            print(f"Failed to download image for card: {cardId}")
+                else:
+                    with open(filename, "rb") as image_file:
+                        response['image'] = base64.b64encode(image_file.read()).decode()
+            return response, 201
         return {'error': 'Request must be JSON'}, 201
-    
+
     @app.post('/getUserSubcollection')
     def post_getUserSubcollection():
         if request.is_json:
@@ -393,6 +402,8 @@ def create_app():
                 payload['type'] = clientUserInfo['type']
                 payload['description'] = clientUserInfo['description'] #This is the effect text
                 payload['attribute'] = clientUserInfo['attribute'] #This is the color
+                payload['atk'] = clientUserInfo['atk'] #This is the power
+                payload['def'] = clientUserInfo['def'] #This is the toughness
             else:
                 payload['attribute'] = clientUserInfo['attribute'] #This is the energy type
                 payload['type'] = clientUserInfo['type'] #This is the stage
