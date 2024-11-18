@@ -269,13 +269,15 @@ def create_app():
             database = client['card_detection_info']
             userCollection = database['user_data']
             cardCollection = database['card_collection']
+            subcolCollection = database['subcollection_info']
             userData = userCollection.find_one({'userid' : userid})
             if userData == None:
                 return {'error': 'Incorrect UserID', 'success' : 0}, 201
             payload = {'userid' : userid}
             userDel = userCollection.delete_one(payload)
             cardDel = cardCollection.delete_many(payload)
-            return {'Message' : 'User removed', 'remUserCnt' : userDel.deleted_count, 'remCardCnt' : cardDel.deleted_count, 'success' : 1}, 201
+            subDel = subcolCollection.delete_many(payload)
+            return {'Message' : 'User removed', 'remUserCnt' : userDel.deleted_count, 'remCardCnt' : cardDel.deleted_count, 'remSubcolCount': subDel.deleted_count, 'success' : 1}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
     
     @app.post('/getUserCollection')
@@ -300,7 +302,7 @@ def create_app():
             cardId = clientUserInfo['cardid']
             response = {}
             if game == 'yugioh':
-                filename = './cardImages/' + cardId + '_yugioh.jpg'
+                filename = './backend/cardImages/' + cardId + '_yugioh.jpg'
                 if not os.path.isfile(filename):
                     url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
                     payload = {'id': cardId, 'tcgplayer_data': None}
@@ -320,7 +322,7 @@ def create_app():
                     with open(filename, "rb") as image_file:
                         response['image'] = base64.b64encode(image_file.read()).decode()
             elif game == 'mtg':
-                filename = './cardImages/' + cardId + '_mtg.jpg'
+                filename = './backend/cardImages/' + cardId + '_mtg.jpg'
                 if not os.path.isfile(filename):
                     url = 'https://api.scryfall.com/cards/'
                     headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
@@ -342,7 +344,7 @@ def create_app():
                     with open(filename, "rb") as image_file:
                         response['image'] = base64.b64encode(image_file.read()).decode()
             elif game == 'pokemon':
-                filename = './cardImages/' + cardId + '_pokemon.jpg'
+                filename = './backend/cardImages/' + cardId + '_pokemon.jpg'
                 if not os.path.isfile(filename):
                     apikey = os.getenv('POKEMON_API_KEY')
                     url = 'https://api.pokemontcg.io/v2/cards/'
