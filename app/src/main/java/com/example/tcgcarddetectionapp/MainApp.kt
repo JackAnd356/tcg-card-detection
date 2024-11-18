@@ -309,6 +309,13 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     userid = userid
                 )
                 allCardsFlag = true
+                collection.forEach {
+                        card ->
+                    if (card.game == game) {
+                        thisSubCol!!.totalValue = thisSubCol!!.totalValue?.plus((card.quantity * card.price))
+                        thisSubCol!!.cardCount = thisSubCol!!.cardCount?.plus(card.quantity)
+                    }
+                }
             }
             else {
                 subColInfo.forEach {

@@ -85,8 +85,6 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 card ->
             if (!cardData.contains(card) && card.game == game) {
                 cardData.add(card)
-                subcolInfo!!.totalValue = subcolInfo!!.totalValue?.plus((card.quantity * card.price))
-                subcolInfo!!.cardCount = subcolInfo!!.cardCount?.plus(card.quantity)
             }
         }
     }
