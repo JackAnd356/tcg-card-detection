@@ -557,6 +557,27 @@ def create_app():
             return {'success' : 1, 'subcollectionid' : subcollectionid}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
     
+    @app.post('/updateUserSubcollection')
+    def post_updateUserSubcollection():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['subcollection_info']
+            payload = {'subcollectionid' : clientUserInfo['subcollectionid']}
+            result = collection.find_one(payload)
+            if result == None:
+                return {'error': 'Subcollection not found', 'success' : 0}
+            updateOp = { '$set' :
+                        {
+                            'name' : clientUserInfo['name'], 
+                            'isDeck' : clientUserInfo['isDeck'], 
+                            'physLoc' : clientUserInfo['physLoc']
+                            }
+                }
+            collection.update_one(payload, updateOp)
+            return {'success' : 1}, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 201
+    
     @app.post('/deleteUserSubcollection')
     def post_deleteUserSubcollection():
         if request.is_json:
@@ -567,7 +588,9 @@ def create_app():
             subCollectionInfo = collection.find_one({'subcollectionid' : subcollectionid})
             if subCollectionInfo == None:
                 return {'error': 'Subcollection not found', 'success' : 0}
+            cardCollection = database['card_collection']
             collection.delete_one({'subcollectionid' : subcollectionid})
+            cardCollection.update_many({}, {'$pull' : {'subcollections' : subcollectionid}})
             return {'success' : 1}, 201
         return {'error': 'Request must be JSON'}, 201
 
