@@ -1,7 +1,10 @@
 package com.example.tcgcarddetectionapp
 
 import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,12 +43,14 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.startActivity
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 import retrofit2.Call
 import retrofit2.Callback
@@ -86,6 +91,13 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     val scrollstate = rememberScrollState()
     var refreshFlag by remember { mutableStateOf(false) }
     var cardData = remember { mutableStateListOf<CardData>() }
+    var navWebsite by remember { mutableStateOf("") }
+
+    if (navWebsite != "") {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(navWebsite))
+        LocalContext.current.startActivity(browserIntent)
+        navWebsite = ""
+    }
 
     if (subcolInfo.subcollectionid == "all") {
         fullCardPool.forEach {
@@ -219,7 +231,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         onCollectionChange = onCollectionChange,
                         subcolInfo = subcolInfo,
                         updateCards = {cardData = it.toMutableStateList()},
-                        fullCardPool = fullCardPool
+                        fullCardPool = fullCardPool,
+                        navWebsite = { navWebsite = it }
                     )
                 }
             }
@@ -257,18 +270,30 @@ fun CardImage(cardData: CardData,
               setFocusedCard: (CardData) -> Unit,
               showCardPopup: () -> Unit,
               modifier: Modifier) {
-    val decodedString = Base64.decode(cardData.image!!, 0)
-    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-    Image(
-        bitmap = img.asImageBitmap(),
-        contentDescription = "Card",
-        modifier
-            .size(120.dp, 200.dp)
-            .clickable {
+    if (cardData.image != "nocardimage") {
+        val decodedString = Base64.decode(cardData.image!!, 0)
+        val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+        Image(
+            bitmap = img.asImageBitmap(),
+            contentDescription = "Card",
+            modifier
+                .size(120.dp, 200.dp)
+                .clickable {
+                    setFocusedCard(cardData)
+                    showCardPopup()
+                }
+        )
+    }
+    else {
+        Image(
+            painter = painterResource(R.drawable.nocardimage),
+            contentDescription = stringResource(R.string.card_image_not_loaded_context),
+            modifier.clickable {
                 setFocusedCard(cardData)
                 showCardPopup()
             }
-    )
+        )
+    }
 }
 
 
@@ -284,7 +309,8 @@ fun CardPopup(cardData: CardData,
               modifier: Modifier = Modifier,
               subcolInfo: SubcollectionInfo,
               onCollectionChange: (Array<CardData>) -> Unit,
-              updateCards: (ArrayList<CardData>) -> Unit) {
+              updateCards: (ArrayList<CardData>) -> Unit,
+              navWebsite: (String) -> Unit) {
     val optionInfo = subcollections.filter( predicate = {
         it.game == game
     })
@@ -301,14 +327,24 @@ fun CardPopup(cardData: CardData,
         if (cardData.game == "yugioh") {
             Row {
                 Column {
-                    val decodedString = Base64.decode(cardData.image!!, 0)
-                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                    Image(
-                        bitmap = img.asImageBitmap(),
-                        contentDescription = "Card",
-                        modifier
-                            .size(120.dp, 200.dp)
-                    )
+                    if (cardData.image != "nocardimage") {
+                        val decodedString = Base64.decode(cardData.image!!, 0)
+                        val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                        Image(
+                            bitmap = img.asImageBitmap(),
+                            contentDescription = "Card",
+                            modifier
+                                .size(120.dp, 200.dp)
+                        )
+                    }
+                    else {
+                        Image(
+                            painter = painterResource(R.drawable.nocardimage),
+                            contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                            modifier
+                                .size(120.dp, 200.dp)
+                        )
+                    }
                     Text(cardData.cardname)
                     Text(
                         text = String.format(stringResource(R.string.card_id_label), cardData.cardid),
@@ -331,7 +367,11 @@ fun CardPopup(cardData: CardData,
                         )
                     )
                     Button(
-                        onClick = {}
+                        onClick = {
+                            if (cardData.purchaseurl != null) {
+                                navWebsite(cardData.purchaseurl!!)
+                            }
+                        }
                     ) {
                         if (storefront == 1) {
                             Text(stringResource(R.string.tcgplayer_label))
@@ -363,14 +403,24 @@ fun CardPopup(cardData: CardData,
         else if (cardData.game == "mtg") {
             Row {
                 Column {
-                    val decodedString = Base64.decode(cardData.image!!, 0)
-                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                    Image(
-                        bitmap = img.asImageBitmap(),
-                        contentDescription = "Card",
-                        modifier
-                            .size(120.dp, 200.dp)
-                    )
+                    if (cardData.image != "nocardimage") {
+                        val decodedString = Base64.decode(cardData.image!!, 0)
+                        val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                        Image(
+                            bitmap = img.asImageBitmap(),
+                            contentDescription = "Card",
+                            modifier
+                                .size(120.dp, 200.dp)
+                        )
+                    }
+                    else {
+                        Image(
+                            painter = painterResource(R.drawable.nocardimage),
+                            contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                            modifier
+                                .size(120.dp, 200.dp)
+                        )
+                    }
                     Text(cardData.cardname)
                     Text(
                         text = String.format(stringResource(R.string.card_setcode_label), cardData.setcode),
@@ -388,7 +438,11 @@ fun CardPopup(cardData: CardData,
                         )
                     )
                     Button(
-                        onClick = {}
+                        onClick = {
+                            if (cardData.purchaseurl != null) {
+                                navWebsite(cardData.purchaseurl!!)
+                            }
+                        }
                     ) {
                         if (storefront == 1) {
                             Text(stringResource(R.string.tcgplayer_label))
@@ -418,14 +472,24 @@ fun CardPopup(cardData: CardData,
         else { //Pokemon
             Row {
                 Column {
-                    val decodedString = Base64.decode(cardData.image!!, 0)
-                    val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                    Image(
-                        bitmap = img.asImageBitmap(),
-                        contentDescription = "Card",
-                        modifier
-                            .size(120.dp, 200.dp)
-                    )
+                    if (cardData.image != "nocardimage") {
+                        val decodedString = Base64.decode(cardData.image!!, 0)
+                        val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                        Image(
+                            bitmap = img.asImageBitmap(),
+                            contentDescription = "Card",
+                            modifier
+                                .size(120.dp, 200.dp)
+                        )
+                    }
+                    else {
+                        Image(
+                            painter = painterResource(R.drawable.nocardimage),
+                            contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                            modifier
+                                .size(120.dp, 200.dp)
+                        )
+                    }
                     Text(cardData.cardname)
                     Text(
                         text = String.format(stringResource(R.string.card_id_label), cardData.cardid),
@@ -467,7 +531,11 @@ fun CardPopup(cardData: CardData,
                         )
                     )
                     Button(
-                        onClick = {}
+                        onClick = {
+                            if (cardData.purchaseurl != null) {
+                                navWebsite(cardData.purchaseurl!!)
+                            }
+                        }
                     ) {
                         if (storefront == 1) {
                             Text(stringResource(R.string.tcgplayer_label))

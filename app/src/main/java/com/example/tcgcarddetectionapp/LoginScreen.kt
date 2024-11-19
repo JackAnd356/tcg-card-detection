@@ -273,6 +273,7 @@ fun cardImagePost(cardid: String, game: String, setCardImage: (String) -> Unit) 
         override fun onFailure(call: Call<GetCardImageResponseModel>, t: Throwable) {
             t.printStackTrace()
             Log.d("ERROR", "Card " + cardid + " not loaded in")
+            setCardImage("nocardimage")
         }
 
     } )

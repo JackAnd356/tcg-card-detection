@@ -23,7 +23,8 @@ data class CardData(
     val retreat: Array<String>? = null,
     val weaknesses: Array<Weakness>? = null,
     val attacks: Array<Attack>? = null,
-    var added: Boolean = true
+    var added: Boolean = true,
+    var purchaseurl: String? = null,
 )
 
 data class Weakness(

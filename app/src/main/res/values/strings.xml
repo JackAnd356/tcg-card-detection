@@ -63,4 +63,5 @@
     <string name="add_to_subcollection_button_label">Add</string>
     <string name="card_added_to_subcollection_message">Card Added To Subcollection!</string>
     <string name="add_from_all_cards_button_label">Add From All Cards</string>
+    <string name="card_image_not_loaded_context">Card Image Could Not Be Loaded</string>
 </resources>
