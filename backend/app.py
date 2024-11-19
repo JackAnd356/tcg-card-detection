@@ -11,6 +11,7 @@ import bcrypt
 import datetime
 import Cards
 import cv2
+import urllib
 from datetime import date, timezone
 from dotenv import load_dotenv, find_dotenv
 from pymongo import database
@@ -134,6 +135,7 @@ def create_app():
                     if (datetime.now(timezone.utc) - oldPriceDate).days == 0:
                         continue
                     price = ''
+                    purchaseURL = ''
                     if game == 'yugioh':
                         url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
                         payload = {'id': cardId, 'tcgplayer_data': None}
@@ -144,6 +146,7 @@ def create_app():
                             for cardSet in cardData['data'][0]['card_sets']:
                                 if cardSet['set_code'] == cardSetCode:
                                     price = cardSet['set_price']
+                                    purchaseURL = urllib.parse.unquote(cardSet['set_url'].split('u=')[1], encoding='utf-8', errors='replace')
                                     break
                     elif game == 'mtg':
                         url = 'https://api.scryfall.com/cards/'
@@ -153,6 +156,7 @@ def create_app():
                         if resp.status_code == 200:
                             cardData = resp.json()
                             price = cardData['prices']['usd']
+                            purchaseURL = urllib.parse.unquote(cardData['purchase_uris']['tcgplayer'].split('u=')[1], encoding='utf-8', errors='replace')
                     elif game == 'pokemon':
                         apikey = os.getenv('POKEMON_API_KEY')
                         url = 'https://api.pokemontcg.io/v2/cards/'
@@ -169,11 +173,19 @@ def create_app():
                                 dictKey = list(cardData['data']['tcgplayer']['prices'].keys())[0]
                                 price = cardData['data']['tcgplayer']['prices'][dictKey]['market']
                     payload = {'cardid' : cardId, 'setcode' : cardSetCode, 'game' : game, 'rarity' : res['rarity']}
-                    updateOp = updateOp = { '$set' : 
+                    if (not 'purchaseurl' in res) and purchaseURL != '':
+                        updateOp = updateOp = { '$set' : 
                                 { 'price' : price,
-                                  'pricedate' : datetime.now(timezone.utc)
+                                  'pricedate' : datetime.now(timezone.utc),
+                                  'purchaseurl': purchaseURL
                                 }
                             }
+                    else:
+                        updateOp = updateOp = { '$set' : 
+                                    { 'price' : price,
+                                      'pricedate' : datetime.now(timezone.utc)
+                                    }
+                                }
                     cardCollection.update_many(payload, updateOp)
                 userData['success'] = 1
                 userData.pop("password")
