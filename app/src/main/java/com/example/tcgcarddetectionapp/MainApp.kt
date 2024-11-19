@@ -128,7 +128,11 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
                     userid = userid,
-                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) }
+                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) },
+                    removeSubcollection = {
+                        val removedSubcol = it
+                        subColInfo = subColInfo.filter { subcol -> subcol != removedSubcol }.toTypedArray()
+                    },
                 )
             }
         }
@@ -162,7 +166,11 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
                     userid = userid,
-                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) }
+                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) },
+                    removeSubcollection = {
+                        val removedSubcol = it
+                        subColInfo = subColInfo.filter { subcol -> subcol != removedSubcol }.toTypedArray()
+                    },
                 )
             }
         }
@@ -196,7 +204,11 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
                     userid = userid,
-                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) }
+                    onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) },
+                    removeSubcollection = {
+                        val removedSubcol = it
+                        subColInfo = subColInfo.filter { subcol -> subcol != removedSubcol }.toTypedArray()
+                    },
                 )
             }
         }
