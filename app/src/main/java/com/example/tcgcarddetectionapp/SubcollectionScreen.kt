@@ -29,19 +29,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.startActivity
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 import retrofit2.Call
 import retrofit2.Callback
@@ -232,7 +227,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         subcolInfo = subcolInfo,
                         updateCards = {cardData = it.toMutableStateList()},
                         fullCardPool = fullCardPool,
-                        navWebsite = { navWebsite = it }
+                        navWebsite = { navWebsite = it },
+                        refreshUI = {refreshFlag = !refreshFlag}
                     )
                 }
             }
@@ -270,7 +266,7 @@ fun CardImage(cardData: CardData,
               setFocusedCard: (CardData) -> Unit,
               showCardPopup: () -> Unit,
               modifier: Modifier) {
-    if (cardData.image != "nocardimage") {
+    if (cardData.image != "nocardimage" && cardData.image != null) {
         val decodedString = Base64.decode(cardData.image!!, 0)
         val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
         Image(
@@ -310,7 +306,8 @@ fun CardPopup(cardData: CardData,
               subcolInfo: SubcollectionInfo,
               onCollectionChange: (Array<CardData>) -> Unit,
               updateCards: (ArrayList<CardData>) -> Unit,
-              navWebsite: (String) -> Unit) {
+              navWebsite: (String) -> Unit,
+              refreshUI: () -> Unit) {
     val optionInfo = subcollections.filter( predicate = {
         it.game == game
     })
@@ -327,7 +324,7 @@ fun CardPopup(cardData: CardData,
         if (cardData.game == "yugioh") {
             Row {
                 Column {
-                    if (cardData.image != "nocardimage") {
+                    if (cardData.image != "nocardimage" && cardData.image != null) {
                         val decodedString = Base64.decode(cardData.image!!, 0)
                         val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                         Image(
@@ -403,7 +400,7 @@ fun CardPopup(cardData: CardData,
         else if (cardData.game == "mtg") {
             Row {
                 Column {
-                    if (cardData.image != "nocardimage") {
+                    if (cardData.image != "nocardimage" && cardData.image != null) {
                         val decodedString = Base64.decode(cardData.image!!, 0)
                         val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                         Image(
@@ -472,7 +469,7 @@ fun CardPopup(cardData: CardData,
         else { //Pokemon
             Row {
                 Column {
-                    if (cardData.image != "nocardimage") {
+                    if (cardData.image != "nocardimage" && cardData.image != null) {
                         val decodedString = Base64.decode(cardData.image!!, 0)
                         val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
                         Image(
@@ -591,7 +588,7 @@ fun CardPopup(cardData: CardData,
 
             Column {
                 Button(onClick = {
-                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, updateCards = updateCards)
+                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, updateCards = updateCards, subcolInfo = subcolInfo)
                     if (successful) Toast.makeText(context, "Card Successfully Removed", Toast.LENGTH_SHORT).show()
                 }, modifier = Modifier.align(Alignment.End)) {
                     Text(text="Delete")
@@ -600,7 +597,7 @@ fun CardPopup(cardData: CardData,
         } else {
             Column {
                 Button(onClick = {
-                    removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcollection = subcolInfo.name)
+                    removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcolInfo = subcolInfo, refreshUI = refreshUI)
                 }) {
                     Text(text = "Remove")
                 }
@@ -621,7 +618,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
     val cardList = allCards.filter {
         it.game == game && (it.subcollections == null || !it.subcollections!!.contains(subcollection))
     }
-    var checkedStates = remember { mutableStateListOf<Boolean>() }
+    val checkedStates = remember { mutableStateListOf<Boolean>() }
     repeat(cardList.size) {
         checkedStates.add(false)
     }
@@ -668,7 +665,9 @@ fun arrToPrintableString(arr: Array<String>): String {
     return str
 }
 
-fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>, onCollectionChange: (Array<CardData>) -> Unit, updateCards: (ArrayList<CardData>) -> Unit): Boolean {
+fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>,
+                             onCollectionChange: (Array<CardData>) -> Unit, updateCards: (ArrayList<CardData>) -> Unit,
+                             subcolInfo: SubcollectionInfo): Boolean {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -696,6 +695,8 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
             } else {
                 card.quantity--
             }
+
+            updateSubcollectionInfo(subcolInfo = subcolInfo, card = card, quantity = 1, adding = false)
             successful = true
         }
 
@@ -706,14 +707,14 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
     return successful
 }
 
-fun removeFromSubcollectionPost(card: CardData, userid: String, subcollection: String, game: String): Boolean {
+fun removeFromSubcollectionPost(card: CardData, userid: String, subcolInfo: SubcollectionInfo, game: String, refreshUI: () -> Unit): Boolean {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
-    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = card.quantity, rarity = card.rarity, subcollection = subcollection)
+    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = card.quantity, rarity = card.rarity, subcollection = subcolInfo.subcollectionid)
     var successful = false
 
     retrofitAPI.removeFromSubcollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
@@ -721,8 +722,10 @@ fun removeFromSubcollectionPost(card: CardData, userid: String, subcollection: S
             call: Call<GenericSuccessErrorResponseModel>,
             response: Response<GenericSuccessErrorResponseModel>
         ) {
-            card.subcollections
+            if (card.subcollections != null) card.subcollections = card.subcollections!!.toList().remove(subcolInfo.subcollectionid).toTypedArray()
             successful = true
+            updateSubcollectionInfo(subcolInfo = subcolInfo, card = card, quantity = 1, adding = false)
+            refreshUI()
         }
 
         override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
@@ -758,18 +761,7 @@ fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: Strin
             else {
                 card.subcollections = card.subcollections!!.plus(subcollection)
             }
-            if (subcolInfo.cardCount == null) {
-                subcolInfo.cardCount = card.quantity
-            }
-            else {
-                subcolInfo.cardCount = subcolInfo.cardCount!! + card.quantity
-            }
-            if (subcolInfo.totalValue == null) {
-                subcolInfo.totalValue = card.quantity * card.price
-            }
-            else {
-                subcolInfo.totalValue = subcolInfo.totalValue!! + (card.quantity * card.price)
-            }
+            updateSubcollectionInfo(subcolInfo = subcolInfo, card = card, quantity = 1, adding = true)
             refreshUI()
         }
 

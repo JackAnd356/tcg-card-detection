@@ -52,7 +52,7 @@ enum class Stages(val title: Int) {
 }
 
 @Composable
-fun ScanScreen(modifier: Modifier = Modifier, userid: String, collectionNavigate: () -> Unit) {
+fun ScanScreen(modifier: Modifier = Modifier, userid: String, collectionNavigate: () -> Unit, addToOverallCards: (CardData) -> Unit) {
     val stage = remember { mutableStateOf(Stages.Home) }
 
     when (stage.value) {
@@ -60,7 +60,7 @@ fun ScanScreen(modifier: Modifier = Modifier, userid: String, collectionNavigate
             ScanHome(modifier, stage)
         }
         Stages.Confirmation -> {
-            ScanConfirmation(modifier, userid, stage)
+            ScanConfirmation(modifier, userid, stage, addToOverallCards = addToOverallCards)
         }
         Stages.PostConfirmation -> {
             ScanPostConfirmation(modifier, stage, collectionNavigate)
@@ -115,12 +115,22 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
 }
 
 @Composable
-fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Stages>) {
+fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Stages>, addToOverallCards: (CardData) -> Unit) {
     Column(verticalArrangement = Arrangement.Top, modifier = modifier
         .fillMaxSize()
         .wrapContentWidth(Alignment.CenterHorizontally)) {
+        if (cards.isEmpty()) {
+            val sampleCard1 = CardData(cardid = "85106525", setcode = "MP24-EN133", game = "yugioh", cardname = "Bonfire",
+                rarity = "Prismatic Secret Rare", quantity = 1, price = 8.24, userid = "1", subcollections = null, image = null)
+            val sampleCard2 = CardData(cardid = "54693926", setcode = "SDAZ-EN030", game = "yugioh", cardname = "Dark Ruler No More",
+                rarity = "Common", quantity = 1, price = 0.27, userid = "1", subcollections = null, image = null)
+            val sampleCard3 = CardData(cardid = "0079", setcode = "FDN", game = "mtg", cardname = "Boltwave",
+                rarity = "U", quantity = 1, price = 2.60, userid = "1", subcollections = null, image = null, cost = "R",
+                attribute = "R", description = "Boltwave deals 3 damage to each opponent.", atk = "", def = "", type = "sorcery")
+            cards = arrayOf(sampleCard2, sampleCard3, sampleCard1)
+        }
         val map = cards.groupBy { it.game }
-        map.forEach({ entry ->
+        map.forEach { entry ->
             val game = entry.key
             Text(text = game, fontSize = 32.sp)
             for (cardData in entry.value) {
@@ -128,16 +138,15 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
-                        checked = true,
-                        onCheckedChange = { cardData.added = it }
+                        checked = cardData.added.value,
+                        onCheckedChange = { cardData.added.value = it }
                     )
                     Text(
                         text = "x${cardData.quantity} ${cardData.cardname}"
                     )
                 }
             }
-        })
-
+        }
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -149,8 +158,8 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
 
             Button(onClick = {
                 cards.forEach { card ->
-                    if (card.added) {
-                        addToCollectionPost(userid = userid, card = card)
+                    if (card.added.value) {
+                        addToCollectionPost(userid = userid, card = card, addToOverallCards = addToOverallCards)
                     }
                 }
                 stage.value = Stages.PostConfirmation
@@ -174,9 +183,11 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
             val game = entry.key
             Text(text = game, fontSize = 32.sp)
             for (cardData in entry.value) {
-                Text(
-                    text = "x${cardData.quantity} ${cardData.cardname}"
-                )
+                if (cardData.added.value) {
+                    Text(
+                        text = "x${cardData.quantity} ${cardData.cardname}"
+                    )
+                }
             }
         })
 
@@ -196,7 +207,7 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
     }
 }
 
-fun addToCollectionPost(userid: String, card: CardData) {
+fun addToCollectionPost(userid: String, card: CardData, addToOverallCards: (CardData) -> Unit) {
     val url = "http://10.0.2.2:5000"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -219,6 +230,8 @@ fun addToCollectionPost(userid: String, card: CardData) {
             if (respData != null) {
                 if (respData.success == 0) {
                     Log.d("ERROR", respData.error!!)
+                } else {
+                    addToOverallCards(card)
                 }
             }
         }
@@ -262,8 +275,9 @@ fun scanPhotoPost(imageFile: File, stage: MutableState<Stages>, err : MutableInt
             val respData = response.body()
             if (respData != null) {
                 cards = respData
-                if (cards.isNotEmpty()) stage.value = Stages.Confirmation
-                else err.intValue = 1
+                stage.value = Stages.Confirmation
+                /*if (cards.isNotEmpty()) stage.value = Stages.Confirmation
+                else err.intValue = 1*/
             } else {
                 // Handle error response
                 err.intValue = 2
@@ -346,7 +360,7 @@ fun ImageCaptureFromCamera(modifier: Modifier, stage: MutableState<Stages>, err:
 @Composable
 fun ScanScreenPreview(modifier: Modifier = Modifier) {
     TCGCardDetectionAppTheme {
-        ScanScreen(modifier = modifier, userid = "2", {})
+        ScanScreen(modifier = modifier, userid = "2", collectionNavigate = {}, addToOverallCards = {})
     }
 }
 

@@ -1,5 +1,8 @@
 package com.example.tcgcarddetectionapp
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+
 
 data class CardData(
     val userid : String,
@@ -23,7 +26,7 @@ data class CardData(
     val retreat: Array<String>? = null,
     val weaknesses: Array<Weakness>? = null,
     val attacks: Array<Attack>? = null,
-    var added: Boolean = true,
+    var added: MutableState<Boolean> = mutableStateOf(false),
     var purchaseurl: String? = null,
 )
 
