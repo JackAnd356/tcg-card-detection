@@ -21,10 +21,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -65,7 +71,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         userid: String,
                         subcollections: Array<SubcollectionInfo>,
                         modifier: Modifier = Modifier,
-                        onCollectionChange: (Array<CardData>) -> Unit) {
+                        onCollectionChange: (Array<CardData>) -> Unit,
+                        removeSubcollection: (SubcollectionInfo) -> Unit,) {
     var searchTerm by remember { mutableStateOf("") }
     var showCardPopup by remember { mutableStateOf(false) }
     var showAllCardAddToSubcollection by remember { mutableStateOf(false) }
@@ -87,6 +94,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var refreshFlag by remember { mutableStateOf(false) }
     var cardData = remember { mutableStateListOf<CardData>() }
     var navWebsite by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var showEditPopup by remember { mutableStateOf(false) }
+    var showDeletePopup by remember { mutableStateOf(false) }
 
     if (navWebsite != "") {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(navWebsite))
@@ -129,7 +139,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             }
             Card(colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = modifier
-                    .fillMaxWidth(.8f)
+                    .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
             ) {
@@ -151,6 +161,35 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             lineHeight = 20.sp,
                             textAlign = TextAlign.Center
                         )
+                    }
+                    Box {
+                        IconButton(
+                            onClick = {expanded = !expanded}
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "More"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = {
+                                expanded = false
+                            }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.edit_option_label)) },
+                                onClick = {
+                                    showEditPopup = !showEditPopup
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.delete_option_label)) },
+                                onClick = {
+                                    showDeletePopup = !showDeletePopup
+                                }
+                            )
+                        }
                     }
                 }
                 Row {
@@ -229,6 +268,31 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         fullCardPool = fullCardPool,
                         navWebsite = { navWebsite = it },
                         refreshUI = {refreshFlag = !refreshFlag}
+                    )
+                }
+            }
+            if (showEditPopup) {
+                Dialog(
+                    onDismissRequest = { showEditPopup = !showEditPopup }
+                ) {
+                    EditSubcollectionPopup(
+                        subcollection = subcolInfo,
+                        onCancel = { showEditPopup = !showEditPopup },
+                    )
+                }
+            }
+            if (showDeletePopup) {
+                Dialog(
+                    onDismissRequest = { showDeletePopup = !showDeletePopup }
+                ) {
+                    DeleteSubcollectionPopup(
+                        subcollection = subcolInfo,
+                        onCancel = { showDeletePopup = !showDeletePopup },
+                        refresh = {  },
+                        onDeleteSubcol = {
+                            navBack()
+                            removeSubcollection(it)
+                        },
                     )
                 }
             }
@@ -837,6 +901,7 @@ fun SubollectionScreenPreview() {
             userid = "1",
             game = "yugioh",
             onCollectionChange = {},
+            removeSubcollection = {},
         )
     }
 }

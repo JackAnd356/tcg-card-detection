@@ -178,7 +178,6 @@ fun CollectionScreen(gameName: String,
                 ) {
                     EditSubcollectionPopup(
                         subcollection = selectedSubcollectionInfo,
-                        refresh = { refreshFlag = !refreshFlag },
                         onCancel = { showEditPopup = !showEditPopup },
                     )
                 }
@@ -394,7 +393,6 @@ fun DialogTest(
 @Composable
 fun EditSubcollectionPopup(
     subcollection: SubcollectionInfo,
-    refresh: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {

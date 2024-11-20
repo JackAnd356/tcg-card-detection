@@ -340,6 +340,17 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     }
                 }
             }
+            var navBack = {}
+            if (game == "yugioh") {
+                navBack = { navController.navigate(CardDetectionScreens.YugiohCollection.name) }
+            }
+            else if (game == "mtg") {
+                navBack = { navController.navigate(CardDetectionScreens.MagicCollection.name) }
+            }
+            else if (game == "pokemon") {
+                navBack = { navController.navigate(CardDetectionScreens.PokemonCollection.name) }
+            }
+
             Scaffold(
                 bottomBar = {
                     CardDetectionBottomBar(
@@ -352,25 +363,28 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 }
             ) {
                 SubcollectionScreen(
-                    subcolInfo = thisSubCol!!,
+                    subcolInfo = thisSubCol ?: SubcollectionInfo(
+                        subcollectionid = "Error",
+                        name = "Error",
+                        totalValue = 0.0,
+                        physLoc = "error",
+                        cardCount = 0,
+                        game = "error",
+                        isDeck = false,
+                        userid = "error"
+                    ),
                     storefront = storefront,
                     allCardsFlag = allCardsFlag,
                     fullCardPool = collection,
                     subcollections = subColInfo,
                     game = game!!,
                     userid = userid,
-                    navBack = {
-                        if (game == "yugioh") {
-                            navController.navigate(CardDetectionScreens.YugiohCollection.name)
-                        }
-                        else if (game == "mtg") {
-                            navController.navigate(CardDetectionScreens.MagicCollection.name)
-                        }
-                        else if (game == "pokemon") {
-                            navController.navigate(CardDetectionScreens.PokemonCollection.name)
-                        }
+                    navBack = navBack,
+                    onCollectionChange = {collection = it},
+                    removeSubcollection = {
+                        val removedSubcol = it
+                        subColInfo = subColInfo.filter { subcol -> subcol != removedSubcol }.toTypedArray()
                     },
-                    onCollectionChange = {collection = it}
                 )
             }
         }
