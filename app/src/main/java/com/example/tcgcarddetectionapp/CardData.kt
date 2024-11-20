@@ -28,7 +28,16 @@ data class CardData(
     val attacks: Array<Attack>? = null,
     var added: MutableState<Boolean> = mutableStateOf(false),
     var purchaseurl: String? = null,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (other !is CardData) return false
+        return this.cardname == other.cardname && this.cardid == other.cardid && this.setcode == other.setcode
+    }
+
+    override fun hashCode(): Int {
+        return (this.cardname + this.cardid + this.setcode).hashCode()
+    }
+}
 
 data class Weakness(
     val type: String,

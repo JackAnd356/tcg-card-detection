@@ -267,7 +267,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         updateCards = {cardData = it.toMutableStateList()},
                         fullCardPool = fullCardPool,
                         navWebsite = { navWebsite = it },
-                        refreshUI = {refreshFlag = !refreshFlag}
+                        refreshUI = {refreshFlag = !refreshFlag},
+                        showCardPopup = {showCardPopup = !showCardPopup}
                     )
                 }
             }
@@ -371,7 +372,8 @@ fun CardPopup(cardData: CardData,
               onCollectionChange: (Array<CardData>) -> Unit,
               updateCards: (ArrayList<CardData>) -> Unit,
               navWebsite: (String) -> Unit,
-              refreshUI: () -> Unit) {
+              refreshUI: () -> Unit,
+              showCardPopup: () -> Unit) {
     val optionInfo = subcollections.filter( predicate = {
         it.game == game
     })
@@ -652,7 +654,8 @@ fun CardPopup(cardData: CardData,
 
             Column {
                 Button(onClick = {
-                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, updateCards = updateCards, subcolInfo = subcolInfo)
+                    showCardPopup()
+                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, updateCards = updateCards, subcolInfo = subcolInfo, refreshUI = refreshUI)
                     if (successful) Toast.makeText(context, "Card Successfully Removed", Toast.LENGTH_SHORT).show()
                 }, modifier = Modifier.align(Alignment.End)) {
                     Text(text="Delete")
@@ -661,6 +664,7 @@ fun CardPopup(cardData: CardData,
         } else {
             Column {
                 Button(onClick = {
+                    showCardPopup()
                     removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcolInfo = subcolInfo, refreshUI = refreshUI)
                 }) {
                     Text(text = "Remove")
@@ -731,7 +735,7 @@ fun arrToPrintableString(arr: Array<String>): String {
 
 fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>,
                              onCollectionChange: (Array<CardData>) -> Unit, updateCards: (ArrayList<CardData>) -> Unit,
-                             subcolInfo: SubcollectionInfo): Boolean {
+                             subcolInfo: SubcollectionInfo, refreshUI: () -> Unit): Boolean {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
         .baseUrl(url)
@@ -762,6 +766,7 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
 
             updateSubcollectionInfo(subcolInfo = subcolInfo, card = card, quantity = 1, adding = false)
             successful = true
+            refreshUI()
         }
 
         override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {

@@ -428,7 +428,8 @@ def create_app():
                 payload['price'] = clientUserInfo['price']
                 payload['pricedate'] = datetime.now(timezone.utc)
                 insertRes = collection.insert_one(payload)
-                return {'success' : insertRes.acknowledged}, 201
+                if insertRes.acknowledged: return {'success' : 1}, 201
+                else: return {'success' : 0}, 201
             else :
                 currCount = result['quantity']
                 currCount += clientUserInfo['quantity']
@@ -438,7 +439,7 @@ def create_app():
                                   'pricedate' : datetime.now(timezone.utc)}
                             }
                 upRes = collection.update_one(payload, updateOp)
-                return {'Message' : 'Successful Update!', 'count' : upRes.modified_count}, 201
+                return {'success' : 1}, 201
         return {'error': 'Request must be JSON'}, 201
     
     @app.post('/addToUserSubcollection')

@@ -231,11 +231,8 @@ fun addToCollectionPost(userid: String, card: CardData, addToOverallCards: (Card
         ) {
             val respData = response.body()
             if (respData != null) {
-                if (respData.success == 0) {
-                    Log.d("ERROR", respData.error!!)
-                } else {
-                    addToOverallCards(card)
-                }
+                println("Adding to overall cards")
+                addToOverallCards(card)
             }
         }
 

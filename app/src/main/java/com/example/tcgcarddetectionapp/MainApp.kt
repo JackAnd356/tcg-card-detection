@@ -286,7 +286,15 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             ) {
                 ScanScreen(userid = userid, collectionNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name)},
                     addToOverallCards = { card ->
-                        collection = collection.plus(card)
+                        var found = false
+                        for (existingCard in collection) {
+                            if (existingCard.equals(card)) {
+                                existingCard.quantity += card.quantity
+                                found = true
+                                break
+                            }
+                        }
+                        if (!found) collection = collection.plus(card)
                 })
             }
         }
