@@ -182,13 +182,16 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
         map.forEach({ entry ->
             val game = entry.key
             Text(text = game, fontSize = 32.sp)
+            var cardsFromGame = false
             for (cardData in entry.value) {
                 if (cardData.added.value) {
+                    cardsFromGame = true
                     Text(
                         text = "x${cardData.quantity} ${cardData.cardname}"
                     )
                 }
             }
+            if (!cardsFromGame) Text(text = "None")
         })
 
         Row(
