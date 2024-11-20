@@ -60,4 +60,10 @@ interface ApiService {
 
     @POST("removeFromUserSubcollection")
     fun removeFromSubcollection(@Body removeFromSubcollectionRequest: AddRemoveCardModel): Call<GenericSuccessErrorResponseModel>
+
+    @POST("updateUserSubcollection")
+    fun updateUserSubcollection(@Body updateUserSubcollectionRequestModel: UpdateUserSubcollectionRequestModel): Call<GenericSuccessErrorResponseModel>
+
+    @POST("deleteUserSubcollection")
+    fun deleteUserSubcollection(@Body deleteUserSubcollectionRequestModel: DeleteUserSubcollectionRequestModel): Call<GenericSuccessErrorResponseModel>
 }

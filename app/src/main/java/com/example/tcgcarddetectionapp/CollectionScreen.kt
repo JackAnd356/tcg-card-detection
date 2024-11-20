@@ -16,11 +16,17 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -60,17 +66,37 @@ fun CollectionScreen(gameName: String,
                      navController: NavController,
                      modifier: Modifier = Modifier,
                      userid: String,
+                     removeSubcollection: (SubcollectionInfo) -> Unit,
                      onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
     var searchTerm by remember { mutableStateOf("") }
     var popUp by remember { mutableStateOf(false)}
     val scrollstate = rememberScrollState()
+    var selectedSubcollectionInfo by remember { mutableStateOf<SubcollectionInfo>(
+        value = SubcollectionInfo(
+            subcollectionid = "none",
+            name = "none",
+            physLoc = "none",
+            game = gameFilter,
+            isDeck = false,
+            userid = userid,
+            totalValue = 0.0,
+            cardCount = 0,
+        ),
+    ) }
+    var showEditPopup by remember { mutableStateOf(false) }
+    var showDeletePopup by remember { mutableStateOf(false) }
+    var refreshFlag by remember { mutableStateOf(false) }
+
     Box(
         modifier
             .background(color = Color.LightGray)
-            .fillMaxWidth().fillMaxHeight(.9f)) {
+            .fillMaxWidth()
+            .fillMaxHeight(.9f)) {
         Column(
             verticalArrangement = Arrangement.Top,
-            modifier = modifier.wrapContentWidth(Alignment.CenterHorizontally).verticalScroll(state = scrollstate)
+            modifier = modifier
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .verticalScroll(state = scrollstate)
         ) {
             Card(colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = modifier
@@ -145,17 +171,46 @@ fun CollectionScreen(gameName: String,
                 gameName = gameFilter,
                 onUserSubColInfoChange = onUserSubColInfoChange)
             }
+
+            if (showEditPopup) {
+                Dialog(
+                    onDismissRequest = {showEditPopup = !showEditPopup}
+                ) {
+                    EditSubcollectionPopup(
+                        subcollection = selectedSubcollectionInfo,
+                        refresh = { refreshFlag = !refreshFlag },
+                        onCancel = { showEditPopup = !showEditPopup },
+                    )
+                }
+            }
+
+            if (showDeletePopup) {
+                Dialog(
+                    onDismissRequest = {showDeletePopup = !showDeletePopup}
+                ) {
+                    DeleteSubcollectionPopup(
+                        subcollection = selectedSubcollectionInfo,
+                        onCancel = { showDeletePopup = !showDeletePopup },
+                        refresh = { refreshFlag = !refreshFlag },
+                        onDeleteSubcol = removeSubcollection,
+                    )
+                }
+            }
             
             subcollections.forEach { subcollection ->
                 if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
                     CollectionSummary(
-                        name = subcollection.name,
-                        cardCount = subcollection.cardCount ?: 0,
-                        location = subcollection.physLoc,
-                        totalValue = subcollection.totalValue ?: 0.0,
-                        subColId = subcollection.subcollectionid,
+                        subcollection = subcollection,
                         game = gameFilter,
                         navController = navController,
+                        onEditSubcollectionInfo = {
+                            selectedSubcollectionInfo = it
+                            showEditPopup = !showEditPopup
+                            },
+                        onDeleteSubcollection = {
+                            selectedSubcollectionInfo = it
+                            showDeletePopup = !showDeletePopup
+                            },
                         modifier = modifier
                     )
                 }
@@ -165,47 +220,87 @@ fun CollectionScreen(gameName: String,
 }
 
 @Composable
-fun CollectionSummary(name: String,
-                      cardCount: Int,
-                      location: String,
-                      totalValue: Double,
-                      subColId: String,
+fun CollectionSummary(subcollection: SubcollectionInfo,
                       game: String,
                       navController: NavController,
+                      onEditSubcollectionInfo: (SubcollectionInfo) -> Unit,
+                      onDeleteSubcollection: (SubcollectionInfo) -> Unit,
                       modifier: Modifier = Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    val name = subcollection.name
+    val cardCount = subcollection.cardCount ?: 0
+    val location = subcollection.physLoc
+    val totalValue = subcollection.totalValue ?: 0.0
+    val subColId = subcollection.subcollectionid
     Card(colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
-            .fillMaxWidth(.8f)
+            .fillMaxWidth()
             .padding(vertical = 20.dp),
         onClick = {
             navController.navigate(CardDetectionScreens.Subcollection.name + "/" + subColId + "/" + game)
         }
     ) {
-        Text(
-            text = name,
-            fontSize = 30.sp,
-            lineHeight = 35.sp,
-            textAlign = TextAlign.Left
-        )
-        Text(
-            text = String.format(stringResource(R.string.cards_label), cardCount),
-            fontSize = 20.sp,
-            lineHeight = 25.sp,
-            textAlign = TextAlign.Left
-        )
         Row {
-            Text(
-                text = String.format(stringResource(R.string.location_label), location),
-                fontSize = 20.sp,
-                lineHeight = 25.sp,
-                textAlign = TextAlign.Left
-            )
-            Text(
-                text = String.format(stringResource(R.string.total_value_label), totalValue, "$"),
-                fontSize = 20.sp,
-                lineHeight = 25.sp,
-                textAlign = TextAlign.Left
-            )
+            Column {
+                Text(
+                    text = name,
+                    fontSize = 30.sp,
+                    lineHeight = 35.sp,
+                    textAlign = TextAlign.Left
+                )
+                Text(
+                    text = String.format(stringResource(R.string.cards_label), cardCount),
+                    fontSize = 20.sp,
+                    lineHeight = 25.sp,
+                    textAlign = TextAlign.Left
+                )
+                Text(
+                    text = String.format(stringResource(R.string.location_label), location),
+                    fontSize = 20.sp,
+                    lineHeight = 25.sp,
+                    textAlign = TextAlign.Left
+                )
+                Text(
+                    text = String.format(
+                        stringResource(R.string.total_value_label),
+                        totalValue,
+                        "$"
+                    ),
+                    fontSize = 20.sp,
+                    lineHeight = 25.sp,
+                    textAlign = TextAlign.Left)
+            }
+            Box {
+                IconButton(
+                    onClick = {
+                        expanded = !expanded
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More"
+                    )
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.edit_option_label)) },
+                        onClick = {
+                            onEditSubcollectionInfo(subcollection)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.delete_option_label)) },
+                        onClick = {
+                            onDeleteSubcollection(subcollection)
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -245,13 +340,13 @@ fun DialogTest(
                 TextField(
                     value = subColName,
                     onValueChange = {subColName = it},
-                    label = {Text("Sub-Collection Name:")}
+                    label = {Text(stringResource(R.string.subcol_name_label))}
                 )
 
                 TextField(
                     value = subColLocation,
                     onValueChange = {subColLocation = it},
-                    label = {Text("Sub-Collection Physical Location:")}
+                    label = {Text(stringResource(R.string.subcol_physloc_label))}
                 )
 
                 Row(
@@ -262,7 +357,7 @@ fun DialogTest(
                         onCheckedChange = { isDeck = it }
                     )
                     Text(
-                        "Is this collection a Deck?"
+                        stringResource(R.string.subcol_isdeck_label)
                     )
                 }
 
@@ -296,6 +391,101 @@ fun DialogTest(
     }
 }
 
+@Composable
+fun EditSubcollectionPopup(
+    subcollection: SubcollectionInfo,
+    refresh: () -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var name by remember { mutableStateOf(subcollection.name)}
+    var physloc by remember { mutableStateOf(subcollection.physLoc) }
+    var isDeck by remember { mutableStateOf(subcollection.isDeck) }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = modifier
+    ) {
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text(stringResource(R.string.subcol_name_label))}
+        )
+        TextField(
+            value = physloc,
+            onValueChange = { physloc = it },
+            label = { Text(stringResource(R.string.subcol_physloc_label))}
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(
+                checked = isDeck,
+                onCheckedChange = { isDeck = it }
+            )
+            Text(
+                stringResource(R.string.subcol_isdeck_label)
+            )
+        }
+        Row {
+            Button(
+                onClick = {
+                    subcollection.name = name
+                    subcollection.physLoc = physloc
+                    subcollection.isDeck = isDeck
+                    updateSubcollectionPost(subcollection)
+                    onCancel()
+                }
+            ) {
+                Text(stringResource(R.string.save_button_label))
+            }
+            Button(
+                onClick = {
+                    onCancel()
+                }
+            ) {
+                Text(stringResource(R.string.cancel_button_label))
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteSubcollectionPopup(
+    subcollection: SubcollectionInfo,
+    onCancel: () -> Unit,
+    refresh: () -> Unit,
+    onDeleteSubcol: (SubcollectionInfo) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = modifier
+    ) {
+        Text(stringResource(R.string.subcol_delete_warning))
+        Row {
+            Button(
+                onClick = {
+                    deleteSubcollectionPost(subcollection)
+                    onDeleteSubcol(subcollection)
+                    refresh()
+                    onCancel()
+                }
+            ) {
+                Text(stringResource(R.string.delete_option_label))
+            }
+            Button(
+                onClick = {
+                    onCancel()
+                }
+            ) {
+                Text(stringResource(R.string.cancel_button_label))
+            }
+        }
+    }
+}
+
 fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean, subcolName: String, physLoc: String, onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
@@ -319,6 +509,57 @@ fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean
                     subcollectionPost(userid = userid, onUserSubColInfoChange, {})
                 }
             }
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
+
+fun updateSubcollectionPost(subcollection: SubcollectionInfo) {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = UpdateUserSubcollectionRequestModel(
+        name = subcollection.name,
+        physLoc = subcollection.physLoc,
+        isDeck = subcollection.isDeck,
+        subcollectionid = subcollection.subcollectionid
+    )
+    retrofitAPI.updateUserSubcollection(requestData).enqueue(object: Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            //Do Nothing
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
+
+fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
+    val url = "http://10.0.2.2:5000/"
+    val retrofit = Retrofit.Builder()
+        .baseUrl(url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = DeleteUserSubcollectionRequestModel(subcollectionid = subcollection.subcollectionid)
+    retrofitAPI.deleteUserSubcollection(requestData).enqueue(object: Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            //Do nothing
         }
 
         override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
@@ -371,7 +612,8 @@ fun CollectionScreenPreview() {
             totalCardCount = 200,
             totalCardValue = 1000000.00,
             userid = "1",
-            onUserSubColInfoChange = {}
+            onUserSubColInfoChange = {},
+            removeSubcollection = {  }
         )
     }
 }

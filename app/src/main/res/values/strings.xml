@@ -64,4 +64,10 @@
     <string name="card_added_to_subcollection_message">Card Added To Subcollection!</string>
     <string name="add_from_all_cards_button_label">Add From All Cards</string>
     <string name="card_image_not_loaded_context">Card Image Could Not Be Loaded</string>
+    <string name="edit_option_label">Edit</string>
+    <string name="delete_option_label">Delete</string>
+    <string name="subcol_name_label">Subcollection Name:</string>
+    <string name="subcol_physloc_label">Sub-Collection Physical Location:</string>
+    <string name="subcol_isdeck_label">Is this collection a Deck?</string>
+    <string name="subcol_delete_warning">Are you sure you want to delete this subcollection?</string>
 </resources>
