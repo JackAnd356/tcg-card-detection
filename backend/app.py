@@ -172,6 +172,7 @@ def create_app():
                             else:
                                 dictKey = list(cardData['data']['tcgplayer']['prices'].keys())[0]
                                 price = cardData['data']['tcgplayer']['prices'][dictKey]['market']
+                            purchaseURL = cardData['data']['tcgplayer']['url']
                     payload = {'cardid' : cardId, 'setcode' : cardSetCode, 'game' : game, 'rarity' : res['rarity']}
                     if (not 'purchaseurl' in res) and purchaseURL != '':
                         updateOp = updateOp = { '$set' : 
@@ -461,8 +462,6 @@ def create_app():
                 if 'subcollections' in result:
                     subColArr = result['subcollections']
                 subCol = clientUserInfo['subcollection']
-                if subCol in subColArr:
-                    return {'error': 'Already a part of subcollection'}, 201
                 subColArr.append(subCol)
                 updateOp = { '$set' : 
                                 { 'subcollections' : subColArr}
