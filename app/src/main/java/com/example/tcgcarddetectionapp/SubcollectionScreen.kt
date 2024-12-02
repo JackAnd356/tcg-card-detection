@@ -115,8 +115,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     else {
         fullCardPool.forEach {
                 card ->
-            if (!cardData.contains(card) && card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
+            if (card.subcollections != null && card.subcollections!!.count { it == subcolInfo.subcollectionid} > cardData.count {it == card} && card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
                 cardData.add(card)
+
             }
         }
     }
@@ -684,7 +685,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                          modifier: Modifier = Modifier) {
     val scrollstate = rememberScrollState()
     val cardList = allCards.filter {
-        it.game == game && (it.subcollections == null || !it.subcollections!!.contains(subcollection))
+        it.game == game
     }
     val checkedStates = remember { mutableStateListOf<Boolean>() }
     repeat(cardList.size) {
