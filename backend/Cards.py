@@ -149,7 +149,7 @@ def preprocess_card(contour, frame):
     cardType, confidence = predict_card(model, img_array)
     qCard["game"] = cardType
 
-    if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_rgb"])
+    if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_bgr"])
     elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp_rgb"])
     else: return None
     qCard["name"] = name
@@ -175,6 +175,37 @@ def draw_on_card(qCard, frame):
 def get_yugioh_card_details(image):
     """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
        See https://pypi.org/project/pytesseract/"""
+    cv2.imshow("Yugioh Card", image)
+    leftTopEdge = image[100:200, 0:7]
+    """cv2.imshow("Left Top Edge", leftTopEdge)"""
+    rightTopEdge = image[100:200, 393:400]
+    """cv2.imshow("Right Top Edge", rightTopEdge)"""
+    leftBottomEdge = image[400:500, 0:7]
+    """cv2.imshow("Left Bottom Edge", leftBottomEdge)"""
+    rightBottomEdge = image[400:500, 393:400]
+    """cv2.imshow("Right Bottom Edge", rightBottomEdge)"""
+    
+    topLeft = cv2.cvtColor(leftTopEdge, cv2.COLOR_BGR2HSV)
+    topRight = cv2.cvtColor(rightTopEdge, cv2.COLOR_BGR2HSV)
+    bottomLeft = cv2.cvtColor(leftBottomEdge, cv2.COLOR_BGR2HSV)
+    bottomRight = cv2.cvtColor(rightBottomEdge, cv2.COLOR_BGR2HSV)
+
+    avgColorTopLeft = np.mean(topLeft, axis=(0, 1))
+    avgColorTopRight = np.mean(topRight, axis=(0, 1))
+    avgColorBottomLeft = np.mean(bottomLeft, axis=(0, 1))
+    avgColorBottomRight = np.mean(bottomRight, axis=(0, 1))
+
+    print(avgColorTopLeft)
+    print(avgColorTopRight)
+    print(avgColorBottomLeft)
+    print(avgColorBottomRight)
+
+    green_hsv_range = ((50, 100, 50), (70, 255, 255))
+    isGreenBottom = np.all(avgColorBottomLeft >= green_hsv_range[0]) and np.all(avgColorBottomLeft <= green_hsv_range[1]) and np.all(avgColorBottomRight >= green_hsv_range[0]) and np.all(avgColorBottomRight <= green_hsv_range[1])
+    isNotGreenTop = np.all(avgColorTopLeft < green_hsv_range[0]) or np.all(avgColorTopLeft > green_hsv_range[1]) or np.all(avgColorTopRight < green_hsv_range[0]) or np.all(avgColorTopRight > green_hsv_range[1])
+
+    print(f'Bottom is Green: {isGreenBottom}')
+    print(f'Top is Not Green: {isNotGreenTop}')
 
     # Extract card name
     nameImg = image[12:60, 17:330]

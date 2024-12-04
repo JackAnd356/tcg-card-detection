@@ -265,7 +265,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         allCardsFlag = allCardsFlag,
                         onCollectionChange = onCollectionChange,
                         subcolInfo = subcolInfo,
-                        updateCards = {cardData = it.toMutableStateList()},
+                        removeCard = {card -> cardData.remove(card)},
                         fullCardPool = fullCardPool,
                         navWebsite = { navWebsite = it },
                         refreshUI = {refreshFlag = !refreshFlag},
@@ -371,7 +371,7 @@ fun CardPopup(cardData: CardData,
               modifier: Modifier = Modifier,
               subcolInfo: SubcollectionInfo,
               onCollectionChange: (Array<CardData>) -> Unit,
-              updateCards: (ArrayList<CardData>) -> Unit,
+              removeCard: (CardData) -> Unit,
               navWebsite: (String) -> Unit,
               refreshUI: () -> Unit,
               showCardPopup: () -> Unit) {
@@ -656,8 +656,9 @@ fun CardPopup(cardData: CardData,
             Column {
                 Button(onClick = {
                     showCardPopup()
-                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, updateCards = updateCards, subcolInfo = subcolInfo, refreshUI = refreshUI)
-                    if (successful) Toast.makeText(context, "Card Successfully Removed", Toast.LENGTH_SHORT).show()
+                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, removeCard = removeCard, subcolInfo = subcolInfo, refreshUI = refreshUI)
+                    if (successful) Toast.makeText(context, "Card Successfully Deleted", Toast.LENGTH_SHORT).show()
+                    else Toast.makeText(context, "Card Deletion Failed", Toast.LENGTH_SHORT).show()
                 }, modifier = Modifier.align(Alignment.End)) {
                     Text(text="Delete")
                 }
@@ -666,7 +667,11 @@ fun CardPopup(cardData: CardData,
             Column {
                 Button(onClick = {
                     showCardPopup()
-                    removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcolInfo = subcolInfo, refreshUI = refreshUI)
+                    if (removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcolInfo = subcolInfo, refreshUI = refreshUI)) {
+                        Toast.makeText(context, "Card Successfully Removed", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Card Removal Failed", Toast.LENGTH_SHORT).show()
+                    }
                 }) {
                     Text(text = "Remove")
                 }
@@ -735,7 +740,7 @@ fun arrToPrintableString(arr: Array<String>): String {
 }
 
 fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>,
-                             onCollectionChange: (Array<CardData>) -> Unit, updateCards: (ArrayList<CardData>) -> Unit,
+                             onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit,
                              subcolInfo: SubcollectionInfo, refreshUI: () -> Unit): Boolean {
     val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
@@ -752,15 +757,13 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
         ) {
             if (card.quantity <= 1) {
                 val cardsWithoutRemoved = ArrayList<CardData>()
-                val cardsFromGameWithoutRemoved = ArrayList<CardData>()
                 for (cardData in fullCardPool) {
                     if (card != cardData) {
-                        if (cardData.game == game) cardsFromGameWithoutRemoved.add(cardData)
                         cardsWithoutRemoved.add(cardData)
                     }
                 }
+                removeCard(card)
                 onCollectionChange(cardsWithoutRemoved.toTypedArray())
-                updateCards(cardsFromGameWithoutRemoved)
             } else {
                 card.quantity--
             }

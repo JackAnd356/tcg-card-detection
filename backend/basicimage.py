@@ -2,7 +2,19 @@ import cv2
 import os
 import Cards
 
-maxFound = 0
+filename = "Fighting_Spirit.jpg"
+filepath = os.path.join("../images", filename)
+img = cv2.imread(filepath)
+img_cards = Cards.process_image(img)
+
+cam = 0
+while cam == 0:
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord("q"):
+        cam = 1
+cv2.destroyAllWindows()
+
+"""maxFound = 0
 maxThreshLow = -1
 maxThreshHigh = -1
 for i in range(20):
@@ -25,18 +37,18 @@ for i in range(20):
 
             if len(img_cards["cards"]) == 0:
                 print(f'No Cards Found: {filename}')
-            """else:
+            else:
                 cam = 0
                 while cam == 0:
                     key = cv2.waitKey(1) & 0xFF
                     if key == ord("q"):
                         cam = 1
-                cv2.destroyAllWindows()"""
+                cv2.destroyAllWindows()
         if cardsFound > maxFound:
             maxFound = cardsFound
             maxThreshLow = i
             maxThreshHigh = j
         print(f'Total Files: {totalFiles}, Cards Found: {cardsFound}')
         
-print(f'Max Found: {maxFound}, Thresh_Low: {maxThreshLow}, Thresh_High: {maxThreshHigh}')
+print(f'Max Found: {maxFound}, Thresh_Low: {maxThreshLow}, Thresh_High: {maxThreshHigh}')"""
 
