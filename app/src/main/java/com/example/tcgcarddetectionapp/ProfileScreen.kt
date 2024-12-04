@@ -323,9 +323,8 @@ fun DeleteUserWarningPopup(
 }
 
 fun SaveUsernamePost(userid: String, username: String) {
-    var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
@@ -351,9 +350,8 @@ fun SaveUsernamePost(userid: String, username: String) {
 }
 
 fun SavePasswordPost(userid: String, password: String) {
-    var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
@@ -379,9 +377,8 @@ fun SavePasswordPost(userid: String, password: String) {
 }
 
 fun SaveEmailPost(userid: String, email: String) {
-    var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
@@ -407,9 +404,8 @@ fun SaveEmailPost(userid: String, email: String) {
 }
 
 fun deleteUserPost(userid: String, navLogin: () -> Unit) {
-    var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)

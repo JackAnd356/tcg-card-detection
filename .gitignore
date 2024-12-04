@@ -13,6 +13,8 @@ sample_images/
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/backend/uploads/
+uploads/
 .DS_Store
 /build
 /captures

@@ -1,5 +1,7 @@
 package com.example.tcgcarddetectionapp
 
+const val api_url = "http://10.0.2.2:5000"
+
 fun <E> List<E>.remove(elem: E): List<E> {
     val lst = ArrayList<E>()
     var found = false

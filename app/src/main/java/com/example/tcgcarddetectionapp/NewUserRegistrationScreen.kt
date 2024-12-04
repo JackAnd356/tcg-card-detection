@@ -213,9 +213,8 @@ fun SaveNewUserPost(
     setErrorText: (String) -> Unit,
     onLoginNavigate: () -> Unit,
 ) {
-    var url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)

@@ -742,9 +742,8 @@ fun arrToPrintableString(arr: Array<String>): String {
 fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>,
                              onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit,
                              subcolInfo: SubcollectionInfo, refreshUI: () -> Unit): Boolean {
-    val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
@@ -781,9 +780,8 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
 }
 
 fun removeFromSubcollectionPost(card: CardData, userid: String, subcolInfo: SubcollectionInfo, game: String, refreshUI: () -> Unit): Boolean {
-    val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
@@ -809,9 +807,8 @@ fun removeFromSubcollectionPost(card: CardData, userid: String, subcolInfo: Subc
 }
 
 fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: String, subcolInfo: SubcollectionInfo, refreshUI: () -> Unit) {
-    val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)

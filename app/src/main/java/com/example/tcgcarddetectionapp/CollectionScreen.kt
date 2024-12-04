@@ -485,9 +485,8 @@ fun DeleteSubcollectionPopup(
 }
 
 fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean, subcolName: String, physLoc: String, onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
-    val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
@@ -517,9 +516,8 @@ fun createNewSubcollectionPost(gameName: String, userid: String, isDeck: Boolean
 }
 
 fun updateSubcollectionPost(subcollection: SubcollectionInfo) {
-    val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
@@ -545,9 +543,8 @@ fun updateSubcollectionPost(subcollection: SubcollectionInfo) {
 }
 
 fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
-    val url = "http://10.0.2.2:5000/"
     val retrofit = Retrofit.Builder()
-        .baseUrl(url)
+        .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
