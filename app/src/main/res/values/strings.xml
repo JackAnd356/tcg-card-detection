@@ -70,4 +70,10 @@
     <string name="subcol_physloc_label">Sub-Collection Physical Location:</string>
     <string name="subcol_isdeck_label">Is this collection a Deck?</string>
     <string name="subcol_delete_warning">Are you sure you want to delete this subcollection?</string>
+    <string name="invalid_value_error">Value entered is invalid</string>
+    <string name="min_quantity_filter_label">Quantity Min</string>
+    <string name="max_quantity_filter_label">Quantity Max</string>
+    <string name="min_level_filter_label">Level Min</string>
+    <string name="max_level_filter_label">Level Max</string>
+    <string name="price_range_filter_label">Price Range</string>
 </resources>
