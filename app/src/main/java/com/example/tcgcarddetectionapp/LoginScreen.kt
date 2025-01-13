@@ -38,7 +38,6 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onUsernameChange: (String) -> Unit,
                 onUserIdChange: (String) -> Unit,
                 onUserEmailChange: (String) -> Unit,
-                onUserStorefrontChange: (Int) -> Unit,
                 onUserCollectionChange: (Array<CardData>) -> Unit,
                 onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
                 modifier: Modifier = Modifier) {
@@ -69,7 +68,6 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onLoginNavigate,
                 onUserIdChange,
                 onUserEmailChange,
-                onUserStorefrontChange,
                 onUserCollectionChange,
                 onUserSubColInfoChange)
         }
@@ -129,7 +127,6 @@ fun LoginScreenPreview() {
         LoginScreen(username = username, userid = "1", onUsernameChange = { username = it }, onLoginNavigate = {},
             onUserIdChange = { },
             onUserEmailChange = { },
-            onUserStorefrontChange = { },
             onUserCollectionChange = { },
             onUserSubColInfoChange = { },
             onNewUserNavigate = { },
@@ -143,7 +140,6 @@ fun loginPost(username: String,
               onLoginNavigate: () -> Unit,
               onUserIdChange: (String) -> Unit,
               onUserEmailChange: (String) -> Unit,
-              onUserStorefrontChange: (Int) -> Unit,
               onUserCollectionChange: (Array<CardData>) -> Unit,
               onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit): Array<Any> {
     val retrofit = Retrofit.Builder()
@@ -171,7 +167,6 @@ fun loginPost(username: String,
                 if (respData != null) {
                     onUserIdChange(respData.userid!!)
                     onUserEmailChange(respData.email!!)
-                    onUserStorefrontChange(respData.storefront!!)
                     collectionPost(respData.userid!!, onUserCollectionChange, onUserSubColInfoChange, onLoginNavigate)
                 }
 

@@ -54,11 +54,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun ProfileScreen(username: String,
                   email: String,
-                  storefront: Int,
                   userid: String,
                   onUsernameChange: (String) -> Unit,
                   onUserEmailChange: (String) -> Unit,
-                  onUserStorefrontChange: (Int) -> Unit,
                   onLogout: () -> Unit,
                   modifier: Modifier = Modifier) {
     var usernameEditFlag by remember { mutableStateOf(false) }
@@ -111,12 +109,6 @@ fun ProfileScreen(username: String,
                 passwordEditFlag = !passwordEditFlag
             },
             oldData = "******"
-        )
-        UserDropdownSelector(
-            label = stringResource(R.string.storefront_label),
-            data = storefront,
-            options = listOf(stringResource(R.string.tcgplayer_label), stringResource(R.string.card_market_label)),
-            onUserStorefrontChange = {onUserStorefrontChange(it)},
         )
         UserDataComponent(
             label = stringResource(R.string.email_label),
@@ -440,10 +432,8 @@ fun ProfileScreenPreview(modifier: Modifier = Modifier) {
     TCGCardDetectionAppTheme {
         ProfileScreen(
             username = "TestUser", email = "TestUser@void.com", modifier = modifier,
-            storefront = 1,
             onUsernameChange = { },
             onUserEmailChange = { },
-            onUserStorefrontChange = { },
             userid = "1",
             onLogout = { },
         )

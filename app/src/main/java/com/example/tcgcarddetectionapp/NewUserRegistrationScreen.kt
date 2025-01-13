@@ -51,10 +51,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun NewUserRegistrationScreen(username: String,
                               email: String,
-                              storefront: Int,
                               onUsernameChange: (String) -> Unit,
                               onUserEmailChange: (String) -> Unit,
-                              onUserStorefrontChange: (Int) -> Unit,
                               onUseridChange: (String) -> Unit,
                               onLoginNavigate: () -> Unit,
                               onBackNavigate: () -> Unit,
@@ -85,12 +83,6 @@ fun NewUserRegistrationScreen(username: String,
             modifier = modifier,
             onChange = {enteredPassword = it},
         )
-        NewUserDropdownSelector(
-            label = stringResource(R.string.storefront_label),
-            data = storefront,
-            options = listOf("TCGPlayer", "Card Market"),
-            onChange = onUserStorefrontChange,
-        )
         NewUserDataComponent(
             label = stringResource(R.string.email_label),
             data = email,
@@ -102,7 +94,7 @@ fun NewUserRegistrationScreen(username: String,
                 SaveNewUserPost(
                     username = username,
                     password = enteredPassword,
-                    storefront = storefront,
+                    storefront = 1, //Still save new user's storefront as 1 in case we want to support it down the road
                     email = email,
                     onUseridChange = onUseridChange,
                     setErrorText = {errorText = it},
@@ -256,11 +248,9 @@ fun NewUserRegistrationScreenPreview(modifier: Modifier = Modifier) {
             modifier = modifier,
             onUsernameChange = { },
             onUserEmailChange = { },
-            onUserStorefrontChange = { },
             onUseridChange = { },
             username = "",
             email = "",
-            storefront = 1,
             onLoginNavigate = {  },
             onBackNavigate = { },
         )

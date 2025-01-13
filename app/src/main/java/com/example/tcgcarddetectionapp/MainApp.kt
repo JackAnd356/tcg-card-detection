@@ -77,7 +77,6 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
     var username by remember { mutableStateOf("") }
     var userid by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var storefront by remember { mutableIntStateOf(1) }
     var collection by remember { mutableStateOf(arrayOf<CardData>()) }
     var subColInfo by remember { mutableStateOf(arrayOf<SubcollectionInfo>()) }
 
@@ -94,7 +93,6 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 onUsernameChange = { username = it },
                 onUserIdChange = { userid = it },
                 onUserEmailChange = { email = it },
-                onUserStorefrontChange = { storefront = it },
                 onUserCollectionChange = {collection = it},
                 onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it})},
             )
@@ -227,43 +225,13 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 ProfileScreen(
                     username = username,
                     email = email,
-                    storefront = storefront,
                     onUsernameChange = { username = it },
                     onUserEmailChange = { email = it },
-                    onUserStorefrontChange = {
-                        storefront = it
-                        val retrofit = Retrofit.Builder()
-                            .baseUrl(api_url)
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .build()
-                        val retrofitAPI = retrofit.create(ApiService::class.java)
-                        val requestData =
-                            SaveStorefrontRequestModel(userid = userid, storefront = storefront)
-                        var saveSuccess = false
-                        var message = "Unexpected Error"
-                        retrofitAPI.saveUserStorefront(requestData)
-                            .enqueue(object : Callback<GenericSuccessErrorResponseModel> {
-                                override fun onResponse(
-                                    call: Call<GenericSuccessErrorResponseModel>,
-                                    response: Response<GenericSuccessErrorResponseModel>
-                                ) {
-
-                                }
-
-                                override fun onFailure(
-                                    call: Call<GenericSuccessErrorResponseModel>,
-                                    t: Throwable
-                                ) {
-                                    t.printStackTrace()
-                                }
-                            })
-                    },
                     userid = userid,
                     onLogout = {
                         username = ""
                         userid = ""
                         email = ""
-                        storefront = 1
                         collection = arrayOf<CardData>()
                         subColInfo = arrayOf<SubcollectionInfo>()
                         navController.navigate(CardDetectionScreens.Login.name)
@@ -302,10 +270,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             NewUserRegistrationScreen(
                 username = username,
                 email = email,
-                storefront = storefront,
                 onUsernameChange = { username = it },
                 onUserEmailChange = { email = it },
-                onUserStorefrontChange = { storefront = it },
                 onUseridChange = { userid = it },
                 onLoginNavigate = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
                 onBackNavigate = { navController.navigate((CardDetectionScreens.Login.name))},
@@ -380,7 +346,6 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                         isDeck = false,
                         userid = "error"
                     ),
-                    storefront = storefront,
                     allCardsFlag = allCardsFlag,
                     fullCardPool = collection,
                     subcollections = subColInfo,

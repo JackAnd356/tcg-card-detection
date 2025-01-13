@@ -66,7 +66,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
-                        storefront: Int,
                         navBack: () -> Unit,
                         allCardsFlag: Boolean,
                         fullCardPool: Array<CardData>,
@@ -540,7 +539,6 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 ) {
                     CardPopup(
                         cardData = currentFocusedCard,
-                        storefront = storefront,
                         subcollections = subcollections,
                         game = game,
                         userid = userid,
@@ -644,7 +642,6 @@ fun CardImage(cardData: CardData,
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun CardPopup(cardData: CardData,
-              storefront: Int,
               subcollections: Array<SubcollectionInfo>,
               game: String,
               userid: String,
@@ -719,11 +716,7 @@ fun CardPopup(cardData: CardData,
                             }
                         }
                     ) {
-                        if (storefront == 1) {
-                            Text(stringResource(R.string.tcgplayer_label))
-                        } else if (storefront == 2) {
-                            Text(stringResource(R.string.card_market_label))
-                        }
+                        Text(stringResource(R.string.tcgplayer_label))
                     }
                     if (cardData.level != null) {
                         Row {
@@ -790,11 +783,7 @@ fun CardPopup(cardData: CardData,
                             }
                         }
                     ) {
-                        if (storefront == 1) {
-                            Text(stringResource(R.string.tcgplayer_label))
-                        } else if (storefront == 2) {
-                            Text(stringResource(R.string.card_market_label))
-                        }
+                        Text(stringResource(R.string.tcgplayer_label))
                     }
                     Row {
                         Text(String.format(stringResource(R.string.cost_label), cardData.cost))
@@ -883,11 +872,7 @@ fun CardPopup(cardData: CardData,
                             }
                         }
                     ) {
-                        if (storefront == 1) {
-                            Text(stringResource(R.string.tcgplayer_label))
-                        } else if (storefront == 2) {
-                            Text(stringResource(R.string.card_market_label))
-                        }
+                        Text(stringResource(R.string.tcgplayer_label))
                     }
 
                     Text(String.format(stringResource(R.string.attribute_label), cardData.attribute))
@@ -1202,7 +1187,6 @@ fun SubollectionScreenPreview() {
     TCGCardDetectionAppTheme {
         SubcollectionScreen(
             subcolInfo = subCol1,
-            storefront = 1,
             navBack = { },
             allCardsFlag = false,
             fullCardPool = cards,
