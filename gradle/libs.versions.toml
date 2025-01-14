@@ -4,6 +4,7 @@ converterGson = "2.9.0"
 credentialsPlayServicesAuth = "1.5.0-beta01"
 credentialsPlayServicesAuthVersion = "<latest version>"
 credentialsVersion = "<latest version>"
+facebookLogin = "latest.release"
 googleidVersion = "<latest version>"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
@@ -30,6 +31,7 @@ androidx-credentials-play-services-auth = { module = "androidx.credentials:crede
 androidx-credentials-play-services-auth-vlatestversion = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentialsPlayServicesAuthVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 credentials-vlatestversion = { module = "androidx.credentials:credentials", version.ref = "credentialsVersion" }
+facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebookLogin" }
 googleid-vlatestversion = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleidVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

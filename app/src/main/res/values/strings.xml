@@ -76,4 +76,8 @@
     <string name="min_level_filter_label">Level Min</string>
     <string name="max_level_filter_label">Level Max</string>
     <string name="price_range_filter_label">Price Range</string>
+    <string name="facebook_app_id">1037081011515399</string>
+    <string name="fb_login_protocol_scheme">fb1037081011515399</string>
+    <string name="facebook_client_token">bf7c1944226b43d35f290c1045b39ad4</string>
+    <string name="facebook_login_placeholder">Login With Facebook</string>
 </resources>

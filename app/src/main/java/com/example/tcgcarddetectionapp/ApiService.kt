@@ -17,6 +17,9 @@ interface ApiService {
     @POST("authenticateGoogleUser")
     fun loginGoogleUser(@Body loginRequest: LoginGoogleRequestModel): Call<LoginResponseModel>
 
+    @POST("authenticateFacebookUser")
+    fun loginFacebookUser(@Body loginRequest: LoginFBRequestModel): Call<LoginResponseModel>
+
     @POST("saveUserStorefront")
     fun saveUserStorefront(@Body saveStorefrontRequestModel: SaveStorefrontRequestModel): Call<GenericSuccessErrorResponseModel>
 

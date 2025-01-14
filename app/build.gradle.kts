@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.googleid.vlatestversion)
     implementation(libs.googleid)
     implementation(libs.play.services.base)
+    implementation(libs.facebook.login)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

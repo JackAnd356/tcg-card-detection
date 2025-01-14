@@ -26,6 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import android.content.Context
+import android.os.Bundle
+import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -33,11 +35,20 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.PublicKeyCredential
 import androidx.credentials.exceptions.GetCredentialException
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.GraphRequest
+import com.facebook.GraphResponse
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import com.facebook.login.widget.LoginButton
 import com.google.android.gms.common.SignInButton
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -61,9 +72,48 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
     var loginError by remember { mutableStateOf("") }
     val WEB_CLIENT_ID = "595031517908-mo8jed9cc8pdshfdhhb7plmoj1vqf5o5.apps.googleusercontent.com"
     val context = LocalContext.current
+    val callbackManager = CallbackManager.Factory.create()
+    val loginManager = LoginManager.getInstance()
 
     val signInWithGoogleOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption.Builder(WEB_CLIENT_ID)
         .build()
+
+    loginManager.registerCallback(callbackManager, object: FacebookCallback<LoginResult> {
+        override fun onCancel() {
+            //Do Nothing
+        }
+
+        override fun onError(error: FacebookException) {
+            error.printStackTrace()
+        }
+
+        override fun onSuccess(result: LoginResult) {
+            val accessToken = result.accessToken
+            val graphReq = GraphRequest.newMeRequest(
+                accessToken,
+                object: GraphRequest.GraphJSONObjectCallback {
+                    override fun onCompleted(obj: JSONObject?, response: GraphResponse?) {
+                        if (obj != null) {
+                            val fbid = obj.get("id") as String
+                            val fbEmail = obj.get("email") as String
+                            loginFacebookPost(fbid,
+                                fbEmail,
+                                onLoginNavigate,
+                                onUserIdChange,
+                                onUserEmailChange,
+                                onUserCollectionChange,
+                                onUserSubColInfoChange)
+                        }
+                    }
+                }
+            )
+            val params = Bundle()
+            params.putString("fields", "id,name,email")
+            graphReq.parameters = params
+            graphReq.executeAsync()
+        }
+
+    })
 
 
     Column(verticalArrangement = Arrangement.Top,
@@ -118,6 +168,13 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                     e.printStackTrace()
                 }
             }
+        }
+        Button(
+            onClick = {
+                loginManager.logIn(context as ActivityResultRegistryOwner, callbackManager, listOf("email"))
+            }
+        ) {
+            Text(stringResource( R.string.facebook_login_placeholder))
         }
         Button(
             onClick = {
@@ -267,6 +324,41 @@ fun loginGooglePost(googleid: String,
     val requestData = LoginGoogleRequestModel(googleid = googleid, email = email)
     var loginSuccess = false
     retrofitAPI.loginGoogleUser(requestData).enqueue(object: Callback<LoginResponseModel>{
+        override fun onResponse(
+            call: Call<LoginResponseModel>,
+            response: Response<LoginResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData?.success == 1) {
+                loginSuccess = true
+                onUserIdChange(respData.userid!!)
+                onUserEmailChange(respData.email!!)
+                collectionPost(respData.userid!!, onUserCollectionChange, onUserSubColInfoChange, onLoginNavigate)
+            }
+        }
+
+        override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+    })
+    return arrayOf(loginSuccess)
+}
+
+fun loginFacebookPost(fbid: String,
+                    email: String,
+                    onLoginNavigate: () -> Unit,
+                    onUserIdChange: (String) -> Unit,
+                    onUserEmailChange: (String) -> Unit,
+                    onUserCollectionChange: (Array<CardData>) -> Unit,
+                    onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit): Array<Any> {
+    val retrofit = Retrofit.Builder()
+        .baseUrl(api_url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = LoginFBRequestModel(fbid = fbid, email = email)
+    var loginSuccess = false
+    retrofitAPI.loginFacebookUser(requestData).enqueue(object: Callback<LoginResponseModel>{
         override fun onResponse(
             call: Call<LoginResponseModel>,
             response: Response<LoginResponseModel>
