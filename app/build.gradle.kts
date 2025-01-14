@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.tcgcarddetectionapp"
-        minSdk = 24
+        minSdk = 34
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -60,6 +60,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.coil)
     implementation(libs.androidx.ui.test.android)
+    implementation(libs.credentials.vlatestversion)
+    implementation(libs.androidx.credentials.play.services.auth.vlatestversion)
+    implementation(libs.googleid.vlatestversion)
+    implementation(libs.googleid)
+    implementation(libs.play.services.base)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

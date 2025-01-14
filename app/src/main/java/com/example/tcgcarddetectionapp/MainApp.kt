@@ -19,11 +19,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -80,6 +84,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
     var collection by remember { mutableStateOf(arrayOf<CardData>()) }
     var subColInfo by remember { mutableStateOf(arrayOf<SubcollectionInfo>()) }
 
+    val credentialManager = CredentialManager.create(LocalContext.current)
+
     NavHost(
         navController = navController,
         startDestination = CardDetectionScreens.Login.name,
@@ -90,6 +96,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 onNewUserNavigate = {navController.navigate((CardDetectionScreens.NewUser.name))},
                 username = username,
                 userid = userid,
+                credentialManager = credentialManager,
                 onUsernameChange = { username = it },
                 onUserIdChange = { userid = it },
                 onUserEmailChange = { email = it },
@@ -234,6 +241,9 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                         email = ""
                         collection = arrayOf<CardData>()
                         subColInfo = arrayOf<SubcollectionInfo>()
+                        runBlocking {
+                            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+                        }
                         navController.navigate(CardDetectionScreens.Login.name)
                     }
                 )

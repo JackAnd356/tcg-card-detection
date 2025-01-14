@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,7 +24,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import android.content.Context
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
+import androidx.credentials.PublicKeyCredential
+import androidx.credentials.exceptions.GetCredentialException
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
+import com.google.android.gms.common.SignInButton
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,6 +49,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onNewUserNavigate: () -> Unit,
                 username: String,
                 userid: String,
+                credentialManager: CredentialManager,
                 onUsernameChange: (String) -> Unit,
                 onUserIdChange: (String) -> Unit,
                 onUserEmailChange: (String) -> Unit,
@@ -44,6 +59,13 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
 
     var password by remember { mutableStateOf("") }
     var loginError by remember { mutableStateOf("") }
+    val WEB_CLIENT_ID = "595031517908-mo8jed9cc8pdshfdhhb7plmoj1vqf5o5.apps.googleusercontent.com"
+    val context = LocalContext.current
+
+    val signInWithGoogleOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption.Builder(WEB_CLIENT_ID)
+        .build()
+
+
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier.wrapContentWidth(Alignment.CenterHorizontally)) {
         Text(
@@ -70,6 +92,32 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onUserEmailChange,
                 onUserCollectionChange,
                 onUserSubColInfoChange)
+        }
+        GoogleSignInButtonStyled(context = context) {
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(signInWithGoogleOption)
+                .build()
+
+            runBlocking {
+                try {
+                    val result = credentialManager.getCredential(
+                        request = request,
+                        context = context,
+                    )
+                    handleGoogleSignIn(result) {
+                        googleid, email ->
+                        loginGooglePost(googleid,
+                            email,
+                            onLoginNavigate,
+                            onUserIdChange,
+                            onUserEmailChange,
+                            onUserCollectionChange,
+                            onUserSubColInfoChange)
+                    }
+                } catch (e: GetCredentialException) {
+                    e.printStackTrace()
+                }
+            }
         }
         Button(
             onClick = {
@@ -124,14 +172,36 @@ fun LoginButton(onClick: () -> Unit) {
 fun LoginScreenPreview() {
     TCGCardDetectionAppTheme {
         var username by remember { mutableStateOf("") }
-        LoginScreen(username = username, userid = "1", onUsernameChange = { username = it }, onLoginNavigate = {},
+        LoginScreen(
+            username = username,
+            userid = "1",
+            onUsernameChange = { username = it },
+            onLoginNavigate = {},
             onUserIdChange = { },
             onUserEmailChange = { },
             onUserCollectionChange = { },
             onUserSubColInfoChange = { },
             onNewUserNavigate = { },
+            credentialManager = TODO(),
+            modifier = TODO(),
         )
     }
+}
+
+@Composable
+fun GoogleSignInButtonStyled(
+    context: Context,
+    onClick: () -> Unit
+) {
+    AndroidView(
+        factory = {
+            SignInButton(context).apply {
+                setSize(SignInButton.SIZE_WIDE)
+                setColorScheme(SignInButton.COLOR_LIGHT)
+                setOnClickListener { onClick() }
+            }
+        },
+    )
 }
 
 fun loginPost(username: String,
@@ -181,6 +251,42 @@ fun loginPost(username: String,
     })
     return arrayOf(loginSuccess, message)
 }
+
+fun loginGooglePost(googleid: String,
+                    email: String,
+              onLoginNavigate: () -> Unit,
+              onUserIdChange: (String) -> Unit,
+              onUserEmailChange: (String) -> Unit,
+              onUserCollectionChange: (Array<CardData>) -> Unit,
+              onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit): Array<Any> {
+    val retrofit = Retrofit.Builder()
+        .baseUrl(api_url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = LoginGoogleRequestModel(googleid = googleid, email = email)
+    var loginSuccess = false
+    retrofitAPI.loginGoogleUser(requestData).enqueue(object: Callback<LoginResponseModel>{
+        override fun onResponse(
+            call: Call<LoginResponseModel>,
+            response: Response<LoginResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData?.success == 1) {
+                loginSuccess = true
+                onUserIdChange(respData.userid!!)
+                onUserEmailChange(respData.email!!)
+                collectionPost(respData.userid!!, onUserCollectionChange, onUserSubColInfoChange, onLoginNavigate)
+            }
+        }
+
+        override fun onFailure(call: Call<LoginResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+    })
+    return arrayOf(loginSuccess)
+}
+
 
 fun collectionPost(userid: String,
                    onUserCollectionChange: (Array<CardData>) -> Unit,
@@ -268,4 +374,37 @@ fun cardImagePost(cardid: String, game: String, setCardImage: (String) -> Unit) 
         }
 
     } )
+}
+
+fun handleGoogleSignIn(result: GetCredentialResponse,
+                       loginGooglePost: (String, String) -> Unit) {
+    // Handle the successfully returned credential.
+    val credential = result.credential
+
+    when (credential) {
+        is CustomCredential -> {
+            if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                try {
+                    // Use googleIdTokenCredential and extract id to validate and
+                    // authenticate on your server.
+                    val googleIdTokenCredential = GoogleIdTokenCredential
+                        .createFrom(credential.data)
+                    val googleid = googleIdTokenCredential.idToken
+                    val email = googleIdTokenCredential.id
+                    loginGooglePost(googleid, email)
+                } catch (e: GoogleIdTokenParsingException) {
+                    e.printStackTrace()
+                }
+            }
+            else {
+                // Catch any unrecognized credential type here.
+                Log.e("CREDENTIAL TYPE ERROR", "Unexpected type of credential")
+            }
+        }
+
+        else -> {
+            // Catch any unrecognized credential type here.
+            Log.e("CREDENTIAL TYPE ERROR", "Unexpected type of credential")
+        }
+    }
 }

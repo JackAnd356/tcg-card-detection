@@ -1,6 +1,10 @@
 [versions]
 agp = "8.7.2"
 converterGson = "2.9.0"
+credentialsPlayServicesAuth = "1.5.0-beta01"
+credentialsPlayServicesAuthVersion = "<latest version>"
+credentialsVersion = "<latest version>"
+googleidVersion = "<latest version>"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -16,10 +20,17 @@ camerax = "1.5.0-alpha02"
 appcompat = "1.7.0"
 coilVer = "3.0.0-rc01"
 uiTestAndroid = "1.7.2"
+googleid = "1.1.1"
+playServicesBase = "18.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentialsPlayServicesAuth" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+androidx-credentials-play-services-auth-vlatestversion = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentialsPlayServicesAuthVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+credentials-vlatestversion = { module = "androidx.credentials:credentials", version.ref = "credentialsVersion" }
+googleid-vlatestversion = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleidVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version = "3.5.0" }
@@ -45,6 +56,8 @@ camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 coil = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilVer" }
 androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
