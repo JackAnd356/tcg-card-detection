@@ -196,6 +196,110 @@ def create_app():
                 print("Test")
                 return {'error': 'Incorrect Username and/or Password', 'success' : 0}, 201
         return {'error': 'Request must be JSON', 'success' : 0}, 201
+
+    @app.post('/authenticateGoogleUser')
+    def post_authenticateGoogleUser():
+        if request.is_json:
+            userLoginInfo = request.get_json()
+            database = client['card_detection_info']
+            collection = database['user_data']
+            googleid = userLoginInfo['googleid']
+            userData = collection.find_one({'googleid' : googleid})
+            if userData == None:
+                userCreateInfo = request.get_json()
+                username = ""
+                authenticator = ""
+                email = userLoginInfo['email']
+                storefront = 1
+                if type(email) != str:
+                    return {'error' : 'Incorrect data type passed for one or more inputs'}, 201
+                coreUserInfo = collection.find_one({'coreuser' : 1})
+                userid = str(int(coreUserInfo['currentmaxuserid']) + 1)
+                updateOp = { '$set' : 
+                                    { 'currentmaxuserid' : userid }
+                                }
+                collection.update_one({'coreuser' : 1}, updateOp)
+                payload = {'username' : username, 'userid' : userid, 'password' : authenticator, 'email' : email, 'storefront' : storefront, 'googleid' : googleid}
+                insertRes = collection.insert_one(payload)
+                userData = collection.find_one({'googleid' : googleid})
+                userData['success'] = 1
+                userData.pop("password")
+                userData.pop("_id")
+                userData.pop("googleid")
+                return userData, 201
+            else:
+                cardCollection = database['card_collection']
+                userid = userData['userid']
+                results = cardCollection.find({'userid' : userid})
+                results = parse_json(results)
+                for res in results :
+                    game = res['game']
+                    cardId = res['cardid']
+                    cardSetCode = res['setcode']
+                    oldPriceDate = datetime.strptime(res['pricedate']['$date'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                    oldPriceDate = oldPriceDate.replace(tzinfo=timezone.utc)
+                    if (datetime.now(timezone.utc) - oldPriceDate).days == 0:
+                        continue
+                    price = ''
+                    purchaseURL = ''
+                    if game == 'yugioh':
+                        url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
+                        payload = {'id': cardId, 'tcgplayer_data': None}
+                        payload = '&'.join([k if v is None else f'{k}={v}' for k, v in payload.items()])
+                        resp = requests.get(url, params=payload)
+                        if resp.status_code == 200:
+                            cardData = resp.json()
+                            for cardSet in cardData['data'][0]['card_sets']:
+                                if cardSet['set_code'] == cardSetCode:
+                                    price = cardSet['set_price']
+                                    purchaseURL = urllib.parse.unquote(cardSet['set_url'].split('u=')[1], encoding='utf-8', errors='replace')
+                                    break
+                    elif game == 'mtg':
+                        url = 'https://api.scryfall.com/cards/'
+                        headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+                        url += cardId
+                        resp = requests.get(url, headers=headers)
+                        if resp.status_code == 200:
+                            cardData = resp.json()
+                            price = cardData['prices']['usd']
+                            purchaseURL = urllib.parse.unquote(cardData['purchase_uris']['tcgplayer'].split('u=')[1], encoding='utf-8', errors='replace')
+                    elif game == 'pokemon':
+                        apikey = os.getenv('POKEMON_API_KEY')
+                        url = 'https://api.pokemontcg.io/v2/cards/'
+                        headers = {'X-Api-Key' : apikey}
+                        url += cardId
+                        resp = requests.get(url, headers=headers)
+                        if resp.status_code == 200:
+                            cardData = resp.json()
+                            if res['rarity'] in list(cardData['data']['tcgplayer']['prices'].keys()):
+                                price = cardData['data']['tcgplayer']['prices'][res['rarirty']]['market']
+                            elif "normal" in list(cardData['data']['tcgplayer']['prices'].keys()):
+                                price = cardData['data']['tcgplayer']['prices']['normal']['market']
+                            else:
+                                dictKey = list(cardData['data']['tcgplayer']['prices'].keys())[0]
+                                price = cardData['data']['tcgplayer']['prices'][dictKey]['market']
+                            purchaseURL = cardData['data']['tcgplayer']['url']
+                    payload = {'cardid' : cardId, 'setcode' : cardSetCode, 'game' : game, 'rarity' : res['rarity']}
+                    if (not 'purchaseurl' in res) and purchaseURL != '':
+                        updateOp = updateOp = { '$set' : 
+                                { 'price' : price,
+                                  'pricedate' : datetime.now(timezone.utc),
+                                  'purchaseurl': purchaseURL
+                                }
+                            }
+                    else:
+                        updateOp = updateOp = { '$set' : 
+                                    { 'price' : price,
+                                      'pricedate' : datetime.now(timezone.utc)
+                                    }
+                                }
+                    cardCollection.update_many(payload, updateOp)
+                userData['success'] = 1
+                userData.pop("password")
+                userData.pop("_id")
+                userData.pop("googleid")
+                return userData, 201
+        return {'error': 'Request must be JSON', 'success' : 0}, 201
     
     @app.post('/saveUsername')
     def post_saveUsername():
