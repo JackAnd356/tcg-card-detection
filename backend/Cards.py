@@ -200,7 +200,7 @@ def get_yugioh_card_details(image):
     print(avgColorBottomLeft)
     print(avgColorBottomRight)
 
-    green_hsv_range = ((50, 100, 50), (70, 255, 255))
+    green_hsv_range = ((60, 0, 0), (90, 255, 255))
     isGreenBottom = np.all(avgColorBottomLeft >= green_hsv_range[0]) and np.all(avgColorBottomLeft <= green_hsv_range[1]) and np.all(avgColorBottomRight >= green_hsv_range[0]) and np.all(avgColorBottomRight <= green_hsv_range[1])
     isNotGreenTop = np.all(avgColorTopLeft < green_hsv_range[0]) or np.all(avgColorTopLeft > green_hsv_range[1]) or np.all(avgColorTopRight < green_hsv_range[0]) or np.all(avgColorTopRight > green_hsv_range[1])
 
