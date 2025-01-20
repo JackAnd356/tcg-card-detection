@@ -203,13 +203,13 @@ def create_app():
             userLoginInfo = request.get_json()
             database = client['card_detection_info']
             collection = database['user_data']
-            googleid = userLoginInfo['googleid']
-            userData = collection.find_one({'googleid' : googleid})
+            email = userLoginInfo['email']
+            userData = collection.find_one({'email' : email})
             if userData == None:
                 userCreateInfo = request.get_json()
                 username = ""
                 authenticator = ""
-                email = userLoginInfo['email']
+                googleid = userLoginInfo['googleid']
                 storefront = 1
                 if type(email) != str:
                     return {'error' : 'Incorrect data type passed for one or more inputs'}, 201
