@@ -658,7 +658,7 @@ fun CardPopup(cardData: CardData,
         it.game == game
     })
     val context = LocalContext.current
-    val optionList = subcollections.map { it.name }
+    val optionList = optionInfo.map { it.name }
     var selectedOption by remember { mutableStateOf("") }
     var selectedIndex by remember { mutableStateOf(1) }
     var responseText by remember { mutableStateOf("")}
