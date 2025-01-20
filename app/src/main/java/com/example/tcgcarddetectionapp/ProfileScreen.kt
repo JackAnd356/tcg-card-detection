@@ -58,6 +58,7 @@ fun ProfileScreen(username: String,
                   onUsernameChange: (String) -> Unit,
                   onUserEmailChange: (String) -> Unit,
                   onLogout: () -> Unit,
+                  lockdownEmail: Boolean,
                   modifier: Modifier = Modifier) {
     var usernameEditFlag by remember { mutableStateOf(false) }
     var passwordEditFlag by remember { mutableStateOf(false) }
@@ -122,7 +123,8 @@ fun ProfileScreen(username: String,
                 oldEmail = email
                 emailEditFlag = !emailEditFlag
             },
-            oldData = oldEmail
+            oldData = oldEmail,
+            mutable = !lockdownEmail,
         )
         Button(
             onClick = { onLogout() }
@@ -145,7 +147,8 @@ fun UserDataComponent(label: String,
                       onChange: (String) -> Unit,
                       onClickEdit: () -> Unit,
                       onClickSave: () -> Unit,
-                      oldData: String? = null) {
+                      oldData: String? = null,
+                      mutable: Boolean? = true) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.LightGray),
         border = BorderStroke(1.dp, Color.Black),
@@ -172,40 +175,40 @@ fun UserDataComponent(label: String,
             }
 
             Spacer(Modifier.weight(1f))
-            Button(onClick = {
-                if (flag && data != oldData) {
-                    onClickSave()
-                }
-                else {
-                    onClickEdit()
-                }
-            }, modifier = Modifier
-                .size(width = 100.dp, height = 40.dp)
-                .align(Alignment.CenterVertically)
-            ) {
-                if (flag && data != oldData) {
-                    Text(
-                        text = stringResource(R.string.save_button_label),
-                        fontSize = 15.sp,
-                        lineHeight = 10.sp,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                else if (flag) {
-                    Text(
-                        text = stringResource(R.string.cancel_button_label),
-                        fontSize = 15.sp,
-                        lineHeight = 10.sp,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                else {
-                    Text(
-                        text = stringResource(R.string.change_button_label),
-                        fontSize = 15.sp,
-                        lineHeight = 10.sp,
-                        textAlign = TextAlign.Center
-                    )
+            if (mutable == true) {
+                Button(
+                    onClick = {
+                        if (flag && data != oldData) {
+                            onClickSave()
+                        } else {
+                            onClickEdit()
+                        }
+                    }, modifier = Modifier
+                        .size(width = 100.dp, height = 40.dp)
+                        .align(Alignment.CenterVertically)
+                ) {
+                    if (flag && data != oldData) {
+                        Text(
+                            text = stringResource(R.string.save_button_label),
+                            fontSize = 15.sp,
+                            lineHeight = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    } else if (flag) {
+                        Text(
+                            text = stringResource(R.string.cancel_button_label),
+                            fontSize = 15.sp,
+                            lineHeight = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.change_button_label),
+                            fontSize = 15.sp,
+                            lineHeight = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -436,6 +439,7 @@ fun ProfileScreenPreview(modifier: Modifier = Modifier) {
             onUserEmailChange = { },
             userid = "1",
             onLogout = { },
+            lockdownEmail = false
         )
     }
 }

@@ -66,6 +66,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 onUserEmailChange: (String) -> Unit,
                 onUserCollectionChange: (Array<CardData>) -> Unit,
                 onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
+                onLockdownEmailChange: (Boolean) -> Unit,
                 modifier: Modifier = Modifier) {
 
     var password by remember { mutableStateOf("") }
@@ -102,7 +103,8 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                                 onUserIdChange,
                                 onUserEmailChange,
                                 onUserCollectionChange,
-                                onUserSubColInfoChange)
+                                onUserSubColInfoChange,
+                                onLockdownEmailChange,)
                         }
                     }
                 }
@@ -162,7 +164,8 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                             onUserIdChange,
                             onUserEmailChange,
                             onUserCollectionChange,
-                            onUserSubColInfoChange)
+                            onUserSubColInfoChange,
+                            onLockdownEmailChange,)
                     }
                 } catch (e: GetCredentialException) {
                     e.printStackTrace()
@@ -241,6 +244,7 @@ fun LoginScreenPreview() {
             onNewUserNavigate = { },
             credentialManager = TODO(),
             modifier = TODO(),
+            onLockdownEmailChange = TODO(),
         )
     }
 }
@@ -311,11 +315,12 @@ fun loginPost(username: String,
 
 fun loginGooglePost(googleid: String,
                     email: String,
-              onLoginNavigate: () -> Unit,
-              onUserIdChange: (String) -> Unit,
-              onUserEmailChange: (String) -> Unit,
-              onUserCollectionChange: (Array<CardData>) -> Unit,
-              onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit): Array<Any> {
+                    onLoginNavigate: () -> Unit,
+                    onUserIdChange: (String) -> Unit,
+                    onUserEmailChange: (String) -> Unit,
+                    onUserCollectionChange: (Array<CardData>) -> Unit,
+                    onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
+                    onLockdownEmailChange: (Boolean) -> Unit,): Array<Any> {
     val retrofit = Retrofit.Builder()
         .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
@@ -333,6 +338,7 @@ fun loginGooglePost(googleid: String,
                 loginSuccess = true
                 onUserIdChange(respData.userid!!)
                 onUserEmailChange(respData.email!!)
+                onLockdownEmailChange(true)
                 collectionPost(respData.userid!!, onUserCollectionChange, onUserSubColInfoChange, onLoginNavigate)
             }
         }
@@ -345,12 +351,13 @@ fun loginGooglePost(googleid: String,
 }
 
 fun loginFacebookPost(fbid: String,
-                    email: String,
-                    onLoginNavigate: () -> Unit,
-                    onUserIdChange: (String) -> Unit,
-                    onUserEmailChange: (String) -> Unit,
-                    onUserCollectionChange: (Array<CardData>) -> Unit,
-                    onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit): Array<Any> {
+                      email: String,
+                      onLoginNavigate: () -> Unit,
+                      onUserIdChange: (String) -> Unit,
+                      onUserEmailChange: (String) -> Unit,
+                      onUserCollectionChange: (Array<CardData>) -> Unit,
+                      onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit,
+                      onLockdownEmailChange: (Boolean) -> Unit): Array<Any> {
     val retrofit = Retrofit.Builder()
         .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
@@ -368,6 +375,7 @@ fun loginFacebookPost(fbid: String,
                 loginSuccess = true
                 onUserIdChange(respData.userid!!)
                 onUserEmailChange(respData.email!!)
+                onLockdownEmailChange(true)
                 collectionPost(respData.userid!!, onUserCollectionChange, onUserSubColInfoChange, onLoginNavigate)
             }
         }

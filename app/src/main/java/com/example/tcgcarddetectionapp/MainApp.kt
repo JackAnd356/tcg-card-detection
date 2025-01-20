@@ -83,6 +83,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
     var email by remember { mutableStateOf("") }
     var collection by remember { mutableStateOf(arrayOf<CardData>()) }
     var subColInfo by remember { mutableStateOf(arrayOf<SubcollectionInfo>()) }
+    var lockdownEmail by remember { mutableStateOf(false)}
 
     val credentialManager = CredentialManager.create(LocalContext.current)
 
@@ -102,6 +103,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                 onUserEmailChange = { email = it },
                 onUserCollectionChange = {collection = it},
                 onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it})},
+                onLockdownEmailChange = {lockdownEmail = it}
             )
         }
         composable(route = CardDetectionScreens.YugiohCollection.name) {
@@ -235,10 +237,12 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     onUsernameChange = { username = it },
                     onUserEmailChange = { email = it },
                     userid = userid,
+                    lockdownEmail = lockdownEmail,
                     onLogout = {
                         username = ""
                         userid = ""
                         email = ""
+                        lockdownEmail = false
                         collection = arrayOf<CardData>()
                         subColInfo = arrayOf<SubcollectionInfo>()
                         runBlocking {
