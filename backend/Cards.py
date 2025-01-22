@@ -3,6 +3,9 @@ import numpy as np
 import tensorflow as tf
 import pytesseract
 import os
+import imagehash
+from PIL import Image
+import json
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -12,6 +15,15 @@ THRESH_HIGH = 120
 
 CARD_MAX_AREA = 2000000
 CARD_MIN_AREA = 10000
+
+# Hashing Variables
+hash_size = 16 #Bytes
+min_similarity = 14*6.8
+check_flipped = True
+hash_filename = 'pokemon_dphash_16byte.json'
+
+with open(f'cardHashes/{hash_filename}', 'r', encoding='utf-8') as json_file:
+    hash_dict = json.load(json_file)
 
 #Classification Model
 model_path = os.path.join(os.path.dirname(__file__), 'card_classifier_model_ver2.h5')
@@ -59,7 +71,9 @@ def preprocess_image(image, thresh_low, thresh_high):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
 
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray,(13,13),0)
+    blur = cv2.GaussianBlur(gray,(5, 5),0)
+
+    """cv2.imshow("Blur Img", blur)"""
 
     threshold1 = thresh_low
     threshold2 = thresh_high
@@ -79,6 +93,9 @@ def find_cards(thresh_image):
     # Find contours and sort their indices by contour size
     cnts,hier = cv2.findContours(thresh_image,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     index_sort = sorted(range(len(cnts)), key=lambda i : cv2.contourArea(cnts[i]),reverse=True)
+
+    """cv2.drawContours(thresh_image, cnts, -1, (0,255,0), 3)
+    cv2.imshow("title", thresh_image)"""
 
     # If there are no contours, do nothing
     if len(cnts) == 0:
@@ -109,7 +126,7 @@ def find_cards(thresh_image):
 
         """print(size)
         print(hier_sort[i][3])
-        print(len(approx)) """
+        print(len(approx))"""
 
         if ((size < CARD_MAX_AREA) and (size > CARD_MIN_AREA)
             and (hier_sort[i][3] == -1) and (len(approx) == 4)):
@@ -149,8 +166,13 @@ def preprocess_card(contour, frame):
     cardType, confidence = predict_card(model, img_array)
     qCard["game"] = cardType
 
+    print(cardType)
+
     if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_bgr"])
     elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp_rgb"])
+    elif cardType == 'pokemon': 
+        name, id = get_pokemon_card_details(qCard["warp_rgb"])
+        setCode = None
     else: return None
     qCard["name"] = name
     qCard["cardid"] = id
@@ -251,6 +273,10 @@ def get_mtg_card_details(image):
 
     return (cardName, cardID, cardSetCode)
 
+def get_pokemon_card_details(image):
+    name, id = get_match_pool(image)
+    return name, id
+
 
 def flattener(image, pts, w, h):
     """Flattens an image of a card into a top-down 200x300 perspective.
@@ -310,3 +336,58 @@ def flattener(image, pts, w, h):
     warp_rgb = cv2.cvtColor(warp,cv2.COLOR_BGR2RGB)
 
     return (warp_rgb, warp)
+
+def get_match_pool(card_image):
+    if card_image is None:
+        return None, None
+    image_hash = hash_image(card_image)
+    name, id = find_match(image_hash)
+    if name is None and check_flipped is True:
+        name, id = find_flipped_match(card_image)
+    if name is not None:
+        return name, id
+    return None, None
+
+def hash_image(img):
+    # Convert the NumPy array to a PIL image
+    img = Image.fromarray(img)
+
+    img = img.convert('RGB')
+
+    # Resize the image to the desired size
+    #img = img.resize((image_size, image_size))
+
+    # Compute the hash
+    # ahash = str(imagehash.average_hash(img, hash_size))
+    dhash = imagehash.dhash(img, hash_size)
+    phash = imagehash.phash(img, hash_size)
+
+    hash = f'{dhash}{phash}'
+
+    return hash
+
+def hamming_distance(hash1, hash2):
+    assert len(hash1) == len(hash2), "Hash lengths are not equal"
+    return sum(ch1 != ch2 for ch1, ch2 in zip(hash1, hash2))
+
+def find_match(hash_a):
+    best_match = None
+    min_sim = min_similarity
+
+    for card_id, data in hash_dict.items():
+        hash_b = data['hash']
+        similarity = hamming_distance(hash_a, hash_b)
+        if similarity < min_sim:
+            min_sim = similarity
+            best_match = card_id
+
+    if best_match is None:
+        return None, None
+
+    return hash_dict[best_match]['name'], hash_dict[best_match]['id']
+
+def find_flipped_match(card_image):
+    card_image = cv2.rotate(card_image, cv2.ROTATE_180)
+    image_hash = hash_image(card_image)
+    name, id = find_match(image_hash)
+    return name, id

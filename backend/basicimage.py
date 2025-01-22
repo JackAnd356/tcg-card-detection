@@ -2,10 +2,13 @@ import cv2
 import os
 import Cards
 
-filename = "Deskbot_007.jpg"
+filename = "Tynamo.jpg"
 filepath = os.path.join("../images", filename)
 img = cv2.imread(filepath)
 img_cards = Cards.process_image(img)
+
+for card in img_cards["cards"]:
+    print(f'Name: {card["name"]} ID: {card["cardid"]} Set Code: {card["setcode"]}')
 
 cam = 0
 while cam == 0:
