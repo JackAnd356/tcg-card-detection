@@ -113,7 +113,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var selectedMaxLevel by remember { mutableStateOf("") }
     var maxLevelErr by remember { mutableStateOf(false) }
     var typeExpanded by remember { mutableStateOf(false) }
-    var priceExpanded by remember { mutableStateOf(false) }
+    var selectedMinPrice by remember { mutableStateOf("") }
+    var minPriceErr by remember { mutableStateOf(false) }
+    var selectedMaxPrice by remember { mutableStateOf("") }
+    var maxPriceErr by remember { mutableStateOf(false) }
 
 
     if (navWebsite != "") {
@@ -267,111 +270,96 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             if (showFilters) {
                 Column {
                     Row {
+                        MinMaxIntComponent(
+                            minVal = selectedMinQuantity,
+                            maxVal = selectedMaxQuantity,
+                            onMinValChange = { selectedMinQuantity = it },
+                            onMaxValChange = { selectedMaxQuantity = it },
+                            label = stringResource(R.string.quantity_filter_label),
+                            minError = minQuantErr,
+                            onMinErrChange = { minQuantErr = it },
+                            maxError = maxQuantErr,
+                            onMaxErrChange = { maxQuantErr = it }
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                priceRange = selectedPriceRange,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                            ).forEach {
+                                    func ->
+                                filterList.add(func)
+                            }
+                        }
+                    }
+                    Row {
+                        MinMaxDoubleComponent(
+                            minVal = selectedMinPrice,
+                            maxVal = selectedMaxPrice,
+                            onMinValChange = { selectedMinPrice = it },
+                            onMaxValChange = {  selectedMaxPrice = it },
+                            label = stringResource(R.string.price_filter_label),
+                            minError = minPriceErr,
+                            onMinErrChange = { minPriceErr = it },
+                            maxError = maxPriceErr,
+                            onMaxErrChange = { maxPriceErr = it }
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                priceRange = selectedPriceRange,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                            ).forEach {
+                                    func ->
+                                filterList.add(func)
+                            }
+                        }
+                    }
+                    Column {
                         if (game == "yugioh") {
-                            TextField(
-                                value = selectedMinQuantity,
-                                onValueChange = { selectedMinQuantity = it
-                                                if (it == "") {
-                                                    minQuantErr = false
-                                                    filterList.clear()
-                                                    recalculateFilterList(
-                                                        type = selectedTypeFilter,
-                                                        quantityMin = selectedMinQuantity,
-                                                        levelMin = selectedMinLevel,
-                                                        priceRange = selectedPriceRange,
-                                                        quantityMax = selectedMaxQuantity,
-                                                        levelMax = selectedMaxLevel,
-                                                    ).forEach {
-                                                            func ->
-                                                        filterList.add(func)
-                                                    }
-                                                }
-                                                else if (it.toInt() < 0 || (selectedMaxQuantity != "" && selectedMaxQuantity.toInt() < it.toInt())) {
-                                                    minQuantErr = true
-                                                }
-                                                else {
-                                                    minQuantErr = false
-                                                    filterList.clear()
-                                                    recalculateFilterList(
-                                                        type = selectedTypeFilter,
-                                                        quantityMin = selectedMinQuantity,
-                                                        levelMin = selectedMinLevel,
-                                                        priceRange = selectedPriceRange,
-                                                        quantityMax = selectedMaxQuantity,
-                                                        levelMax = selectedMaxLevel,
-                                                    ).forEach {
-                                                            func ->
-                                                        filterList.add(func)
-                                                    }
-                                                }},
-                                label = { Text(stringResource(R.string.min_quantity_filter_label)) },
-                                isError = minQuantErr,
-                                supportingText = {
-                                    if (minQuantErr) {
-                                        Text(
-                                            text = stringResource(R.string.invalid_value_error),
-                                            color = Color.Red
-                                        )
-                                    }
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                            )
-                            TextField(
-                                value = selectedMinLevel,
-                                onValueChange = { selectedMinLevel = it
-                                    if (it == "") {
-                                        minLevelErr = false
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            priceRange = selectedPriceRange,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                        ).forEach {
-                                                func ->
-                                            filterList.add(func)
-                                        }
-                                    }
-                                    else if (it.toInt() < 0 || (selectedMaxLevel != "" && selectedMaxLevel.toInt() < it.toInt())) {
-                                        minLevelErr = true
-                                    }
-                                    else {
-                                        minLevelErr = false
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            priceRange = selectedPriceRange,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                        ).forEach {
-                                                func ->
-                                            filterList.add(func)
-                                        }
-                                    }},
-                                label = { Text(stringResource(R.string.min_level_filter_label)) },
-                                isError = minLevelErr,
-                                supportingText = {
-                                    if (minLevelErr) {
-                                        Text(
-                                            text = stringResource(R.string.invalid_value_error),
-                                            color = Color.Red
-                                        )
-                                    }
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                            )
+                            MinMaxIntComponent(
+                                minVal = selectedMinLevel,
+                                maxVal = selectedMaxLevel,
+                                onMinValChange = { selectedMinLevel = it },
+                                onMaxValChange = { selectedMaxLevel = it },
+                                label = stringResource(R.string.level_filter_label),
+                                minError = minLevelErr,
+                                onMinErrChange = { minLevelErr = it },
+                                maxError = maxLevelErr,
+                                onMaxErrChange = { maxLevelErr = it }
+                            ) {
+                                filterList.clear()
+                                recalculateFilterList(
+                                    type = selectedTypeFilter,
+                                    quantityMin = selectedMinQuantity,
+                                    levelMin = selectedMinLevel,
+                                    priceRange = selectedPriceRange,
+                                    quantityMax = selectedMaxQuantity,
+                                    levelMax = selectedMaxLevel,
+                                    priceMin = selectedMinPrice,
+                                    priceMax = selectedMaxPrice,
+                                ).forEach {
+                                        func ->
+                                    filterList.add(func)
+                                }
+                            }
                             DropdownMenu(
                                 expanded = typeExpanded,
                                 onDismissRequest = {
                                     typeExpanded = false
                                 }
                             ) {
-                                listOfTypes.forEach {
-                                        type ->
+                                listOfTypes.forEach { type ->
                                     DropdownMenuItem(
                                         text = { Text(type) },
                                         onClick = {
@@ -384,121 +372,15 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                                 priceRange = selectedPriceRange,
                                                 quantityMax = selectedMaxQuantity,
                                                 levelMax = selectedMaxLevel,
-                                            ).forEach {
-                                                    func ->
+                                                priceMin = selectedMinPrice,
+                                                priceMax = selectedMaxPrice,
+                                            ).forEach { func ->
                                                 filterList.add { func(it) }
                                             }
                                         }
                                     )
                                 }
                             }
-                        }
-
-                        else if (game == "mtg") {
-
-                        }
-                        else if (game == "pokemon") {
-
-                        }
-                    }
-                    Row {
-                        if (game == "yugioh") {
-                            TextField(
-                                value = selectedMaxQuantity,
-                                onValueChange = { selectedMaxQuantity = it
-                                    if (it == "") {
-                                        maxQuantErr = false
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            priceRange = selectedPriceRange,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                        ).forEach {
-                                                func ->
-                                            filterList.add(func)
-                                        }
-                                    }
-                                    else if (it.toInt() < 0 || (selectedMinQuantity != "" && selectedMinQuantity.toInt() > it.toInt())) {
-                                        maxQuantErr = true
-                                    }
-                                    else {
-                                        maxQuantErr = false
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            priceRange = selectedPriceRange,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                        ).forEach {
-                                                func ->
-                                            filterList.add(func)
-                                        }
-                                    }},
-                                label = { Text(stringResource(R.string.max_quantity_filter_label)) },
-                                isError = maxQuantErr,
-                                supportingText = {
-                                    if (maxQuantErr) {
-                                        Text(
-                                            text = stringResource(R.string.invalid_value_error),
-                                            color = Color.Red
-                                        )
-                                    }
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                            )
-                            TextField(
-                                value = selectedMaxLevel,
-                                onValueChange = { selectedMaxLevel = it
-                                    if (it == "") {
-                                        maxLevelErr = false
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            priceRange = selectedPriceRange,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                        ).forEach {
-                                                func ->
-                                            filterList.add(func)
-                                        }
-                                    }
-                                    else if (it.toInt() < 0 || (selectedMinLevel != "" && selectedMinLevel.toInt() > it.toInt())) {
-                                        maxLevelErr = true
-                                    }
-                                    else {
-                                        maxLevelErr = false
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            priceRange = selectedPriceRange,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                        ).forEach {
-                                                func ->
-                                            filterList.add(func)
-                                        }
-                                    }},
-                                label = { Text(stringResource(R.string.max_level_filter_label)) },
-                                isError = maxLevelErr,
-                                supportingText = {
-                                    if (maxLevelErr) {
-                                        Text(
-                                            text = stringResource(R.string.invalid_value_error),
-                                            color = Color.Red
-                                        )
-                                    }
-                                },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                            )
                         }
                         else if (game == "mtg") {
 
@@ -997,6 +879,139 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
     }
 }
 
+@Composable
+fun MinMaxIntComponent(minVal: String,
+                       maxVal: String,
+                       onMinValChange: (String) -> Unit,
+                       onMaxValChange: (String) -> Unit,
+                       label: String,
+                       minError: Boolean,
+                       onMinErrChange: (Boolean) -> Unit,
+                       maxError: Boolean,
+                       onMaxErrChange: (Boolean) -> Unit,
+                       recalculateFilter: () -> Unit) {
+    Row {
+        Text(label)
+        TextField(
+            value = minVal,
+            onValueChange = {
+                onMinValChange(it)
+                if (it == "") {
+                    onMinErrChange(false)
+                    recalculateFilter()
+                } else if (it.toInt() < 0 || (maxVal != "" && maxVal.toInt() < it.toInt())) {
+                    onMinErrChange(true)
+                } else {
+                    onMinErrChange(false)
+                    recalculateFilter()
+                }
+            },
+            isError = minError,
+            supportingText = {
+                if (minError) {
+                    Text(
+                        text = stringResource(R.string.invalid_value_error),
+                        color = Color.Red
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+        Text("-")
+        TextField(
+            value = maxVal,
+            onValueChange = {
+                onMaxValChange(it)
+                if (it == "") {
+                    onMaxErrChange(false)
+                    recalculateFilter()
+                } else if (it.toInt() < 0 || (minVal != "" && minVal.toInt() > it.toInt())) {
+                    onMaxErrChange(true)
+                } else {
+                    onMaxErrChange(false)
+                    recalculateFilter()
+                }
+            },
+            isError = maxError,
+            supportingText = {
+                if (maxError) {
+                    Text(
+                        text = stringResource(R.string.invalid_value_error),
+                        color = Color.Red
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+    }
+}
+@Composable
+fun MinMaxDoubleComponent(minVal: String,
+                       maxVal: String,
+                       onMinValChange: (String) -> Unit,
+                       onMaxValChange: (String) -> Unit,
+                       label: String,
+                       minError: Boolean,
+                       onMinErrChange: (Boolean) -> Unit,
+                       maxError: Boolean,
+                       onMaxErrChange: (Boolean) -> Unit,
+                       recalculateFilter: () -> Unit) {
+    Row {
+        Text(label)
+        TextField(
+            value = minVal,
+            onValueChange = {
+                onMinValChange(it)
+                if (it == "") {
+                    onMinErrChange(false)
+                    recalculateFilter()
+                } else if (it.toDouble() < 0 || (maxVal != "" && maxVal.toDouble() < it.toDouble())) {
+                    onMinErrChange(true)
+                } else {
+                    onMinErrChange(false)
+                    recalculateFilter()
+                }
+            },
+            isError = minError,
+            supportingText = {
+                if (minError) {
+                    Text(
+                        text = stringResource(R.string.invalid_value_error),
+                        color = Color.Red
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+        Text("-")
+        TextField(
+            value = maxVal,
+            onValueChange = {
+                onMaxValChange(it)
+                if (it == "") {
+                    onMaxErrChange(false)
+                    recalculateFilter()
+                } else if (it.toDouble() < 0 || (minVal != "" && minVal.toDouble() > it.toDouble())) {
+                    onMaxErrChange(true)
+                } else {
+                    onMaxErrChange(false)
+                    recalculateFilter()
+                }
+            },
+            isError = maxError,
+            supportingText = {
+                if (maxError) {
+                    Text(
+                        text = stringResource(R.string.invalid_value_error),
+                        color = Color.Red
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+    }
+}
+
 fun arrToPrintableString(arr: Array<String>): String {
     var str = ""
     arr.forEach {
@@ -1110,7 +1125,7 @@ fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: Strin
     })
 }
 
-fun recalculateFilterList(type: String, quantityMin: String, levelMin: String, priceRange: Int, quantityMax: String, levelMax: String): MutableList<(CardData) -> Boolean> {
+fun recalculateFilterList(type: String, quantityMin: String, levelMin: String, priceRange: Int, quantityMax: String, levelMax: String, priceMin: String, priceMax: String): MutableList<(CardData) -> Boolean> {
     var ret = mutableListOf<(CardData) -> Boolean>()
     if (type != "") {
         ret.add({it.type == type})
@@ -1126,6 +1141,12 @@ fun recalculateFilterList(type: String, quantityMin: String, levelMin: String, p
     }
     if (levelMax != "" && (levelMin == "" || levelMin.toInt() < levelMax.toInt())) {
         ret.add({ (it.level?.toInt() ?: 0) <= levelMax.toInt()})
+    }
+    if (priceMin != "" && (priceMax == "" || priceMin.toDouble() < priceMax.toDouble())) {
+        ret.add({ (it.price) >= priceMin.toDouble()})
+    }
+    if (priceMax != "" && (priceMin == "" || priceMin.toDouble() < priceMax.toDouble())) {
+        ret.add({ (it.price) <= priceMax.toDouble()})
     }
     return ret
 }

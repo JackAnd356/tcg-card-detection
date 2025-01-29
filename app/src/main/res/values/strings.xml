@@ -71,10 +71,9 @@
     <string name="subcol_isdeck_label">Is this collection a Deck?</string>
     <string name="subcol_delete_warning">Are you sure you want to delete this subcollection?</string>
     <string name="invalid_value_error">Value entered is invalid</string>
-    <string name="min_quantity_filter_label">Quantity Min</string>
-    <string name="max_quantity_filter_label">Quantity Max</string>
-    <string name="min_level_filter_label">Level Min</string>
-    <string name="max_level_filter_label">Level Max</string>
+    <string name="quantity_filter_label">Quantity</string>
+    <string name="level_filter_label">Level</string>
+    <string name="price_filter_label">Price</string>
     <string name="price_range_filter_label">Price Range</string>
     <string name="facebook_app_id">1037081011515399</string>
     <string name="fb_login_protocol_scheme">fb1037081011515399</string>
