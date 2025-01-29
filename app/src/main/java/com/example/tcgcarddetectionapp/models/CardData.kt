@@ -1,4 +1,4 @@
-package com.example.tcgcarddetectionapp
+package com.example.tcgcarddetectionapp.models
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

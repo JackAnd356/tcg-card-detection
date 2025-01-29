@@ -1,5 +1,8 @@
 package com.example.tcgcarddetectionapp
 
+import com.example.tcgcarddetectionapp.models.CardData
+import com.example.tcgcarddetectionapp.models.SubcollectionInfo
+
 const val api_url = "http://10.0.2.2:5000"
 
 fun <E> List<E>.remove(elem: E): List<E> {
