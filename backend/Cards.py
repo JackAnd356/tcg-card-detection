@@ -20,9 +20,9 @@ CARD_MIN_AREA = 10000
 hash_size = 16 #Bytes
 min_similarity = 14*6.8
 check_flipped = True
-hash_filename = 'pokemon_dphash_16byte.json'
 
-with open(f'cardHashes/{hash_filename}', 'r', encoding='utf-8') as json_file:
+hash_path = os.path.join(os.path.dirname(__file__), 'cardHashes/pokemon_dphash_16byte.json')
+with open(hash_path, 'r', encoding='utf-8') as json_file:
     hash_dict = json.load(json_file)
 
 #Classification Model
