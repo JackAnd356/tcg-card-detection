@@ -469,6 +469,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             if (searchTerm == "") {
                 filteredCardData = cardData.toMutableList()
             }
+            filteredCardData = sortSubcollection(filteredCardData, game)
             for (i in 0..(filteredCardData.size - 1) step 2) {
                 Row{
                     for (j in i..(i + 1).coerceAtMost(filteredCardData.size - 1)) {
@@ -1149,6 +1150,31 @@ fun recalculateFilterList(type: String, quantityMin: String, levelMin: String, p
         ret.add({ (it.price) <= priceMax.toDouble()})
     }
     return ret
+}
+
+fun sortSubcollection(subCol: MutableList<CardData> , game: String): MutableList<CardData> {
+    if (game == "yugioh") {
+        return subCol.sortedWith( compareBy<CardData> {
+            yugiohSort(it.type!!)
+        }.thenBy { it.cardname }).toMutableList()
+    }
+    else {
+        return subCol.sortedWith( compareBy<CardData> {
+            it.attribute
+        }.thenBy { it.cardname }).toMutableList()
+    }
+}
+
+fun yugiohSort(type: String): Int {
+    if (type.contains(" Spell")) {
+        return 2
+    }
+    else if (type.contains(" Trap")) {
+        return 3
+    }
+    else {
+        return 1
+    }
 }
 
 
