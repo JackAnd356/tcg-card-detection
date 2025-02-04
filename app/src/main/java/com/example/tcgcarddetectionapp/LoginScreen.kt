@@ -32,8 +32,18 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
-import androidx.credentials.PublicKeyCredential
 import androidx.credentials.exceptions.GetCredentialException
+import com.example.tcgcarddetectionapp.models.CardData
+import com.example.tcgcarddetectionapp.models.GetCardImageRequestModel
+import com.example.tcgcarddetectionapp.models.GetCardImageResponseModel
+import com.example.tcgcarddetectionapp.models.LoginFBRequestModel
+import com.example.tcgcarddetectionapp.models.LoginGoogleRequestModel
+import com.example.tcgcarddetectionapp.models.LoginRequestModel
+import com.example.tcgcarddetectionapp.models.LoginResponseModel
+import com.example.tcgcarddetectionapp.models.SubcollectionInfo
+import com.example.tcgcarddetectionapp.models.UserCollectionRequestModel
+import com.example.tcgcarddetectionapp.models.UserSubcollectionInfoRequestModel
+import com.example.tcgcarddetectionapp.models.UserSubcollectionInfoResponseModel
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -42,7 +52,6 @@ import com.facebook.GraphRequest
 import com.facebook.GraphResponse
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.facebook.login.widget.LoginButton
 import com.google.android.gms.common.SignInButton
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
