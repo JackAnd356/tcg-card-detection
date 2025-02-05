@@ -79,4 +79,5 @@
     <string name="fb_login_protocol_scheme">fb1037081011515399</string>
     <string name="facebook_client_token">bf7c1944226b43d35f290c1045b39ad4</string>
     <string name="facebook_login_placeholder">Login With Facebook</string>
+    <string name="subcollection_quantity_label">Amount In SubCollection</string>
 </resources>

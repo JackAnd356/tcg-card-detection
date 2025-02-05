@@ -3,6 +3,7 @@ package com.example.tcgcarddetectionapp
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -549,6 +550,10 @@ fun CardPopup(cardData: CardData,
     var selectedIndex by remember { mutableStateOf(1) }
     var responseText by remember { mutableStateOf("")}
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
+    var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
+    var cardQuantErr by remember { mutableStateOf(false) }
+    var subColQuant by remember { mutableStateOf(cardData.subcollections!!.count{ it == subcolInfo.subcollectionid}.toString()) }
+    var refreshFlag by remember { mutableStateOf(false) }
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
@@ -805,8 +810,80 @@ fun CardPopup(cardData: CardData,
             ) {
                 Text(stringResource(R.string.add_to_subcollection_button_label))
             }
-
-            Column {
+            Row {
+                Text(stringResource(R.string.quantity_filter_label) + ": ")
+                Button(
+                    onClick = {
+                        removeFromCollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            game = cardData.game,
+                            quantity = 1,
+                            fullCardPool = fullCardPool,
+                            onCollectionChange = onCollectionChange,
+                            removeCard = removeCard,
+                            subcolInfo = subcolInfo,
+                            refreshUI = refreshUI,
+                        )
+                        cardQuantity = (cardQuantity.toInt() - 1).toString()
+                    }
+                ) { Text("-")}
+                TextField(
+                    value = cardQuantity,
+                    onValueChange = {
+                        if (it != "" && it.toInt() > 0) {
+                            cardQuantErr = false
+                            val quantityChange = (it.toInt() - cardQuantity.toInt())
+                            if (quantityChange > 0) {
+                                increaseQuantityPost(
+                                    userid = userid,
+                                    card = cardData,
+                                    quantityChange = quantityChange
+                                )
+                            }
+                            else {
+                                removeFromCollectionPost(
+                                    card = cardData,
+                                    userid = userid,
+                                    game = cardData.game,
+                                    quantity = (quantityChange * -1),
+                                    fullCardPool = fullCardPool,
+                                    onCollectionChange = onCollectionChange,
+                                    removeCard = removeCard,
+                                    subcolInfo = subcolInfo,
+                                    refreshUI = refreshUI,
+                                )
+                            }
+                        }
+                        else {
+                            cardQuantErr = true
+                        }
+                        cardQuantity = it
+                                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = modifier.fillMaxWidth(.25f),
+                    isError = cardQuantErr,
+                    supportingText = {
+                        if (cardQuantErr) {
+                            Text(
+                                text = stringResource(R.string.invalid_value_error),
+                                color = Color.Red
+                            )
+                        }
+                    }
+                )
+                Button(
+                    onClick = {
+                        increaseQuantityPost(
+                            userid = userid,
+                            card = cardData,
+                            quantityChange = 1
+                        )
+                        cardQuantity = (cardQuantity.toInt() + 1).toString()
+                    }
+                ) { Text("+")}
+            }
+            /*Column {
                 Button(onClick = {
                     showCardPopup()
                     val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, removeCard = removeCard, subcolInfo = subcolInfo, refreshUI = refreshUI)
@@ -815,9 +892,45 @@ fun CardPopup(cardData: CardData,
                 }, modifier = Modifier.align(Alignment.End)) {
                     Text(text="Delete")
                 }
-            }
+            }*/
         } else {
-            Column {
+            Row {
+                Text(stringResource(R.string.subcollection_quantity_label) + ": ")
+                Button(
+                    onClick = {
+                        removeFromSubcollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            subcolInfo = subcolInfo,
+                            game = cardData.game,
+                            refreshUI = {
+                                refreshUI()
+                                refreshFlag = !refreshFlag
+                                        },
+                        )
+                        refreshFlag = !refreshFlag
+                        subColQuant = (subColQuant.toInt() - 1).toString()
+                    }
+                ) { Text("-")}
+                Text(subColQuant)
+                Button(
+                    onClick = {
+                        saveToSubcollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            subcollection = subcolInfo.subcollectionid,
+                            subcolInfo = subcolInfo,
+                            refreshUI = {
+                                refreshUI()
+                                refreshFlag = !refreshFlag
+                                        },
+                        )
+                        refreshFlag = !refreshFlag
+                        subColQuant = (subColQuant.toInt() + 1).toString()
+                    }
+                ) { Text("+")}
+            }
+            /*Column {
                 Button(onClick = {
                     showCardPopup()
                     if (removeFromSubcollectionPost(card = cardData, userid = userid, game = game, subcolInfo = subcolInfo, refreshUI = refreshUI)) {
@@ -828,7 +941,7 @@ fun CardPopup(cardData: CardData,
                 }) {
                     Text(text = "Remove")
                 }
-            }
+            }*/
         }
     }
 }
@@ -1040,7 +1153,7 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
             call: Call<GenericSuccessErrorResponseModel>,
             response: Response<GenericSuccessErrorResponseModel>
         ) {
-            if (card.quantity <= 1) {
+            if (card.quantity <= quantity) {
                 val cardsWithoutRemoved = ArrayList<CardData>()
                 for (cardData in fullCardPool) {
                     if (card != cardData) {
@@ -1050,7 +1163,7 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
                 removeCard(card)
                 onCollectionChange(cardsWithoutRemoved.toTypedArray())
             } else {
-                card.quantity--
+                card.quantity = card.quantity - quantity
             }
 
             updateSubcollectionInfo(subcolInfo = subcolInfo, card = card, quantity = 1, adding = false)
@@ -1063,6 +1176,39 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
         }
     })
     return successful
+}
+
+fun increaseQuantityPost(userid: String, card: CardData, quantityChange: Int) {
+    val retrofit = Retrofit.Builder()
+        .baseUrl(api_url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+
+    card.quantity += quantityChange
+
+    val requestData = AddRemoveCardModel(userid = userid, game = card.game, cardid = card.cardid, setcode = card.setcode,
+        cardname = card.cardname, price = card.price, quantity = quantityChange, level = card.level, attribute = card.attribute,
+        type = card.type, atk = card.atk, def = card.def, description = card.description, cost = card.cost, attacks = card.attacks,
+        weaknesses = card.weaknesses, hp = card.hp, retreat = card.retreat, rarity = card.rarity)
+
+    retrofitAPI.addToCollection(requestData).enqueue(object:
+        Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            val respData = response.body()
+            if (respData != null) {
+                //Do Nothing
+            }
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
 }
 
 fun removeFromSubcollectionPost(card: CardData, userid: String, subcolInfo: SubcollectionInfo, game: String, refreshUI: () -> Unit): Boolean {
@@ -1079,7 +1225,9 @@ fun removeFromSubcollectionPost(card: CardData, userid: String, subcolInfo: Subc
             call: Call<GenericSuccessErrorResponseModel>,
             response: Response<GenericSuccessErrorResponseModel>
         ) {
-            if (card.subcollections != null) card.subcollections = card.subcollections!!.toList().remove(subcolInfo.subcollectionid).toTypedArray()
+            if (card.subcollections != null) {
+                card.subcollections = card.subcollections!!.toList().remove(subcolInfo.subcollectionid).toTypedArray()
+            }
             successful = true
             updateSubcollectionInfo(subcolInfo = subcolInfo, card = card, quantity = 1, adding = false)
             refreshUI()
