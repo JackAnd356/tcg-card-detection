@@ -138,28 +138,71 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         }
     }
     else {
-        fullCardPool.forEach {
-                card ->
-            var filterFlag = true
-            filterList.forEach {
-                func ->
-                if (!func(card)) {
-                    filterFlag = false
+        if (game == "yugioh") {
+            fullCardPool.sortedWith( compareBy<CardData> {
+                yugiohSort(it.type!!)
+            }.thenBy { it.cardname }).forEach {
+                    card ->
+                var filterFlag = true
+                filterList.forEach {
+                        func ->
+                    if (!func(card)) {
+                        filterFlag = false
+                    }
+                }
+                if (card.subcollections != null &&
+                    card.subcollections!!.count { it == subcolInfo.subcollectionid} > cardData.count {it == card} &&
+                    card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
+                    val numCopiesToAdd = card.subcollections!!.count { it == subcolInfo.subcollectionid} - cardData.count {it == card}
+                    for (i in 1..numCopiesToAdd) {
+                        cardData.add(card)
+                    }
+                }
+                else if (card.subcollections != null &&
+                    card.subcollections!!.count { it == subcolInfo.subcollectionid} < cardData.count {it == card} &&
+                    card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
+                    val numCopiesToRemove = cardData.count {it == card} - card.subcollections!!.count { it == subcolInfo.subcollectionid}
+                    for (i in 1..numCopiesToRemove) {
+                        cardData.remove(card)
+                    }
+                }
+                else if (!filterFlag && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
+
+                if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
+                    if (card.game == "yugioh") {
+                        listOfTypes.add(card.type!!)
+                    }
                 }
             }
-            if (card.subcollections != null &&
-                card.subcollections!!.count { it == subcolInfo.subcollectionid} > cardData.count {it == card} &&
-                card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
+        }
+        else {
+            fullCardPool.sortedWith( compareBy<CardData> {
+                it.attribute
+            }.thenBy { it.cardname }).forEach {
+                    card ->
+                var filterFlag = true
+                filterList.forEach {
+                        func ->
+                    if (!func(card)) {
+                        filterFlag = false
+                    }
+                }
+                if (card.subcollections != null &&
+                    card.subcollections!!.count { it == subcolInfo.subcollectionid} > cardData.count {it == card} &&
+                    card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
 
-                cardData.add(card)
-            }
-            else if (!filterFlag && cardData.contains(card)) {
-                cardData.removeAll(Collections.singleton(card))
-            }
+                    cardData.add(card)
+                }
+                else if (!filterFlag && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
 
-            if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
-                if (card.game == "yugioh") {
-                    listOfTypes.add(card.type!!)
+                if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
+                    if (card.game == "yugioh") {
+                        listOfTypes.add(card.type!!)
+                    }
                 }
             }
         }
