@@ -9,7 +9,7 @@
     <string name="subcollection_page">Subcollection</string>
     <string name="change_button_label">Change</string>
     <string name="save_button_label">Save</string>
-    <string name="profile_screen_heading">Profile Screen</string>
+    <string name="profile_screen_heading">Profile</string>
     <string name="new_user_registration_screen_heading">New User Registration Screen</string>
     <string name="username_label">Username</string>
     <string name="password_label">Password</string>

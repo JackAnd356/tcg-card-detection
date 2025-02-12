@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
@@ -73,7 +75,8 @@ fun ProfileScreen(username: String,
     var showDeletePopup by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.Top,
-        modifier = modifier) {
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.profile_screen_heading),
             fontSize = 50.sp,
@@ -131,15 +134,30 @@ fun ProfileScreen(username: String,
             mutable = !lockdownEmail,
         )
         Button(
-            onClick = { onLogout() }
-        ) {
-            Text(stringResource(R.string.logout_button_label))
-        }
-        Button(
-            onClick = { showDeletePopup = !showDeletePopup}
+            onClick = { showDeletePopup = !showDeletePopup},
+            colors = ButtonColors(
+                containerColor = Color(0xFFFF7A7A),
+                contentColor = Color.White,
+                disabledContainerColor = Color(0xFFFF7A7A),
+                disabledContentColor = Color.White
+            ),
+            modifier = modifier.fillMaxWidth(.9f).padding(top = 30.dp),
         ) {
             Text(stringResource(R.string.delete_account_button_label))
         }
+        Button(
+            onClick = { onLogout() },
+            colors = ButtonColors(
+                containerColor = Color(0xFF77E6FF),
+                contentColor = Color.White,
+                disabledContainerColor = Color(0xFF77E6FF),
+                disabledContentColor = Color.White
+            ),
+            modifier = modifier.fillMaxWidth(.9f).padding(top = 30.dp),
+        ) {
+            Text(stringResource(R.string.logout_button_label))
+        }
+
     }
 }
 
@@ -154,7 +172,7 @@ fun UserDataComponent(label: String,
                       oldData: String? = null,
                       mutable: Boolean? = true) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
@@ -189,7 +207,13 @@ fun UserDataComponent(label: String,
                         }
                     }, modifier = Modifier
                         .size(width = 100.dp, height = 40.dp)
-                        .align(Alignment.CenterVertically)
+                        .align(Alignment.CenterVertically),
+                    colors = ButtonColors(
+                        containerColor = Color(0xFFDD9D9D9),
+                        contentColor = Color(0xFF8A8A8A),
+                        disabledContainerColor = Color(0xFFDD9D9D9),
+                        disabledContentColor = Color(0xFF8A8A8A)
+                    )
                 ) {
                     if (flag && data != oldData) {
                         Text(
