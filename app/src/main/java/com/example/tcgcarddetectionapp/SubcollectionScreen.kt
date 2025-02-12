@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,12 +33,14 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +100,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         ),
     ) }
     val scrollstate = rememberScrollState()
-    var refreshFlag by remember { mutableStateOf(false) }
+    var refreshFlag by remember { mutableStateOf(0) }
     var cardData = remember { mutableStateListOf<CardData>() }
     var navWebsite by remember { mutableStateOf("") }
     var optionsExpanded by remember { mutableStateOf(false) }
@@ -121,6 +124,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var minPriceErr by remember { mutableStateOf(false) }
     var selectedMaxPrice by remember { mutableStateOf("") }
     var maxPriceErr by remember { mutableStateOf(false) }
+
+    val forceRecomposeState = rememberUpdatedState(refreshFlag)
 
 
     if (navWebsite != "") {
@@ -169,6 +174,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 else if (!filterFlag && cardData.contains(card)) {
                     cardData.removeAll(Collections.singleton(card))
                 }
+                else if ((card.subcollections == null || !card.subcollections!!.contains(subcolInfo.subcollectionid)) && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
 
                 if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
                     if (card.game == "yugioh") {
@@ -196,6 +204,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     cardData.add(card)
                 }
                 else if (!filterFlag && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
+                else if ((card.subcollections == null || !card.subcollections!!.contains(subcolInfo.subcollectionid)) && cardData.contains(card)) {
                     cardData.removeAll(Collections.singleton(card))
                 }
 
@@ -458,7 +469,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         userid = userid,
                         subcolInfo = subcolInfo,
                         modifier = modifier,
-                        refreshUI = { refreshFlag = !refreshFlag }
+                        refreshUI = { refreshFlag++ }
                     )
                 }
             }
@@ -477,7 +488,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         removeCard = {card -> cardData.remove(card)},
                         fullCardPool = fullCardPool,
                         navWebsite = { navWebsite = it },
-                        refreshUI = {refreshFlag = !refreshFlag},
+                        refreshUI = {
+                            refreshFlag++
+                            Log.d("DEBUG", "Refresh flag flipped")
+                                    },
                         showCardPopup = {showCardPopup = !showCardPopup}
                     )
                 }
@@ -507,6 +521,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     )
                 }
             }
+
             var filteredCardData = mutableListOf<CardData>()
             cardData.forEach { card ->
                 if (searchTerm in card.cardname) {
@@ -595,8 +610,9 @@ fun CardPopup(cardData: CardData,
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
     var cardQuantErr by remember { mutableStateOf(false) }
-    var subColQuant by remember { mutableStateOf(cardData.subcollections!!.count{ it == subcolInfo.subcollectionid}.toString()) }
-    var refreshFlag by remember { mutableStateOf(false) }
+    var subColQuant by remember { mutableStateOf(cardData.subcollections?.count{ it == subcolInfo.subcollectionid}.toString()) }
+    var showCardDeletePopup by remember { mutableStateOf(false) }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
@@ -857,18 +873,23 @@ fun CardPopup(cardData: CardData,
                 Text(stringResource(R.string.quantity_filter_label) + ": ")
                 Button(
                     onClick = {
-                        removeFromCollectionPost(
-                            card = cardData,
-                            userid = userid,
-                            game = cardData.game,
-                            quantity = 1,
-                            fullCardPool = fullCardPool,
-                            onCollectionChange = onCollectionChange,
-                            removeCard = removeCard,
-                            subcolInfo = subcolInfo,
-                            refreshUI = refreshUI,
-                        )
-                        cardQuantity = (cardQuantity.toInt() - 1).toString()
+                        if (cardQuantity.toInt() > 1) {
+                            removeFromCollectionPost(
+                                card = cardData,
+                                userid = userid,
+                                game = cardData.game,
+                                quantity = 1,
+                                fullCardPool = fullCardPool,
+                                onCollectionChange = onCollectionChange,
+                                removeCard = removeCard,
+                                subcolInfo = subcolInfo,
+                                refreshUI = refreshUI,
+                            )
+                            cardQuantity = (cardQuantity.toInt() - 1).toString()
+                        }
+                        else {
+                            showCardDeletePopup = true
+                        }
                     }
                 ) { Text("-")}
                 TextField(
@@ -941,18 +962,22 @@ fun CardPopup(cardData: CardData,
                 Text(stringResource(R.string.subcollection_quantity_label) + ": ")
                 Button(
                     onClick = {
-                        removeFromSubcollectionPost(
-                            card = cardData,
-                            userid = userid,
-                            subcolInfo = subcolInfo,
-                            game = cardData.game,
-                            refreshUI = {
-                                refreshUI()
-                                refreshFlag = !refreshFlag
-                                        },
-                        )
-                        refreshFlag = !refreshFlag
-                        subColQuant = (subColQuant.toInt() - 1).toString()
+                        if (subColQuant.toInt() > 1) {
+                            removeFromSubcollectionPost(
+                                card = cardData,
+                                userid = userid,
+                                subcolInfo = subcolInfo,
+                                game = cardData.game,
+                                refreshUI = {
+                                    refreshUI()
+                                },
+                            )
+                            subColQuant = (subColQuant.toInt() - 1).toString()
+                        }
+                        else {
+                            showCardDeletePopup = true
+                        }
+
                     }
                 ) { Text("-")}
                 Text(subColQuant)
@@ -965,10 +990,8 @@ fun CardPopup(cardData: CardData,
                             subcolInfo = subcolInfo,
                             refreshUI = {
                                 refreshUI()
-                                refreshFlag = !refreshFlag
                                         },
                         )
-                        refreshFlag = !refreshFlag
                         subColQuant = (subColQuant.toInt() + 1).toString()
                     }
                 ) { Text("+")}
@@ -986,6 +1009,57 @@ fun CardPopup(cardData: CardData,
                 }
             }*/
         }
+    }
+    if (showCardDeletePopup) {
+        AlertDialog(
+            onDismissRequest = { showCardDeletePopup = false },
+            title = { Text(stringResource(R.string.remove_card_title)) },
+            text = {
+                if (allCardsFlag) {
+                    Text(stringResource(R.string.remove_card_all_cards_text))
+                }
+                else {
+                    Text(String.format(stringResource(R.string.remove_card_subcollection_text), subcolInfo.name))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showCardDeletePopup = false
+                    if (allCardsFlag) {
+                        removeFromCollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            game = cardData.game,
+                            quantity = 1,
+                            fullCardPool = fullCardPool,
+                            onCollectionChange = onCollectionChange,
+                            removeCard = removeCard,
+                            subcolInfo = subcolInfo,
+                            refreshUI = refreshUI,
+                        )
+                    }
+                    else {
+                        removeFromSubcollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            subcolInfo = subcolInfo,
+                            game = cardData.game,
+                            refreshUI = {
+                                refreshUI()
+                            },
+                        )
+                    }
+                    showCardPopup()
+                }) {
+                    Text(stringResource(R.string.yes_label))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCardDeletePopup = false }) {
+                    Text(stringResource(R.string.no_label))
+                }
+            }
+        )
     }
 }
 

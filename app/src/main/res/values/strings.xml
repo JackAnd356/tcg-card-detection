@@ -80,4 +80,7 @@
     <string name="facebook_client_token">bf7c1944226b43d35f290c1045b39ad4</string>
     <string name="facebook_login_placeholder">Login With Facebook</string>
     <string name="subcollection_quantity_label">Amount In SubCollection</string>
+    <string name="remove_card_title">Remove Card?</string>
+    <string name="remove_card_all_cards_text">Are you sure you want to remove this card from your collection (This Cannot Be Undone)?</string>
+    <string name="remove_card_subcollection_text">Are you sure you want to remove this card from %1$s?</string>
 </resources>
