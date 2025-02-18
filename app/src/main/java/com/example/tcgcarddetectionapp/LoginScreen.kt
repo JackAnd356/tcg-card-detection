@@ -241,7 +241,8 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
         onValueChange = onChange,
         label = { Text(stringResource(R.string.username_label)) },
         modifier = modifier.fillMaxWidth(.9f),
-        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFD9D9D9), unfocusedLabelColor = Color(0xFFADADAD))
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFD9D9D9), unfocusedLabelColor = Color(0xFFADADAD)),
+        singleLine = true,
     )
 }
 
@@ -254,7 +255,8 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         modifier = modifier.fillMaxWidth(.9f).padding(bottom = 8.dp),
-        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFD9D9D9), unfocusedLabelColor = Color(0xFFADADAD))
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFD9D9D9), unfocusedLabelColor = Color(0xFFADADAD)),
+        singleLine = true,
     )
 }
 
