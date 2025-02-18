@@ -873,7 +873,7 @@ fun CardPopup(cardData: CardData,
                 Text(stringResource(R.string.quantity_filter_label) + ": ")
                 Button(
                     onClick = {
-                        if (cardQuantity.toInt() > 1) {
+                        if (cardData.quantity > 1) {
                             removeFromCollectionPost(
                                 card = cardData,
                                 userid = userid,
@@ -897,7 +897,7 @@ fun CardPopup(cardData: CardData,
                     onValueChange = {
                         if (it != "" && it.toInt() > 0) {
                             cardQuantErr = false
-                            val quantityChange = (it.toInt() - cardQuantity.toInt())
+                            val quantityChange = (it.toInt() - cardData.quantity)
                             if (quantityChange > 0) {
                                 increaseQuantityPost(
                                     userid = userid,
