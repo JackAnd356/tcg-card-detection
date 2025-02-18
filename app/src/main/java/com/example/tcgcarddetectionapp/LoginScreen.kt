@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -212,9 +213,9 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
             },
             colors = ButtonColors(
                 containerColor = Color.White,
-                contentColor = Color(0xFF3F8CFF),
+                contentColor = colorResource(R.color.hyperlinkBlue),
                 disabledContainerColor = Color.White,
-                disabledContentColor = Color(0xFF3F8CFF)
+                disabledContentColor = colorResource(R.color.hyperlinkBlue)
             ),
             modifier = modifier.padding(top = 40.dp)
         ) {
@@ -241,7 +242,7 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
         onValueChange = onChange,
         label = { Text(stringResource(R.string.username_label)) },
         modifier = modifier.fillMaxWidth(.9f),
-        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFD9D9D9), unfocusedLabelColor = Color(0xFFADADAD)),
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
         singleLine = true,
     )
 }
@@ -255,7 +256,7 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         modifier = modifier.fillMaxWidth(.9f).padding(bottom = 8.dp),
-        colors = TextFieldDefaults.colors(unfocusedContainerColor = Color(0xFFD9D9D9), unfocusedLabelColor = Color(0xFFADADAD)),
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
         singleLine = true,
     )
 }
@@ -267,9 +268,9 @@ fun LoginButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
         modifier = modifier.fillMaxWidth(.9f),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         colors = ButtonColors(
-            containerColor = Color(0xFF81DDFF),
+            containerColor = colorResource(R.color.buttonLightBlue),
             contentColor = Color.White,
-            disabledContainerColor = Color(0xFF81DDFF),
+            disabledContainerColor = colorResource(R.color.buttonLightBlue),
             disabledContentColor = Color.White
         )
     ) {

@@ -8,4 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="lightGreen">#A9F9A2</color>
+    <color name="buttonLightBlue">#81DDFF</color>
+    <color name="hyperlinkBlue">#3F8CFF</color>
+    <color name="textFieldLightGrey">#D9D9D9</color>
+    <color name="textLightGrey">#ADADAD</color>
 </resources>

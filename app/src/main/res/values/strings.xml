@@ -10,7 +10,7 @@
     <string name="change_button_label">Change</string>
     <string name="save_button_label">Save</string>
     <string name="profile_screen_heading">Profile</string>
-    <string name="new_user_registration_screen_heading">New User Registration Screen</string>
+    <string name="new_user_registration_screen_heading">New User Registration</string>
     <string name="username_label">Username</string>
     <string name="password_label">Password</string>
     <string name="storefront_label">TCG Storefront: </string>
@@ -27,7 +27,7 @@
     <string name="location_label">Location: %1$s</string>
     <string name="cancel_button_label">Cancel</string>
     <string name="new_user_button_label">Don\'t Have An Account? Click Here To Register</string>
-    <string name="register_button_label">Register</string>
+    <string name="register_button_label">Sign Up</string>
     <string name="back_to_main_collections_button_label">&lt;-Back To Main Collections</string>
     <string name="total_cards_label">Total Cards: %1$d</string>
     <string name="filter_button_label">Filter</string>
@@ -83,4 +83,5 @@
     <string name="remove_card_title">Remove Card?</string>
     <string name="remove_card_all_cards_text">Are you sure you want to remove this card from your collection (This Cannot Be Undone)?</string>
     <string name="remove_card_subcollection_text">Are you sure you want to remove this card from %1$s?</string>
+    <string name="labeled_data_entry_ghost_text">Enter %1$s Here...</string>
 </resources>
