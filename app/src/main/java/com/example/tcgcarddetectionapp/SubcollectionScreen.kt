@@ -137,8 +137,18 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     if (subcolInfo.subcollectionid == "all") {
         fullCardPool.forEach {
                 card ->
-            if (!cardData.contains(card) && card.game == game) {
+            var filterFlag = true
+            filterList.forEach {
+                    func ->
+                if (!func(card)) {
+                    filterFlag = false
+                }
+            }
+            if (!cardData.contains(card) && card.game == game && filterFlag) {
                 cardData.add(card)
+            }
+            else if (cardData.contains(card) && !filterFlag) {
+                cardData.removeAll(Collections.singleton(card))
             }
         }
     }
@@ -1406,10 +1416,10 @@ fun recalculateFilterList(type: String, quantityMin: String, levelMin: String, p
         ret.add({it.quantity <= quantityMax.toInt()})
     }
     if (levelMin != "" && (levelMax == "" || levelMin.toInt() < levelMax.toInt())) {
-        ret.add({ (it.level?.toInt() ?: 13) >= levelMin.toInt()})
+        ret.add({ (it.level?.toInt() ?: -1) >= levelMin.toInt()})
     }
     if (levelMax != "" && (levelMin == "" || levelMin.toInt() < levelMax.toInt())) {
-        ret.add({ (it.level?.toInt() ?: 0) <= levelMax.toInt()})
+        ret.add({ (it.level?.toInt() ?: Int.MAX_VALUE) <= levelMax.toInt()})
     }
     if (priceMin != "" && (priceMax == "" || priceMin.toDouble() < priceMax.toDouble())) {
         ret.add({ (it.price) >= priceMin.toDouble()})
