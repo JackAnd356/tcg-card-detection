@@ -836,6 +836,9 @@ def processCardImage(cardImagePath):
         cardSetCode = card['setcode']
         cardName = card['name']
         cardGame = card['game']
+        scryfallid = ""
+        if 'scryfallid' in card:
+            scryfallid = card['scryfallid']
         setName = ''
         if cardGame == 'yugioh':
             url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -861,10 +864,16 @@ def processCardImage(cardImagePath):
             scannedCards.append({'error': 'card not found'})
             continue
         if cardGame == 'mtg':
-            url = 'https://api.scryfall.com/cards/named'
-            headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
-            payload = {'exact' : cardName, 'set' : cardSetCode}
-            resp = requests.get(url, params=payload, headers=headers)
+            if scryfallid == "":
+                url = 'https://api.scryfall.com/cards/named'
+                headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+                payload = {'exact' : cardName, 'set' : cardSetCode}
+                resp = requests.get(url, params=payload, headers=headers)
+            else:
+                url = 'https://api.scryfall.com/cards/'
+                headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+                url += scryfallid
+                resp = requests.get(url, headers=headers)
             if resp.status_code == 200:
                 cardData = resp.json()
                 if fuzz.ratio(cardData['collector_number'], cardId) < 90:
