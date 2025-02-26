@@ -21,3 +21,6 @@ uploads/
 .externalNativeBuild
 .cxx
 local.properties
+/data
+/configs
+/images

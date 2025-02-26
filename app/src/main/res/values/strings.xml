@@ -9,8 +9,8 @@
     <string name="subcollection_page">Subcollection</string>
     <string name="change_button_label">Change</string>
     <string name="save_button_label">Save</string>
-    <string name="profile_screen_heading">Profile Screen</string>
-    <string name="new_user_registration_screen_heading">New User Registration Screen</string>
+    <string name="profile_screen_heading">Profile</string>
+    <string name="new_user_registration_screen_heading">New User Registration</string>
     <string name="username_label">Username</string>
     <string name="password_label">Password</string>
     <string name="storefront_label">TCG Storefront: </string>
@@ -27,7 +27,7 @@
     <string name="location_label">Location: %1$s</string>
     <string name="cancel_button_label">Cancel</string>
     <string name="new_user_button_label">Don\'t Have An Account? Click Here To Register</string>
-    <string name="register_button_label">Register</string>
+    <string name="register_button_label">Sign Up</string>
     <string name="back_to_main_collections_button_label">&lt;-Back To Main Collections</string>
     <string name="total_cards_label">Total Cards: %1$d</string>
     <string name="filter_button_label">Filter</string>
@@ -66,6 +66,10 @@
     <string name="card_image_not_loaded_context">Card Image Could Not Be Loaded</string>
     <string name="edit_option_label">Edit</string>
     <string name="delete_option_label">Delete</string>
+    <string name="scan_network_error">There was a network error in processing your image, try again</string>
+    <string name="take_another_photo_label">Take Another Photo</string>
+    <string name="no_card_error">Cards could not be found within the image, try taking an image in better lighting or closer up.</string>
+    <string name="go_to_collection_label">Go to Yugioh Collection</string>
     <string name="subcol_name_label">Subcollection Name:</string>
     <string name="subcol_physloc_label">Sub-Collection Physical Location:</string>
     <string name="subcol_isdeck_label">Is this collection a Deck?</string>
@@ -80,4 +84,10 @@
     <string name="facebook_client_token">bf7c1944226b43d35f290c1045b39ad4</string>
     <string name="facebook_login_placeholder">Login With Facebook</string>
     <string name="subcollection_quantity_label">Amount In SubCollection</string>
+    <string name="remove_card_title">Remove Card?</string>
+    <string name="remove_card_all_cards_text">Are you sure you want to remove this card from your collection (This Cannot Be Undone)?</string>
+    <string name="remove_card_subcollection_text">Are you sure you want to remove this card from %1$s?</string>
+    <string name="user_photo_instructions">Some Tips for Taking a Good Photo\n\n 1. Make sure to include all of the card you are trying to scan.\n\n 2. Try not to overlap cards.\n\n 3. Take the photo in a room with good lighting.</string>
+    <string name="labeled_data_entry_ghost_text">Enter %1$s Here...</string>
+    <string name="scan_screen_heading">Scan</string>
 </resources>

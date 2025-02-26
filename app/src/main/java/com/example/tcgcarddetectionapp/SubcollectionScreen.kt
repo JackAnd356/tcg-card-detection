@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,12 +33,14 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,7 +100,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         ),
     ) }
     val scrollstate = rememberScrollState()
-    var refreshFlag by remember { mutableStateOf(false) }
+    var refreshFlag by remember { mutableStateOf(0) }
     var cardData = remember { mutableStateListOf<CardData>() }
     var navWebsite by remember { mutableStateOf("") }
     var optionsExpanded by remember { mutableStateOf(false) }
@@ -122,6 +125,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var selectedMaxPrice by remember { mutableStateOf("") }
     var maxPriceErr by remember { mutableStateOf(false) }
 
+    val forceRecomposeState = rememberUpdatedState(refreshFlag)
+
 
     if (navWebsite != "") {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(navWebsite))
@@ -132,34 +137,93 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     if (subcolInfo.subcollectionid == "all") {
         fullCardPool.forEach {
                 card ->
-            if (!cardData.contains(card) && card.game == game) {
-                cardData.add(card)
-            }
-        }
-    }
-    else {
-        fullCardPool.forEach {
-                card ->
             var filterFlag = true
             filterList.forEach {
-                func ->
+                    func ->
                 if (!func(card)) {
                     filterFlag = false
                 }
             }
-            if (card.subcollections != null &&
-                card.subcollections!!.count { it == subcolInfo.subcollectionid} > cardData.count {it == card} &&
-                card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
-
+            if (!cardData.contains(card) && card.game == game && filterFlag) {
                 cardData.add(card)
             }
-            else if (!filterFlag && cardData.contains(card)) {
+            else if (cardData.contains(card) && !filterFlag) {
                 cardData.removeAll(Collections.singleton(card))
             }
+        }
+    }
+    else {
+        if (game == "yugioh") {
+            fullCardPool.sortedWith( compareBy<CardData> {
+                yugiohSort(it.type!!)
+            }.thenBy { it.cardname }).forEach {
+                    card ->
+                var filterFlag = true
+                filterList.forEach {
+                        func ->
+                    if (!func(card)) {
+                        filterFlag = false
+                    }
+                }
+                if (card.subcollections != null &&
+                    card.subcollections!!.count { it == subcolInfo.subcollectionid} > cardData.count {it == card} &&
+                    card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
+                    val numCopiesToAdd = card.subcollections!!.count { it == subcolInfo.subcollectionid} - cardData.count {it == card}
+                    for (i in 1..numCopiesToAdd) {
+                        cardData.add(card)
+                    }
+                }
+                else if (card.subcollections != null &&
+                    card.subcollections!!.count { it == subcolInfo.subcollectionid} < cardData.count {it == card} &&
+                    card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
+                    val numCopiesToRemove = cardData.count {it == card} - card.subcollections!!.count { it == subcolInfo.subcollectionid}
+                    for (i in 1..numCopiesToRemove) {
+                        cardData.remove(card)
+                    }
+                }
+                else if (!filterFlag && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
+                else if ((card.subcollections == null || !card.subcollections!!.contains(subcolInfo.subcollectionid)) && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
 
-            if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
-                if (card.game == "yugioh") {
-                    listOfTypes.add(card.type!!)
+                if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
+                    if (card.game == "yugioh") {
+                        listOfTypes.add(card.type!!)
+                    }
+                }
+            }
+        }
+        else {
+            fullCardPool.sortedWith( compareBy<CardData> {
+                it.attribute
+            }.thenBy { it.cardname }).forEach {
+                    card ->
+                var filterFlag = true
+                filterList.forEach {
+                        func ->
+                    if (!func(card)) {
+                        filterFlag = false
+                    }
+                }
+                if (card.subcollections != null &&
+                    card.subcollections!!.count { it == subcolInfo.subcollectionid} > cardData.count {it == card} &&
+                    card.subcollections?.contains(subcolInfo.subcollectionid) == true && filterFlag) {
+
+                    cardData.add(card)
+                }
+                else if (!filterFlag && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
+                else if ((card.subcollections == null || !card.subcollections!!.contains(subcolInfo.subcollectionid)) && cardData.contains(card)) {
+                    cardData.removeAll(Collections.singleton(card))
+                }
+
+                if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
+                    if (card.game == "yugioh") {
+                        listOfTypes.add(card.type!!)
+                    }
                 }
             }
         }
@@ -415,7 +479,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         userid = userid,
                         subcolInfo = subcolInfo,
                         modifier = modifier,
-                        refreshUI = { refreshFlag = !refreshFlag }
+                        refreshUI = { refreshFlag++ }
                     )
                 }
             }
@@ -434,7 +498,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         removeCard = {card -> cardData.remove(card)},
                         fullCardPool = fullCardPool,
                         navWebsite = { navWebsite = it },
-                        refreshUI = {refreshFlag = !refreshFlag},
+                        refreshUI = {
+                            refreshFlag++
+                            Log.d("DEBUG", "Refresh flag flipped")
+                                    },
                         showCardPopup = {showCardPopup = !showCardPopup}
                     )
                 }
@@ -464,6 +531,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     )
                 }
             }
+
             var filteredCardData = mutableListOf<CardData>()
             cardData.forEach { card ->
                 if (searchTerm in card.cardname) {
@@ -552,8 +620,9 @@ fun CardPopup(cardData: CardData,
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
     var cardQuantErr by remember { mutableStateOf(false) }
-    var subColQuant by remember { mutableStateOf(cardData.subcollections!!.count{ it == subcolInfo.subcollectionid}.toString()) }
-    var refreshFlag by remember { mutableStateOf(false) }
+    var subColQuant by remember { mutableStateOf(cardData.subcollections?.count{ it == subcolInfo.subcollectionid}.toString()) }
+    var showCardDeletePopup by remember { mutableStateOf(false) }
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
@@ -814,18 +883,23 @@ fun CardPopup(cardData: CardData,
                 Text(stringResource(R.string.quantity_filter_label) + ": ")
                 Button(
                     onClick = {
-                        removeFromCollectionPost(
-                            card = cardData,
-                            userid = userid,
-                            game = cardData.game,
-                            quantity = 1,
-                            fullCardPool = fullCardPool,
-                            onCollectionChange = onCollectionChange,
-                            removeCard = removeCard,
-                            subcolInfo = subcolInfo,
-                            refreshUI = refreshUI,
-                        )
-                        cardQuantity = (cardQuantity.toInt() - 1).toString()
+                        if (cardData.quantity > 1) {
+                            removeFromCollectionPost(
+                                card = cardData,
+                                userid = userid,
+                                game = cardData.game,
+                                quantity = 1,
+                                fullCardPool = fullCardPool,
+                                onCollectionChange = onCollectionChange,
+                                removeCard = removeCard,
+                                subcolInfo = subcolInfo,
+                                refreshUI = refreshUI,
+                            )
+                            cardQuantity = (cardQuantity.toInt() - 1).toString()
+                        }
+                        else {
+                            showCardDeletePopup = true
+                        }
                     }
                 ) { Text("-")}
                 TextField(
@@ -833,7 +907,7 @@ fun CardPopup(cardData: CardData,
                     onValueChange = {
                         if (it != "" && it.toInt() > 0) {
                             cardQuantErr = false
-                            val quantityChange = (it.toInt() - cardQuantity.toInt())
+                            val quantityChange = (it.toInt() - cardData.quantity)
                             if (quantityChange > 0) {
                                 increaseQuantityPost(
                                     userid = userid,
@@ -898,18 +972,22 @@ fun CardPopup(cardData: CardData,
                 Text(stringResource(R.string.subcollection_quantity_label) + ": ")
                 Button(
                     onClick = {
-                        removeFromSubcollectionPost(
-                            card = cardData,
-                            userid = userid,
-                            subcolInfo = subcolInfo,
-                            game = cardData.game,
-                            refreshUI = {
-                                refreshUI()
-                                refreshFlag = !refreshFlag
-                                        },
-                        )
-                        refreshFlag = !refreshFlag
-                        subColQuant = (subColQuant.toInt() - 1).toString()
+                        if (subColQuant.toInt() > 1) {
+                            removeFromSubcollectionPost(
+                                card = cardData,
+                                userid = userid,
+                                subcolInfo = subcolInfo,
+                                game = cardData.game,
+                                refreshUI = {
+                                    refreshUI()
+                                },
+                            )
+                            subColQuant = (subColQuant.toInt() - 1).toString()
+                        }
+                        else {
+                            showCardDeletePopup = true
+                        }
+
                     }
                 ) { Text("-")}
                 Text(subColQuant)
@@ -922,10 +1000,8 @@ fun CardPopup(cardData: CardData,
                             subcolInfo = subcolInfo,
                             refreshUI = {
                                 refreshUI()
-                                refreshFlag = !refreshFlag
                                         },
                         )
-                        refreshFlag = !refreshFlag
                         subColQuant = (subColQuant.toInt() + 1).toString()
                     }
                 ) { Text("+")}
@@ -943,6 +1019,57 @@ fun CardPopup(cardData: CardData,
                 }
             }*/
         }
+    }
+    if (showCardDeletePopup) {
+        AlertDialog(
+            onDismissRequest = { showCardDeletePopup = false },
+            title = { Text(stringResource(R.string.remove_card_title)) },
+            text = {
+                if (allCardsFlag) {
+                    Text(stringResource(R.string.remove_card_all_cards_text))
+                }
+                else {
+                    Text(String.format(stringResource(R.string.remove_card_subcollection_text), subcolInfo.name))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showCardDeletePopup = false
+                    if (allCardsFlag) {
+                        removeFromCollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            game = cardData.game,
+                            quantity = 1,
+                            fullCardPool = fullCardPool,
+                            onCollectionChange = onCollectionChange,
+                            removeCard = removeCard,
+                            subcolInfo = subcolInfo,
+                            refreshUI = refreshUI,
+                        )
+                    }
+                    else {
+                        removeFromSubcollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            subcolInfo = subcolInfo,
+                            game = cardData.game,
+                            refreshUI = {
+                                refreshUI()
+                            },
+                        )
+                    }
+                    showCardPopup()
+                }) {
+                    Text(stringResource(R.string.yes_label))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCardDeletePopup = false }) {
+                    Text(stringResource(R.string.no_label))
+                }
+            }
+        )
     }
 }
 
@@ -1289,10 +1416,10 @@ fun recalculateFilterList(type: String, quantityMin: String, levelMin: String, p
         ret.add({it.quantity <= quantityMax.toInt()})
     }
     if (levelMin != "" && (levelMax == "" || levelMin.toInt() < levelMax.toInt())) {
-        ret.add({ (it.level?.toInt() ?: 13) >= levelMin.toInt()})
+        ret.add({ (it.level?.toInt() ?: -1) >= levelMin.toInt()})
     }
     if (levelMax != "" && (levelMin == "" || levelMin.toInt() < levelMax.toInt())) {
-        ret.add({ (it.level?.toInt() ?: 0) <= levelMax.toInt()})
+        ret.add({ (it.level?.toInt() ?: Int.MAX_VALUE) <= levelMax.toInt()})
     }
     if (priceMin != "" && (priceMax == "" || priceMin.toDouble() < priceMax.toDouble())) {
         ret.add({ (it.price) >= priceMin.toDouble()})

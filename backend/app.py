@@ -612,26 +612,44 @@ def create_app():
                 payload['rarity'] = ''
             result = collection.find_one(payload)
             if payload['game'] == 'yugioh':
-                payload['level'] = clientUserInfo['level']
-                payload['attribute'] = clientUserInfo['attribute']
-                payload['type'] = clientUserInfo['type']
-                payload['description'] = clientUserInfo['description']
-                payload['atk'] = clientUserInfo['atk']
-                payload['def'] = clientUserInfo['def']
+                if "level" in clientUserInfo:
+                    payload['level'] = clientUserInfo['level']
+                if "attribute" in clientUserInfo:
+                    payload['attribute'] = clientUserInfo['attribute']
+                if "type" in clientUserInfo:                    
+                    payload['type'] = clientUserInfo['type']
+                if "description" in clientUserInfo:                    
+                    payload['description'] = clientUserInfo['description']
+                if "atk" in clientUserInfo:                    
+                    payload['atk'] = clientUserInfo['atk']
+                if "def" in clientUserInfo:    
+                    payload['def'] = clientUserInfo['def']
             elif payload['game'] == 'mtg':
-                payload['cost'] = clientUserInfo['cost']
-                payload['type'] = clientUserInfo['type']
-                payload['description'] = clientUserInfo['description'] #This is the effect text
-                payload['attribute'] = clientUserInfo['attribute'] #This is the color
-                payload['atk'] = clientUserInfo['atk'] #This is the power
-                payload['def'] = clientUserInfo['def'] #This is the toughness
+                if "cost" in clientUserInfo:
+                    payload['cost'] = clientUserInfo['cost']
+                if "type" in clientUserInfo:
+                    payload['type'] = clientUserInfo['type']
+                if "description" in clientUserInfo:
+                    payload['description'] = clientUserInfo['description'] #This is the effect text
+                if "attribute" in clientUserInfo:
+                    payload['attribute'] = clientUserInfo['attribute'] #This is the color
+                if "atk" in clientUserInfo:
+                    payload['atk'] = clientUserInfo['atk'] #This is the power
+                if "def" in clientUserInfo:
+                    payload['def'] = clientUserInfo['def'] #This is the toughness
             else:
-                payload['attribute'] = clientUserInfo['attribute'] #This is the energy type
-                payload['type'] = clientUserInfo['type'] #This is the stage
-                payload['attacks'] = clientUserInfo['attacks']
-                payload['weakenesses'] = clientUserInfo['weaknesses']
-                payload['hp'] = clientUserInfo['hp']
-                payload['retreat'] = clientUserInfo['retreat']
+                if "cost" in clientUserInfo:
+                    payload['cost'] = clientUserInfo['attribute'] #This is the energy type
+                if "type" in clientUserInfo:
+                    payload['type'] = clientUserInfo['type'] #This is the stage
+                if "attacks" in clientUserInfo:
+                    payload['attacks'] = clientUserInfo['attacks']
+                if "weakenesses" in clientUserInfo:
+                    payload['weakenesses'] = clientUserInfo['weaknesses']
+                if "hp" in clientUserInfo:
+                    payload['hp'] = clientUserInfo['hp']
+                if "retreat" in clientUserInfo:
+                    payload['retreat'] = clientUserInfo['retreat']
             if result == None:
                 payload['quantity'] = clientUserInfo['quantity']
                 payload['price'] = clientUserInfo['price']
@@ -818,6 +836,9 @@ def processCardImage(cardImagePath):
         cardSetCode = card['setcode']
         cardName = card['name']
         cardGame = card['game']
+        scryfallid = ""
+        if 'scryfallid' in card:
+            scryfallid = card['scryfallid']
         setName = ''
         if cardGame == 'yugioh':
             url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -843,10 +864,16 @@ def processCardImage(cardImagePath):
             scannedCards.append({'error': 'card not found'})
             continue
         if cardGame == 'mtg':
-            url = 'https://api.scryfall.com/cards/named'
-            headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
-            payload = {'exact' : cardName, 'set' : cardSetCode}
-            resp = requests.get(url, params=payload, headers=headers)
+            if scryfallid == "":
+                url = 'https://api.scryfall.com/cards/named'
+                headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+                payload = {'exact' : cardName, 'set' : cardSetCode}
+                resp = requests.get(url, params=payload, headers=headers)
+            else:
+                url = 'https://api.scryfall.com/cards/'
+                headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+                url += scryfallid
+                resp = requests.get(url, headers=headers)
             if resp.status_code == 200:
                 cardData = resp.json()
                 if fuzz.ratio(cardData['collector_number'], cardId) < 90:

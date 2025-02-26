@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -24,15 +26,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,15 +67,11 @@ fun NewUserRegistrationScreen(username: String,
     var errorText by remember { mutableStateOf("")}
 
     Column(verticalArrangement = Arrangement.Top,
-        modifier = modifier) {
-        Button(
-            onClick = {onBackNavigate()}
-        ) {
-            Text(stringResource(R.string.back_to_login_button_label))
-        }
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.new_user_registration_screen_heading),
-            fontSize = 50.sp,
+            fontSize = 30.sp,
             lineHeight = 100.sp,
             textAlign = TextAlign.Center
         )
@@ -101,9 +103,22 @@ fun NewUserRegistrationScreen(username: String,
                     onLoginNavigate = onLoginNavigate,
                 )
             },
-            enabled = username != "" && enteredPassword != ""
+            enabled = username != "" && enteredPassword != "",
+            modifier = modifier.fillMaxWidth(.9f).padding(top = 50.dp),
+            colors = ButtonColors(
+                containerColor = colorResource(R.color.buttonLightBlue),
+                contentColor = Color.White,
+                disabledContainerColor = colorResource(R.color.buttonLightBlue),
+                disabledContentColor = Color.White
+            ),
         ) {
             Text(stringResource(R.string.register_button_label))
+        }
+        Button(
+            onClick = {onBackNavigate()},
+            modifier = modifier.fillMaxWidth(.9f).padding(top = 20.dp),
+        ) {
+            Text(stringResource(R.string.back_to_login_button_label))
         }
         if (errorText != "") {
             Text(errorText,
@@ -118,7 +133,7 @@ fun NewUserDataComponent(label: String,
                          modifier: Modifier = Modifier,
                          onChange: (String) -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color.Black),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
@@ -126,10 +141,18 @@ fun NewUserDataComponent(label: String,
             .height(70.dp)
             .requiredHeight(70.dp)) {
         Row {
+            Text(
+                text = label + ":",
+                modifier = modifier.align(Alignment.CenterVertically)
+            )
+            Spacer(Modifier.weight(1f))
             TextField(
                 value = data,
                 onValueChange = onChange,
-                label = { Text(label) }
+                modifier = modifier.fillMaxWidth(.8f).align(Alignment.CenterVertically),
+                label = { Text(String.format(stringResource(R.string.labeled_data_entry_ghost_text), label)) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
+                singleLine = true,
             )
         }
     }

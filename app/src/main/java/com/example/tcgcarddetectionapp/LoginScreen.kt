@@ -28,6 +28,22 @@ import androidx.compose.ui.viewinterop.AndroidView
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -128,23 +144,20 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
 
 
     Column(verticalArrangement = Arrangement.Top,
-        modifier = modifier.wrapContentWidth(Alignment.CenterHorizontally)) {
-        Text(
-            text = stringResource(R.string.login_label),
-            fontSize = 100.sp,
-            lineHeight = 116.sp,
-            textAlign = TextAlign.Center
-        )
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Logo(modifier = modifier)
-        UsernameField(username = username, modifier = modifier, onChange = {onUsernameChange(it)})
-        Text(
-            text = loginError,
-            fontSize = 20.sp,
-            lineHeight = 30.sp,
-            textAlign = TextAlign.Left
-        )
+        UsernameField(username = username, modifier = modifier.padding(bottom = 8.dp), onChange = {onUsernameChange(it)})
+        if (loginError != "") {
+            Text(
+                text = loginError,
+                fontSize = 20.sp,
+                lineHeight = 30.sp,
+                textAlign = TextAlign.Left
+            )
+        }
         PasswordField(password = password, modifier = modifier, onChange = {password = it})
-        LoginButton{
+        LoginButton(modifier = modifier){
             loginPost(username,
                 password,
                 setErrorMessage = {loginError = it},
@@ -184,14 +197,27 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
         Button(
             onClick = {
                 loginManager.logIn(context as ActivityResultRegistryOwner, callbackManager, listOf("email"))
-            }
+            },
+            modifier = modifier.size(190.dp, 40.dp),
+            shape = RoundedCornerShape(corner = CornerSize(0.dp))
         ) {
-            Text(stringResource( R.string.facebook_login_placeholder))
+            Image(
+                painter = painterResource(id = R.drawable.facebook_icon_white_logo),
+                contentDescription = "Login With Facebook",
+            )
+            Text(stringResource( R.string.facebook_login_placeholder), fontSize = 12.sp)
         }
         Button(
             onClick = {
                 onNewUserNavigate()
-            }
+            },
+            colors = ButtonColors(
+                containerColor = Color.White,
+                contentColor = colorResource(R.color.hyperlinkBlue),
+                disabledContainerColor = Color.White,
+                disabledContentColor = colorResource(R.color.hyperlinkBlue)
+            ),
+            modifier = modifier.padding(top = 40.dp)
         ) {
             Text(
                 stringResource(R.string.new_user_button_label)
@@ -214,7 +240,10 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
     TextField(
         value = username,
         onValueChange = onChange,
-        label = { Text(stringResource(R.string.username_label)) }
+        label = { Text(stringResource(R.string.username_label)) },
+        modifier = modifier.fillMaxWidth(.9f),
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
+        singleLine = true,
     )
 }
 
@@ -225,14 +254,27 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
         onValueChange = onChange,
         label = { Text(stringResource(R.string.password_label)) },
         visualTransformation = PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        modifier = modifier.fillMaxWidth(.9f).padding(bottom = 8.dp),
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
+        singleLine = true,
     )
 }
 
 @Composable
-fun LoginButton(onClick: () -> Unit) {
-    Button(onClick = { onClick()}) {
-        Text(stringResource(R.string.login_label))
+fun LoginButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Button(
+        onClick = { onClick()},
+        modifier = modifier.fillMaxWidth(.9f),
+        shape = RoundedCornerShape(corner = CornerSize(0.dp)),
+        colors = ButtonColors(
+            containerColor = colorResource(R.color.buttonLightBlue),
+            contentColor = Color.White,
+            disabledContainerColor = colorResource(R.color.buttonLightBlue),
+            disabledContentColor = Color.White
+        )
+    ) {
+        Text(stringResource(R.string.login_label), fontSize = 30.sp)
     }
 }
 

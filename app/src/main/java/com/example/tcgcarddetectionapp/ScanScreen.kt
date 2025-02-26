@@ -7,11 +7,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -73,12 +77,13 @@ fun ScanScreen(modifier: Modifier = Modifier, userid: String, collectionNavigate
 @Composable
 fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
     val error = remember { mutableIntStateOf(0) }
-    Column(verticalArrangement = Arrangement.Top, modifier = modifier
+    Column(verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier
         .fillMaxSize()
         .wrapContentWidth(Alignment.CenterHorizontally)) {
         Text(
-            text = "Scan Screen",
-            fontSize = 40.sp,
+            text = stringResource(R.string.scan_screen_heading),
+            fontSize = 50.sp,
             lineHeight = 46.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(16.dp)
@@ -91,9 +96,10 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
                 .height(550.dp)
                 .width(400.dp)
                 .background(Color.Black)) {
-            Text(text = "Make sure to include all of the card you are trying to scan", fontSize = 30.sp, color = Color.White)
+            Text(text = stringResource(R.string.user_photo_instructions), fontSize = 30.sp, color = Color.White)
         }
 
+        Spacer(modifier= Modifier.height(20.dp))
         ImageCaptureFromCamera(Modifier.align(Alignment.CenterHorizontally), stage = stage, err = error)
 
         if (error.intValue > 0) {
@@ -106,9 +112,9 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
                     shape = RoundedCornerShape(16.dp),
                 ) {
                     if (error.intValue == 1) {
-                        Text(text = "Cards could not be found within the image, try taking an image in better lighting or closer up")
+                        Text(text = stringResource(R.string.no_card_error))
                     } else {
-                        Text(text = "There was a network error in processing your image, try again")
+                        Text(text = stringResource(R.string.scan_network_error))
                     }
                 }
             }
@@ -118,55 +124,84 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
 
 @Composable
 fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Stages>, addToOverallCards: (CardData) -> Unit) {
+    if (cards.isEmpty()) {
+        val sampleCard1 = CardData(cardid = "85106525", setcode = "MP24-EN133", game = "yugioh", cardname = "Bonfire",
+            rarity = "Prismatic Secret Rare", quantity = 1, price = 8.24, userid = "1", subcollections = null, image = null, level="0", attribute = "spell", type = "none", atk = "0", def = "0",
+            description = "Add 1 Level 4 or lower Pyro monster from your Deck to your hand. You can only activate 1 \"Bonfire\" once per turn")
+        val sampleCard2 = CardData(cardid = "54693926", setcode = "SDAZ-EN030", game = "yugioh", cardname = "Dark Ruler No More",
+            rarity = "Common", quantity = 1, price = 0.27, userid = "1", subcollections = null, image = null, level="0", attribute = "spell", type = "none", atk = "0", def = "0",
+            description = "Negate the effects of all face-up monsters your opponent currently controls, until the end of this turn, also, for the rest of this turn after this card resolves, your opponent takes no damage. Neither player can activate monster effects in response to this card's activation")
+        val sampleCard3 = CardData(cardid = "0079", setcode = "FDN", game = "mtg", cardname = "Boltwave",
+            rarity = "U", quantity = 1, price = 2.60, userid = "1", subcollections = null, image = null, cost = "R",
+            attribute = "R", description = "Boltwave deals 3 damage to each opponent.", atk = "", def = "", type = "sorcery")
+        cards = arrayOf(sampleCard2, sampleCard3, sampleCard1)
+    }
+    val context = LocalContext.current
     Column(verticalArrangement = Arrangement.Top, modifier = modifier
         .fillMaxSize()
         .wrapContentWidth(Alignment.CenterHorizontally)) {
-        if (cards.isEmpty()) {
-            val sampleCard1 = CardData(cardid = "85106525", setcode = "MP24-EN133", game = "yugioh", cardname = "Bonfire",
-                rarity = "Prismatic Secret Rare", quantity = 1, price = 8.24, userid = "1", subcollections = null, image = null)
-            val sampleCard2 = CardData(cardid = "54693926", setcode = "SDAZ-EN030", game = "yugioh", cardname = "Dark Ruler No More",
-                rarity = "Common", quantity = 1, price = 0.27, userid = "1", subcollections = null, image = null)
-            val sampleCard3 = CardData(cardid = "0079", setcode = "FDN", game = "mtg", cardname = "Boltwave",
-                rarity = "U", quantity = 1, price = 2.60, userid = "1", subcollections = null, image = null, cost = "R",
-                attribute = "R", description = "Boltwave deals 3 damage to each opponent.", atk = "", def = "", type = "sorcery")
-            cards = arrayOf(sampleCard2, sampleCard3, sampleCard1)
-        }
-        val map = cards.groupBy { it.game }
-        map.forEach { entry ->
-            val game = entry.key
-            Text(text = game, fontSize = 32.sp)
-            for (cardData in entry.value) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(
-                        checked = cardData.added.value,
-                        onCheckedChange = { cardData.added.value = it }
-                    )
-                    Text(
-                        text = "x${cardData.quantity} ${cardData.cardname}"
-                    )
-                }
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(onClick = {
-                stage.value = Stages.Home
-            }) {
-                Text(text = "Cancel")
-            }
+        Column(verticalArrangement = Arrangement.Top, modifier = modifier.padding(16.dp)
+            .background(Color.Gray).padding(16.dp)) {
+            val map = cards.groupBy { it.game }
+            map.forEach { entry ->
+                val game = entry.key
+                Text(text = mapGameToFullName(game), fontSize = 32.sp)
+                for (cardData in entry.value) {
+                    val isChecked = remember { cardData.added }
 
-            Button(onClick = {
-                cards.forEach { card ->
-                    if (card.added.value) {
-                        addToCollectionPost(userid = userid, card = card, addToOverallCards = addToOverallCards)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .background(
+                                color = if (isChecked.value) Color(ContextCompat.getColor(context, R.color.extremelyLightBlue))
+                                else Color(ContextCompat.getColor(context, R.color.gray)),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .border(
+                                width = 2.dp,
+                                color = if (isChecked.value) Color(ContextCompat.getColor(context, R.color.buttonBlueBorder))
+                                else Color.Transparent,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .clickable { isChecked.value = !isChecked.value }
+                            .padding(8.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "x${cardData.quantity} ${cardData.cardname}",
+                                modifier = Modifier.weight(1f)
+                            )
+                            Checkbox(
+                                checked = isChecked.value,
+                                onCheckedChange = { isChecked.value = it }
+                            )
+                        }
                     }
                 }
-                stage.value = Stages.PostConfirmation
-            }) {
-                Text(text = "Submit")
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = {
+                    stage.value = Stages.Home
+                }) {
+                    Text(text = "Cancel")
+                }
+
+                Button(onClick = {
+                    cards.forEach { card ->
+                        if (card.added.value) {
+                            addToCollectionPost(userid = userid, card = card, addToOverallCards = addToOverallCards)
+                        }
+                    }
+                    stage.value = Stages.PostConfirmation
+                }) {
+                    Text(text = "Submit")
+                }
             }
         }
     }
@@ -326,33 +361,15 @@ fun ImageCaptureFromCamera(modifier: Modifier, stage: MutableState<Stages>, err:
         }
     })
 
-    val image = painterResource(R.drawable.photo_button)
-    Button(modifier = modifier, onClick =  {
+    val image = painterResource(R.drawable.takepicture)
+    Button(modifier = modifier.width(125.dp).height(125.dp), onClick =  {
         if (cameraPermission) {
             takePictureLauncher.launch(uri)
         } else {
             cameraPermLauncher.launch(Manifest.permission.CAMERA)
         }
     }) {
-        Image(
-            painter = image,
-            contentDescription = "Take Photo Button"
-        )
-    }
-
-    if (picTaken) {
-        println("Picture Taken")
-        val painter = rememberAsyncImagePainter(
-            model = ImageRequest.Builder(context)
-                .data(uri)
-                .build()
-        )
-
-        Image(
-            painter = painter,
-            modifier = Modifier,
-            contentDescription = "Captured Image"
-        )
+        Icon(painter = image, contentDescription = "")
     }
 }
 

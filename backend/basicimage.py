@@ -2,7 +2,7 @@ import cv2
 import os
 import Cards
 
-filename = "Tynamo.jpg"
+filename = "Red_Dragon_Archfiend.jpg"
 filepath = os.path.join("../images", filename)
 img = cv2.imread(filepath)
 img_cards = Cards.process_image(img)

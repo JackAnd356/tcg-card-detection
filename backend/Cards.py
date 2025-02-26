@@ -4,6 +4,7 @@ import tensorflow as tf
 import pytesseract
 import os
 import imagehash
+import difflib
 from PIL import Image
 import json
 
@@ -21,9 +22,19 @@ hash_size = 16 #Bytes
 min_similarity = 14*6.8
 check_flipped = True
 
-hash_path = os.path.join(os.path.dirname(__file__), 'cardHashes/pokemon_dphash_16byte.json')
-with open(hash_path, 'r', encoding='utf-8') as json_file:
-    hash_dict = json.load(json_file)
+pokemon_hash_path = os.path.join(os.path.dirname(__file__), 'cardHashes/pokemon_dphash_16byte.json')
+yugioh_hash_path = os.path.join(os.path.dirname(__file__), 'cardHashes/yugioh_dphash_16byte.json')
+mtg_hash_path = os.path.join(os.path.dirname(__file__), 'cardHashes/mtg_dphash_16byte.json')
+
+# Card Hash Dictionaries
+with open(pokemon_hash_path, 'r', encoding='utf-8') as json_file:
+    pokemon_hash_dict = json.load(json_file)
+
+with open(yugioh_hash_path, 'r', encoding='utf-8') as json_file:
+    yugioh_hash_dict = json.load(json_file)
+
+with open(mtg_hash_path, 'r', encoding='utf-8') as json_file:
+    mtg_hash_dict = json.load(json_file)
 
 #Classification Model
 model_path = os.path.join(os.path.dirname(__file__), 'card_classifier_model_ver2.h5')
@@ -71,14 +82,14 @@ def preprocess_image(image, thresh_low, thresh_high):
     """Returns a grayed, blurred, and adaptively thresholded camera image."""
 
     gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray,(5, 5),0)
+    blur = cv2.GaussianBlur(gray,(13, 13),0)
 
     """cv2.imshow("Blur Img", blur)"""
 
     threshold1 = thresh_low
     threshold2 = thresh_high
     imgCanny = cv2.Canny(blur, threshold1, threshold2)
-    """cv2.imshow("Canny Img", imgCanny)"""
+    cv2.imshow("Canny Img", imgCanny)
 
     kernel = np.ones((5, 5), np.uint8)
     imgDil = cv2.dilate(imgCanny, kernel, iterations=1)
@@ -168,15 +179,17 @@ def preprocess_card(contour, frame):
 
     print(cardType)
 
-    if cardType == 'yugioh': (name, id, setCode) = get_yugioh_card_details(qCard["warp_bgr"])
-    elif cardType == 'mtg': (name, id, setCode) = get_mtg_card_details(qCard["warp_rgb"])
-    elif cardType == 'pokemon': 
-        name, id = get_pokemon_card_details(qCard["warp_rgb"])
-        setCode = None
+    if cardType == 'yugioh': match = get_yugioh_card_details(qCard["warp_bgr"])
+    elif cardType == 'mtg': match = get_mtg_card_details(qCard["warp_rgb"])
+    elif cardType == 'pokemon': match = get_pokemon_card_details(qCard["warp_rgb"])
     else: return None
-    qCard["name"] = name
-    qCard["cardid"] = id
-    qCard["setcode"] = setCode
+
+    if match is None: return None
+    qCard["name"] = match["name"]
+    qCard["cardid"] = match["id"]
+    if "setcode" in match: qCard["setcode"] = match["setcode"]
+    else: qCard["setcode"] = None
+    if "scryfallid" in match: qCard["scryfallid"] = match["scryfallid"]
 
     return qCard
 
@@ -195,17 +208,11 @@ def draw_on_card(qCard, frame):
     return frame
 
 def get_yugioh_card_details(image):
-    """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
-       See https://pypi.org/project/pytesseract/"""
-    cv2.imshow("Yugioh Card", image)
+    """Use Pytesseract/Imagehash to find the name, id, and setcode of a yugioh card through matching hashes"""
     leftTopEdge = image[100:200, 0:7]
-    """cv2.imshow("Left Top Edge", leftTopEdge)"""
     rightTopEdge = image[100:200, 393:400]
-    """cv2.imshow("Right Top Edge", rightTopEdge)"""
     leftBottomEdge = image[400:500, 0:7]
-    """cv2.imshow("Left Bottom Edge", leftBottomEdge)"""
     rightBottomEdge = image[400:500, 393:400]
-    """cv2.imshow("Right Bottom Edge", rightBottomEdge)"""
     
     topLeft = cv2.cvtColor(leftTopEdge, cv2.COLOR_BGR2HSV)
     topRight = cv2.cvtColor(rightTopEdge, cv2.COLOR_BGR2HSV)
@@ -217,65 +224,64 @@ def get_yugioh_card_details(image):
     avgColorBottomLeft = np.mean(bottomLeft, axis=(0, 1))
     avgColorBottomRight = np.mean(bottomRight, axis=(0, 1))
 
-    print(avgColorTopLeft)
-    print(avgColorTopRight)
-    print(avgColorBottomLeft)
-    print(avgColorBottomRight)
-
     green_hsv_range = ((60, 0, 0), (90, 255, 255))
     isGreenBottom = np.all(avgColorBottomLeft >= green_hsv_range[0]) and np.all(avgColorBottomLeft <= green_hsv_range[1]) and np.all(avgColorBottomRight >= green_hsv_range[0]) and np.all(avgColorBottomRight <= green_hsv_range[1])
     isNotGreenTop = np.all(avgColorTopLeft < green_hsv_range[0]) or np.all(avgColorTopLeft > green_hsv_range[1]) or np.all(avgColorTopRight < green_hsv_range[0]) or np.all(avgColorTopRight > green_hsv_range[1])
-
-    print(f'Bottom is Green: {isGreenBottom}')
-    print(f'Top is Not Green: {isNotGreenTop}')
+    print(isGreenBottom)
+    print(isNotGreenTop)
 
     # Extract card name
-    nameImg = image[12:60, 17:330]
+    """nameImg = image[12:60, 17:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    """cv2.imshow("NameImg", nameImg)"""
     cardName = pytesseract.image_to_string(nameImg)
 
     # Extract card ID
     cardIDImg = image[585:598, 5:70]
     cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    """cv2.imshow("cardIDImg", cardIDImg)"""
-    cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789')
-    
+    cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789')"""
+    match = get_match_pool(image, yugioh_hash_dict)
+    if match is None: return None
+
     # Extract card set code
     cardSetCodeImg = image[435:450, 285:380]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    """cv2.imshow("setCodeImg", cardSetCodeImg)"""
-    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+    cardSetCodeOCR = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-')
+    print(cardSetCodeOCR)
+    bestSetcodeMatch = difflib.get_close_matches(cardSetCodeOCR, match["setcodes"], n = 3, cutoff = 0.5)
+    if len(bestSetcodeMatch) == 0: 
+        print("No matches found for setcode")
+        match["setcode"] = None
+    else:
+        match["setcode"] = bestSetcodeMatch[0]
 
-    return (cardName, cardID, cardSetCode)
+    return match
 
 def get_mtg_card_details(image):
-    """Use Pytesseract to find the name of card, id of card, and set code of card, by cropping the original image
-       See https://pypi.org/project/pytesseract/"""
+    """Use Pytesseract/Imagehash to find the name, id, and collector number of a magic the gathering card through matching hashes"""
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Extract card name
-    nameImg = image[20:60, 30:330]
+    """nameImg = image[20:60, 30:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    """cv2.imshow("NameImg", nameImg)"""
     cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ')
     
     cardSetCodeImg = image[572:590, 0:70]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-    """cv2.imshow("cardSetCodeImg", cardSetCodeImg)"""
-    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')
+    cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')"""
+    match = get_match_pool(image, mtg_hash_dict)
+    if match is None: return None
 
     # Extract card ID
     cardIDImg = image[560:572, 0:70]
     cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     """cv2.imshow("cardIDImg", cardIDImg)"""
     cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')
+    match["id"] = cardID
 
-    return (cardName, cardID, cardSetCode)
+    return match
 
 def get_pokemon_card_details(image):
-    name, id = get_match_pool(image)
-    return name, id
+    return get_match_pool(image, pokemon_hash_dict)
 
 
 def flattener(image, pts, w, h):
@@ -337,28 +343,23 @@ def flattener(image, pts, w, h):
 
     return (warp_rgb, warp)
 
-def get_match_pool(card_image):
+def get_match_pool(card_image, hash_dict):
     if card_image is None:
-        return None, None
+        return None
     image_hash = hash_image(card_image)
-    name, id = find_match(image_hash)
-    if name is None and check_flipped is True:
-        name, id = find_flipped_match(card_image)
-    if name is not None:
-        return name, id
-    return None, None
+    match = find_match(image_hash, hash_dict)
+    if match is None and check_flipped is True:
+        match = find_flipped_match(card_image, hash_dict)
+    if match is not None:
+        return match
+    return None
 
 def hash_image(img):
-    # Convert the NumPy array to a PIL image
+    """Computes the difference and perceptual hash of an image"""
     img = Image.fromarray(img)
 
     img = img.convert('RGB')
 
-    # Resize the image to the desired size
-    #img = img.resize((image_size, image_size))
-
-    # Compute the hash
-    # ahash = str(imagehash.average_hash(img, hash_size))
     dhash = imagehash.dhash(img, hash_size)
     phash = imagehash.phash(img, hash_size)
 
@@ -370,7 +371,8 @@ def hamming_distance(hash1, hash2):
     assert len(hash1) == len(hash2), "Hash lengths are not equal"
     return sum(ch1 != ch2 for ch1, ch2 in zip(hash1, hash2))
 
-def find_match(hash_a):
+def find_match(hash_a, hash_dict):
+    """Finds the closest match for a card by hamming distance to hashed dictionary"""
     best_match = None
     min_sim = min_similarity
 
@@ -382,12 +384,13 @@ def find_match(hash_a):
             best_match = card_id
 
     if best_match is None:
-        return None, None
+        return None
 
-    return hash_dict[best_match]['name'], hash_dict[best_match]['id']
+    return hash_dict[best_match]
 
-def find_flipped_match(card_image):
+def find_flipped_match(card_image, hash_dict):
+    """Rotates the card 180 degrees and tries to find closest match"""
     card_image = cv2.rotate(card_image, cv2.ROTATE_180)
     image_hash = hash_image(card_image)
-    name, id = find_match(image_hash)
-    return name, id
+    match = find_match(image_hash, hash_dict)
+    return match

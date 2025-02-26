@@ -11,8 +11,13 @@ import cv2
 from dotenv import load_dotenv, find_dotenv
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import json
+from PIL import Image
+import imagehash
 
 load_dotenv(find_dotenv())
+
+hash_size = 16
 
 def getYugiohSample(numCards):
     url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
@@ -21,15 +26,12 @@ def getYugiohSample(numCards):
         cardData = resp.json()
         cards = cardData["data"]
 
-        random.shuffle(cards)
-
         counter = 0
 
         for i,card in enumerate(cards):
             img_url = card["card_images"][0]["image_url"]
-            card_name = card["name"].replace(' ', '_').replace('/', '_')
-            card_name = sanitize_filename(card_name)
-            filename = f'../sample_images/yugioh/{card_name}.jpg'
+            card_name = card["name"]
+            filename = f'../sample_images/yugioh/temp_img.jpg'
 
             img = requests.get(img_url)
             if img.status_code == 200:
@@ -39,8 +41,7 @@ def getYugiohSample(numCards):
                 print(f'Downloaded {card_name} Num: {i}/{numCards} Total Downloaded: {counter}')
             else:
                 print(f'Failed to get Image of: {card_name}')
-            if counter >= numCards: break
-            time.sleep(0.25)
+            time.sleep(0.1)
     else:
         print(f'API Gave Error Status Code: {resp.status_code}')
 
@@ -74,7 +75,31 @@ def getMTGSample(numCards):
         else:
             print(f'API Gave Error Status Code: {resp.status_code}')
         
-        time.sleep(0.25)
+        time.sleep(0.1)
+
+
+def getMTGCard(scryfallId, filename):
+    url = f'https://api.scryfall.com/cards/{scryfallId}'
+    headers = {'User-Agent' : 'TCG Card Detection App 0.1', 'Accept' : '*/*'}
+    resp = requests.get(url, headers=headers)
+
+    if resp.status_code == 200:
+        cardData = resp.json()
+        if not "image_uris" in cardData: return
+        img_url = cardData["image_uris"]["normal"]
+        card_name = cardData["name"]
+
+        img = requests.get(img_url)
+        if img.status_code == 200:
+            with open(filename, "wb") as img_file:
+                img_file.write(img.content)
+            #print(f'Downloaded {card_name}')
+            return cardData
+        else:
+            print(f'Failed to get Image of: {card_name}')
+    else:
+        print(f'API Gave Error Status Code: {resp.status_code}')
+
 
 def getPokemonSample(numCards):
     apikey = os.getenv('POKEMON_API_KEY')
@@ -236,6 +261,24 @@ def predict_card(model, img):
     categories = ["Yugioh", "MagicTheGathering", "Pokemon"]
     return categories[category], confidence
 
+def hash_image(img):
+    # Convert the NumPy array to a PIL image
+    img = Image.fromarray(img)
+
+    img = img.convert('RGB')
+
+    # Resize the image to the desired size
+    #img = img.resize((image_size, image_size))
+
+    # Compute the hash
+    # ahash = str(imagehash.average_hash(img, hash_size))
+    dhash = imagehash.dhash(img, hash_size)
+    phash = imagehash.phash(img, hash_size)
+
+    hash = f'{dhash}{phash}'
+
+    return hash
+
 """training_data, test_data = getTrainingData()
 print(f"Training data: {training_data[0].shape}, Training labels: {training_data[1].shape}")
 print(f"Test data: {test_data[0].shape}, Test labels: {test_data[1].shape}")
@@ -244,7 +287,7 @@ model, history = trainModel(training_data, test_data)
 plot_training_history(history)
 model.save('card_classifier_model_ver2.h5')"""
 
-model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
+"""model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
 img = cv2.imread("../sample_images/other/Adley_Rutschman_Topps_Vintage.jpg")
 imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
 
@@ -254,4 +297,104 @@ predictions = model.predict(img_array)
 (predicted_class, confidence) = predict_card(model, img_array)
 print(predicted_class)
 print(confidence)
-print(predictions)
+print(predictions)"""
+
+def getAndHashAllMtgCards(mtgDataset, mtgCompleted, mtgMissed):
+    counter = 0
+    filename = "../sample_images/mtg/temp.jpg"
+    mtgSets = mtgDataset["data"]
+
+    try:
+        for setcode in mtgSets.keys():
+            cardList = mtgSets[setcode]["cards"]
+            for card in cardList:
+                counter += 1
+                if counter % 5000 == 0:
+                    with open("./cardHashes/mtg_dphash_16byte.json", "w") as f:
+                        json.dump(mtgCompleted, f, indent=4)
+                    with open("./cardHashes/missed_mtg_cards.json", "w") as f:
+                        json.dump(mtgMissed, f, indent=4)
+    
+                name = card["name"]
+                setcode = card["setCode"]
+                if not "scryfallId" in card["identifiers"]:
+                    mtgMissed[name] = {"name": name, "setcode": setcode, "scryfallId": "None"}
+                    continue
+
+                scryfallId = card["identifiers"]["scryfallId"]
+                if scryfallId in mtgCompleted: 
+                    print(f'Already have: {name}')
+                    continue
+                scryFallCard = getMTGCard(scryfallId, filename)
+                if scryFallCard is not None:
+                    image = cv2.imread(filename)
+                    hash_val = hash_image(image)
+                    mtgCompleted[scryfallId] = {"name": name, "setcode": setcode, "hash": hash_val, "scryfallId": scryfallId}
+                else:
+                    mtgMissed[name] = {"name": name, "setcode": setcode, "scryfallId": scryfallId}
+                print(f'Downloaded {counter} Cards.  Last: {name}')
+    except KeyboardInterrupt:
+        print("Saving Hashes Now")
+    finally:
+        with open("./cardHashes/mtg_dphash_16byte.json", "w") as f:
+            json.dump(mtgCompleted, f, indent=4)
+
+        with open("./cardHashes/missed_mtg_cards.json", "w") as f:
+            json.dump(mtgMissed, f, indent=4)
+
+def getAndHashAllYugiohCards(yugiohCompleted, yugiohMissed):
+    url = 'https://db.ygoprodeck.com/api/v7/cardinfo.php'
+    resp = requests.get(url)
+    if resp.status_code == 200:
+        cardData = resp.json()
+        cards = cardData["data"]
+
+        counter = 1
+        try:
+            for i,card in enumerate(cards):
+                if counter % 5000 == 0:
+                    with open("./cardHashes/yugioh_dphash_16byte.json", "w") as f:
+                        json.dump(yugiohCompleted, f, indent=4)
+                    with open("./cardHashes/missed_yugioh_cards.json", "w") as f:
+                        json.dump(yugiohMissed, f, indent=4)
+
+                img_url = card["card_images"][0]["image_url"]
+                card_name = card["name"]
+                card_id = card["id"]
+                if str(card_id) in yugiohCompleted: continue
+
+                if not "card_sets" in card: continue
+                sets = card["card_sets"]
+                setcodes = []
+                for set in sets:
+                    setcodes.append(set["set_code"])
+                filename = f'../sample_images/yugioh/temp_img.jpg'
+
+                img = requests.get(img_url)
+                if img.status_code == 200:
+                    counter += 1
+                    with open(filename, "wb") as img_file:
+                        img_file.write(img.content)
+                    image = cv2.imread(filename)
+                    hash = hash_image(image)
+                    yugiohCompleted[card_id] = {"id": card_id, "setcodes": setcodes, "name": card_name, "hash": hash}
+                else:
+                    yugiohMissed[card_id] = {"id": card_id, "setcodes": setcodes, "name": card_name}
+                print(f'Downloaded {i} Cards. Last: {card_name}')
+        except KeyboardInterrupt:
+            print("Saving Hashes")
+        finally:
+            with open("./cardHashes/yugioh_dphash_16byte.json", "w") as f:
+                json.dump(yugiohCompleted, f, indent=4)
+
+            with open("./cardHashes/missed_yugioh_cards.json", "w") as f:
+                json.dump(yugiohMissed, f, indent=4)
+
+
+with open("./cardHashes/yugioh_dphash_16byte.json", 'r', encoding='utf-8') as completed_json_file:
+    yugiohCompleted = json.load(completed_json_file)
+
+with open("./cardHashes/missed_yugioh_cards.json", 'r', encoding='utf-8') as missed_json_file:
+    yugiohMissed = json.load(missed_json_file)
+
+getAndHashAllYugiohCards(yugiohCompleted, yugiohMissed)

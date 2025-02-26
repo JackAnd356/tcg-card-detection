@@ -31,4 +31,13 @@ fun updateSubcollectionInfo(subcolInfo: SubcollectionInfo, card: CardData, quant
     }
 }
 
+fun mapGameToFullName(game : String): String {
+    return when (game) {
+        "Pokemon" -> "Yu-Gi-Oh!"
+        "mtg" -> "Magic the Gathering"
+        "pokemon" -> "Pokemon"
+        else -> "New Game"
+    }
+}
+
 
