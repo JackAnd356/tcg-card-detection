@@ -15,8 +15,4 @@
     <color name="extremelyLightBlue">#FFE3F2FD</color>
     <color name="gray">#FFCCCCCC</color>
     <color name="buttonBlueBorder">#FF2196F3</color>
-    <color name="buttonLightBlue">#81DDFF</color>
-    <color name="hyperlinkBlue">#3F8CFF</color>
-    <color name="textFieldLightGrey">#D9D9D9</color>
-    <color name="textLightGrey">#ADADAD</color>
 </resources>
