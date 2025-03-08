@@ -100,5 +100,7 @@
     <string name="yugioh_ghost_rare_description">Gold name. Mirror-like finish which looks white and shows picture when tilted</string>
     <string name="yugioh_starlight_rare_description">Extremely visible foiling. Lines and rainbows visible throughout</string>
     <string name="submit">Submit</string>
+    <string name="view_all_collection">Click to View All</string>
     <string name="ignore_card">Ignore This Card</string>
+    <string name="more_options">More Options</string>
 </resources>

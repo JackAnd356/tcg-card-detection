@@ -14,7 +14,7 @@
     <color name="textLightGrey">#ADADAD</color>
     <color name="extremelyLightBlue">#FFE3F2FD</color>
     <color name="extremelyLightRed">#FFFFACAC</color>
-    <color name="gray">#FFCCCCCC</color>
+    <color name="gray">#FFE2E2E2</color>
     <color name="buttonBlueBorder">#FF2196F3</color>
     <color name="buttonRedBorder">#FFFF3232</color>
 </resources>

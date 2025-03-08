@@ -137,7 +137,7 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
         val sampleCard2 = CardData(cardid = "54693926", setcode = "SDAZ-EN030", game = "yugioh", cardname = "Dark Ruler No More",
             rarity = "Common", quantity = 1, price = 0.27, userid = "1", subcollections = null, image = null, level="0", attribute = "spell", type = "none", atk = "0", def = "0",
             description = "Negate the effects of all face-up monsters your opponent currently controls, until the end of this turn, also, for the rest of this turn after this card resolves, your opponent takes no damage. Neither player can activate monster effects in response to this card's activation")
-        val sampleCard3 = CardData(cardid = "0079", setcode = "FDN", game = "mtg", cardname = "Boltwave",
+        val sampleCard3 = CardData(cardid = "8d1ec351-5e70-4eb2-b590-6bff94ef8178", setcode = "FDN", game = "mtg", cardname = "Boltwave",
             rarity = "U", quantity = 1, price = 2.60, userid = "1", subcollections = null, image = null, cost = "R",
             attribute = "R", description = "Boltwave deals 3 damage to each opponent.", atk = "", def = "", type = "sorcery")
         cards = arrayOf(sampleCard2, sampleCard3, sampleCard1)
@@ -224,6 +224,7 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                     cards.forEach { card ->
                         if (card.added.value) {
                             addToCollectionPost(userid = userid, card = card, addToOverallCards = addToOverallCards)
+                            cardImagePost(card.cardid, card.game, {card.image = it})
                         }
                     }
                     stage.value = Stages.PostConfirmation
