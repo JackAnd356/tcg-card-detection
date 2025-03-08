@@ -33,10 +33,24 @@ fun updateSubcollectionInfo(subcolInfo: SubcollectionInfo, card: CardData, quant
 
 fun mapGameToFullName(game : String): String {
     return when (game) {
-        "Pokemon" -> "Yu-Gi-Oh!"
+        "yugioh" -> "Yu-Gi-Oh!"
         "mtg" -> "Magic the Gathering"
         "pokemon" -> "Pokemon"
         else -> "New Game"
+    }
+}
+
+fun mapRarityToPlaceholder(rarity: String): Pair<Int, Int> {
+    return when (rarity) {
+        "Common" -> Pair(R.drawable.common, R.string.yugioh_common_description)
+        "Rare" -> Pair(R.drawable.common, R.string.yugioh_rare_description)
+        "Super Rare" -> Pair(R.drawable.common, R.string.yugioh_super_rare_description)
+        "Ultra Rare" -> Pair(R.drawable.common, R.string.yugioh_ultra_rare_description)
+        "Ultimate Rare" -> Pair(R.drawable.common, R.string.yugioh_ultimate_rare_description)
+        "Secret Rare" -> Pair(R.drawable.common, R.string.yugioh_secret_rare_description)
+        "Ghost Rare" -> Pair(R.drawable.common, R.string.yugioh_ghost_rare_description)
+        "Starlight Rare" -> Pair(R.drawable.common, R.string.yugioh_starlight_rare_description)
+        else -> Pair(R.drawable.nocardimage, R.string.no_card_error)
     }
 }
 

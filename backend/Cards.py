@@ -394,3 +394,39 @@ def find_flipped_match(card_image, hash_dict):
     image_hash = hash_image(card_image)
     match = find_match(image_hash, hash_dict)
     return match
+
+def ygoprodeck_to_card_data(ygoCard, setcode):
+    cardData = {}
+    cardData["quantity"] = 1
+    cardData["game"] = "yugioh"
+    cardData["cardname"] = ygoCard["name"]
+    cardData["attribute"] = ygoCard["attribute"]
+    cardData["level"] = ygoCard["level"]
+    cardData["type"] = ygoCard["type"]
+    cardData["description"] = ygoCard["description"]
+    cardData["atk"] = ygoCard["atk"]
+    cardData["def"] = ygoCard["def"]
+    setname = ''
+    rarities = []
+    for set in ygoCard["card_sets"]:
+        if setcode == set["set_code"]:
+            setname = set["set_name"]
+            rarities.append(set["set_rarity"])
+    
+    if setname == '':
+        return None
+    
+    cardData["setcode"] = setcode
+    if (len(rarities) == 1):
+        cardData["rarity"] = rarities[0]
+    else:
+        cardData["possRarities"] = rarities
+
+    return cardData
+
+def scryfall_to_card_data(scryfallCard):
+    cardData = {}
+    cardData["quantity"] = 1
+    cardData["game"] = "mtg"
+    cardData["cardname"] = scryfallCard["name"]
+    return cardData

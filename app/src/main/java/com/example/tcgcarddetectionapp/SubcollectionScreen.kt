@@ -1378,7 +1378,7 @@ fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: Strin
         cardid = card.cardid,
         setcode = card.setcode,
         game = card.game,
-        rarity = card.rarity,
+        rarity = card.rarity!!,
         subcollection = subcollection,
     )
     retrofitAPI.addToUserSubcollection(requestData).enqueue(object : Callback<SaveToSubcollectionResponseModel> {
@@ -1505,7 +1505,7 @@ fun SubollectionScreenPreview() {
         game = "yugioh",
         price = 14.10,
         image = "",
-        "Test Card"
+        cardname = "Test Card"
     )
 
     val cards = arrayOf(card1, card2, card3)

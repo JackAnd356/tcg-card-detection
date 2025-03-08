@@ -9,7 +9,8 @@ data class CardData(
     val cardid: String,
     val setcode: String,
     var quantity: Int,
-    val rarity: String,
+    var rarity: String? = null,
+    var possRarities: Array<String>? = null,
     var subcollections: Array<String>?,
     val game: String,
     val price: Double,
@@ -26,7 +27,7 @@ data class CardData(
     val retreat: Array<String>? = null,
     val weaknesses: Array<Weakness>? = null,
     val attacks: Array<Attack>? = null,
-    var added: MutableState<Boolean> = mutableStateOf(false),
+    var added: MutableState<Boolean> = mutableStateOf(true),
     var purchaseurl: String? = null,
 ) {
     override fun equals(other: Any?): Boolean {

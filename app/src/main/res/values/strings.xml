@@ -90,4 +90,15 @@
     <string name="user_photo_instructions">Some Tips for Taking a Good Photo\n\n 1. Make sure to include all of the card you are trying to scan.\n\n 2. Try not to overlap cards.\n\n 3. Take the photo in a room with good lighting.</string>
     <string name="labeled_data_entry_ghost_text">Enter %1$s Here...</string>
     <string name="scan_screen_heading">Scan</string>
+    <string name="rarity_choice_text">Our scanner could not find the rarity for this card. Please select the image/description which best fits the card.</string>
+    <string name="yugioh_common_description">Name in black/white and no foil on card.</string>
+    <string name="yugioh_rare_description">Name in silver and no foil on card</string>
+    <string name="yugioh_ultra_rare_description">Name in gold and foiling throughout card</string>
+    <string name="yugioh_super_rare_description">Name in black/white and foiling only on picture</string>
+    <string name="yugioh_ultimate_rare_description">Name in gold and embossed. Picture embossed as well.</string>
+    <string name="yugioh_secret_rare_description">Name in silver. Diagonal holographic lines throughout card</string>
+    <string name="yugioh_ghost_rare_description">Gold name. Mirror-like finish which looks white and shows picture when tilted</string>
+    <string name="yugioh_starlight_rare_description">Extremely visible foiling. Lines and rainbows visible throughout</string>
+    <string name="submit">Submit</string>
+    <string name="ignore_card">Ignore This Card</string>
 </resources>
