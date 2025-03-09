@@ -11,13 +11,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -46,7 +51,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -125,6 +132,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var selectedMaxPrice by remember { mutableStateOf("") }
     var maxPriceErr by remember { mutableStateOf(false) }
 
+    val leftOffset = LocalConfiguration.current.screenWidthDp * 0.05
     val forceRecomposeState = rememberUpdatedState(refreshFlag)
 
 
@@ -230,29 +238,31 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     }
 
     Box(
-        modifier
-            .background(color = Color.LightGray)
+        modifier = modifier
+            .background(color = Color.White)
             .fillMaxWidth()
-            .fillMaxHeight(.9f)) {
+            .fillMaxHeight(.9f),
+        contentAlignment = Alignment.Center) {
         Column(
             verticalArrangement = Arrangement.Top,
-            modifier = modifier
+            modifier = Modifier
                 .wrapContentWidth(Alignment.CenterHorizontally)
-                .verticalScroll(state = scrollstate)
         ) {
             Button(
                 onClick = { navBack() }
             ) {
                 Text(stringResource(R.string.back_to_main_collections_button_label))
             }
-            Card(colors = CardDefaults.cardColors(containerColor = Color.White),
-                modifier = modifier
-                    .fillMaxWidth()
+            Card(colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gray)),
+                modifier = Modifier
+                    .fillMaxWidth(.9f)
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
             ) {
-                Row {
-                    Column {
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center) {
+                    Column(modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = subcolInfo.name,
                             fontSize = 40.sp,
@@ -270,37 +280,42 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             textAlign = TextAlign.Center
                         )
                     }
-                    Box {
-                        IconButton(
-                            onClick = {optionsExpanded = !optionsExpanded}
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More"
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = optionsExpanded,
-                            onDismissRequest = {
-                                optionsExpanded = false
+                    if (subcolInfo.subcollectionid != "all") {
+                        Box {
+                            IconButton(
+                                onClick = {optionsExpanded = !optionsExpanded}
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More"
+                                )
                             }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.edit_option_label)) },
-                                onClick = {
-                                    showEditPopup = !showEditPopup
+                            DropdownMenu(
+                                expanded = optionsExpanded,
+                                onDismissRequest = {
+                                    optionsExpanded = false
                                 }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.delete_option_label)) },
-                                onClick = {
-                                    showDeletePopup = !showDeletePopup
-                                }
-                            )
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.edit_option_label)) },
+                                    onClick = {
+                                        showEditPopup = !showEditPopup
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.delete_option_label)) },
+                                    onClick = {
+                                        showDeletePopup = !showDeletePopup
+                                    }
+                                )
+                            }
                         }
                     }
                 }
-                Row {
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
                     if (subcolInfo.physLoc != "") {
                         Text(
                             text = String.format(
@@ -326,15 +341,29 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
 
             }
             TextField(
+                modifier = Modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally),
                 value = searchTerm,
                 onValueChange = { searchTerm = it },
                 label = { Text(stringResource(R.string.search_label)) }
             )
-            Button(
-                onClick = { showFilters = !showFilters }
-            ) {
-                Text(stringResource(R.string.filter_button_label))
+            Row(modifier = modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally)) {
+                Button(
+                    onClick = { showFilters = !showFilters }
+                ) {
+                    Text(stringResource(R.string.filter_button_label))
+                }
+                if(!allCardsFlag) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        onClick = {
+                            showAllCardAddToSubcollection = !showAllCardAddToSubcollection
+                        }
+                    ) {
+                        Text(stringResource(R.string.add_from_all_cards_button_label))
+                    }
+                }
             }
+
             if (showFilters) {
                 Column {
                     Row {
@@ -459,15 +488,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     }
                 }
             }
-            if(!allCardsFlag) {
-                Button(
-                    onClick = {
-                        showAllCardAddToSubcollection = !showAllCardAddToSubcollection
-                    }
-                ) {
-                    Text(stringResource(R.string.add_from_all_cards_button_label))
-                }
-            }
+
             if (showAllCardAddToSubcollection) {
                 Dialog(
                     onDismissRequest = {showAllCardAddToSubcollection = !showAllCardAddToSubcollection}
@@ -542,18 +563,19 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 filteredCardData = cardData.toMutableList()
             }
             filteredCardData = sortSubcollection(filteredCardData, game)
-            for (i in 0..(filteredCardData.size - 1) step 2) {
-                Row{
-                    for (j in i..(i + 1).coerceAtMost(filteredCardData.size - 1)) {
-                        val cardInfo = filteredCardData[j]
-                        CardImage(
-                            cardData = cardInfo,
-                            setFocusedCard = { currentFocusedCard = it },
-                            showCardPopup = { showCardPopup = !showCardPopup },
-                            modifier = modifier
-                                .padding(vertical = 20.dp, horizontal = 15.dp)
-                        )
-                    }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(filteredCardData) { cardInfo ->
+                    CardImage(
+                        cardData = cardInfo,
+                        setFocusedCard = { currentFocusedCard = it },
+                        showCardPopup = { showCardPopup = !showCardPopup },
+                        modifier = Modifier
+                            .padding(vertical = 10.dp, horizontal = 10.dp)
+                    )
                 }
             }
         }

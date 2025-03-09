@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,8 +35,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
 import com.example.tcgcarddetectionapp.models.AddRemoveCardModel
 import com.example.tcgcarddetectionapp.models.CardData
 import com.example.tcgcarddetectionapp.models.GenericSuccessErrorResponseModel

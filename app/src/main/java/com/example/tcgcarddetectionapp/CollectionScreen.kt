@@ -57,7 +57,6 @@ import com.example.tcgcarddetectionapp.models.GenericSuccessErrorResponseModel
 import com.example.tcgcarddetectionapp.models.SubcollectionInfo
 import com.example.tcgcarddetectionapp.models.UpdateUserSubcollectionRequestModel
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -104,12 +103,12 @@ fun CollectionScreen(gameName: String,
             .fillMaxHeight(.9f)) {
         Column(
             verticalArrangement = Arrangement.Top,
-            modifier = modifier
+            modifier = Modifier
                 .wrapContentWidth(Alignment.CenterHorizontally)
                 .verticalScroll(state = scrollstate)
         ) {
             Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth(cardWidth)
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
@@ -125,7 +124,7 @@ fun CollectionScreen(gameName: String,
                 )
             }
             Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth(cardWidth)
                     .align(Alignment.CenterHorizontally)
                     .padding(bottom = 20.dp),
@@ -133,14 +132,14 @@ fun CollectionScreen(gameName: String,
                     navController.navigate(CardDetectionScreens.Subcollection.name + "/all/" + gameFilter)
                 }
             ) {
-                Column(modifier = modifier.padding(vertical = 10.dp),
+                Column(modifier = Modifier.padding(vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = String.format(
                             stringResource(R.string.all_cards_label),
                             totalCardCount
                         ),
-                        modifier = modifier.fillMaxWidth(1f),
+                        modifier = Modifier.fillMaxWidth(1f),
                         fontSize = 20.sp,
                         lineHeight = 25.sp,
                         textAlign = TextAlign.Center
@@ -151,7 +150,7 @@ fun CollectionScreen(gameName: String,
                             totalCardValue,
                             "$"
                         ),
-                        modifier = modifier.fillMaxWidth(1f),
+                        modifier = Modifier.fillMaxWidth(1f),
                         fontSize = 20.sp,
                         lineHeight = 25.sp,
                         textAlign = TextAlign.Center
@@ -162,7 +161,7 @@ fun CollectionScreen(gameName: String,
                             totalCardValue,
                             "$"
                         ),
-                        modifier = modifier.fillMaxWidth(1f),
+                        modifier = Modifier.fillMaxWidth(1f),
                         fontSize = 20.sp,
                         lineHeight = 25.sp,
                         textAlign = TextAlign.Center
@@ -171,7 +170,7 @@ fun CollectionScreen(gameName: String,
 
             }
             TextField(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth(cardWidth)
                     .align(Alignment.CenterHorizontally),
                 value = searchTerm,
@@ -179,7 +178,7 @@ fun CollectionScreen(gameName: String,
                 label = { Text(stringResource(R.string.search_label)) }
             )
             Box(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = leftOffset.dp, top = 5.dp)
             ) {
@@ -238,9 +237,9 @@ fun CollectionScreen(gameName: String,
             subcollections.forEach { subcollection ->
                 if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
                     Box(
-                        modifier = modifier
+                        modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = leftOffset.dp)
+                            .padding(start = leftOffset.dp, end = leftOffset.dp)
                     ) {
                         CollectionSummary(
                             subcollection = subcollection,
@@ -254,7 +253,7 @@ fun CollectionScreen(gameName: String,
                                 selectedSubcollectionInfo = it
                                 showDeletePopup = !showDeletePopup
                             },
-                            modifier = modifier.fillMaxWidth(cardWidth)
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
@@ -376,7 +375,7 @@ fun DialogTest(
     var subColName by remember { mutableStateOf("") }
     var subColLocation by remember { mutableStateOf("")}
     var isDeck by remember { mutableStateOf(false)}
-    var context = LocalContext.current
+    val context = LocalContext.current
     Dialog(onDismissRequest = { onDismissRequest() }) {
         // Draw a rectangle shape with rounded corners inside the dialog
         Card(

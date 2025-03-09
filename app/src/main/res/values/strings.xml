@@ -88,7 +88,7 @@
     <string name="remove_card_all_cards_text">Are you sure you want to remove this card from your collection (This Cannot Be Undone)?</string>
     <string name="remove_card_subcollection_text">Are you sure you want to remove this card from %1$s?</string>
     <string name="user_photo_instructions">Some Tips for Taking a Good Photo\n\n 1. Make sure to include all of the card you are trying to scan.\n\n 2. Try not to overlap cards.\n\n 3. Take the photo in a room with good lighting.</string>
-    <string name="labeled_data_entry_ghost_text">Enter %1$s Here...</string>
+    <string name="labeled_data_entry_ghost_text">Enter %1$s Here&#8230;</string>
     <string name="scan_screen_heading">Scan</string>
     <string name="rarity_choice_text">Our scanner could not find the rarity for this card. Please select the image/description which best fits the card.</string>
     <string name="yugioh_common_description">Name in black/white and no foil on card.</string>
