@@ -3,6 +3,7 @@ package com.example.tcgcarddetectionapp
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -622,6 +625,32 @@ fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
         }
 
     })
+}
+
+@Composable
+fun FilterTextfield(modifier: Modifier, label: String, value: String, onValueChange: (String) -> Unit) {
+    Column() {
+        Text(
+            text = label,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start,
+            color = Color.Black
+        )
+
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)),
+            shape = RoundedCornerShape(8.dp),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
+            )
+        )
+    }
 }
 
 @Preview(showBackground = true)

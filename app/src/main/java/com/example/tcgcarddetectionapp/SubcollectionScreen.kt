@@ -2,11 +2,14 @@ package com.example.tcgcarddetectionapp
 
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Paint.Align
 import android.net.Uri
 import android.util.Log
+import android.view.RoundedCorner
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,12 +27,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -49,7 +54,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -258,6 +266,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     .fillMaxWidth(.9f)
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
+                    .border(1.dp, colorResource(R.color.borderGray), shape = RoundedCornerShape(10.dp))
+                    .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp),
+                        spotColor = Color.Black, ambientColor = Color.Black)
             ) {
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center) {
@@ -340,18 +351,31 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 }
 
             }
-            TextField(
-                modifier = Modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally),
-                value = searchTerm,
-                onValueChange = { searchTerm = it },
-                label = { Text(stringResource(R.string.search_label)) }
-            )
-            Row(modifier = modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally)) {
+
+            Row(modifier = Modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically) {
+                TextField(
+                    modifier = Modifier.weight(.75f).padding(end = 5.dp).height(26.dp),
+                    value = searchTerm,
+                    onValueChange = { searchTerm = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.search_label)) }
+                )
                 Button(
-                    onClick = { showFilters = !showFilters }
+                    modifier = Modifier.weight(.25f).height(50.dp),
+                    shape = if (!showFilters) RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
+                            else RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp),
+                    onClick = {
+                        showFilters = !showFilters
+                    },
+                    colors = ButtonDefaults.buttonColors(colorResource(R.color.darkGray))
                 ) {
                     Text(stringResource(R.string.filter_button_label))
                 }
+            }
+
+            Row(modifier = modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally)) {
+
                 if(!allCardsFlag) {
                     Spacer(modifier = Modifier.weight(1f))
                     Button(
@@ -365,8 +389,12 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             }
 
             if (showFilters) {
-                Column {
-                    Row {
+                Column(modifier = Modifier.fillMaxWidth(.9f)
+                    .clip(RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp))
+                    .background(color = colorResource(R.color.darkGray))
+                    .align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(modifier = Modifier.padding(vertical = 10.dp)) {
                         MinMaxIntComponent(
                             minVal = selectedMinQuantity,
                             maxVal = selectedMaxQuantity,
@@ -376,7 +404,11 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             minError = minQuantErr,
                             onMinErrChange = { minQuantErr = it },
                             maxError = maxQuantErr,
-                            onMaxErrChange = { maxQuantErr = it }
+                            onMaxErrChange = { maxQuantErr = it },
+                            modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                                .background(Color.White)
+                                .padding(5.dp)
+                                .fillMaxWidth(.9f)
                         ) {
                             filterList.clear()
                             recalculateFilterList(
@@ -394,7 +426,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             }
                         }
                     }
-                    Row {
+                    Row(modifier = Modifier.padding(vertical = 10.dp)) {
                         MinMaxDoubleComponent(
                             minVal = selectedMinPrice,
                             maxVal = selectedMaxPrice,
@@ -422,7 +454,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             }
                         }
                     }
-                    Column {
+                    Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         if (game == "yugioh") {
                             MinMaxIntComponent(
                                 minVal = selectedMinLevel,
@@ -433,7 +465,11 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 minError = minLevelErr,
                                 onMinErrChange = { minLevelErr = it },
                                 maxError = maxLevelErr,
-                                onMaxErrChange = { maxLevelErr = it }
+                                onMaxErrChange = { maxLevelErr = it },
+                                modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                                    .background(Color.White)
+                                    .padding(5.dp)
+                                    .fillMaxWidth(.9f)
                             ) {
                                 filterList.clear()
                                 recalculateFilterList(
@@ -1155,10 +1191,13 @@ fun MinMaxIntComponent(minVal: String,
                        onMinErrChange: (Boolean) -> Unit,
                        maxError: Boolean,
                        onMaxErrChange: (Boolean) -> Unit,
+                       modifier: Modifier,
                        recalculateFilter: () -> Unit) {
-    Row {
-        Text(label)
+    Row(modifier = modifier) {
+        Text(modifier = Modifier.weight(.3f),
+            text = label)
         TextField(
+            modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(10.dp)).weight(.3f),
             value = minVal,
             onValueChange = {
                 onMinValChange(it)
@@ -1183,8 +1222,10 @@ fun MinMaxIntComponent(minVal: String,
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-        Text("-")
+        Text(modifier = Modifier.weight(.1f),
+            text = "-")
         TextField(
+            modifier = Modifier.border(1.dp, Color.Black, RoundedCornerShape(10.dp)).weight(.3f),
             value = maxVal,
             onValueChange = {
                 onMaxValChange(it)
