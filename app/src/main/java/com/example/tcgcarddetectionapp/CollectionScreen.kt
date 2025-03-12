@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -45,6 +50,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,7 +114,6 @@ fun CollectionScreen(gameName: String,
             verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .wrapContentWidth(Alignment.CenterHorizontally)
-                .verticalScroll(state = scrollstate)
         ) {
             Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
                 modifier = Modifier
@@ -236,28 +241,34 @@ fun CollectionScreen(gameName: String,
                     )
                 }
             }
-            
-            subcollections.forEach { subcollection ->
-                if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = leftOffset.dp, end = leftOffset.dp)
-                    ) {
-                        CollectionSummary(
-                            subcollection = subcollection,
-                            game = gameFilter,
-                            navController = navController,
-                            onEditSubcollectionInfo = {
-                                selectedSubcollectionInfo = it
-                                showEditPopup = !showEditPopup
-                            },
-                            onDeleteSubcollection = {
-                                selectedSubcollectionInfo = it
-                                showDeletePopup = !showDeletePopup
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                contentPadding = PaddingValues(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(subcollections) { subcollection ->
+                    if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = leftOffset.dp, end = leftOffset.dp)
+                        ) {
+                            CollectionSummary(
+                                subcollection = subcollection,
+                                game = gameFilter,
+                                navController = navController,
+                                onEditSubcollectionInfo = {
+                                    selectedSubcollectionInfo = it
+                                    showEditPopup = !showEditPopup
+                                },
+                                onDeleteSubcollection = {
+                                    selectedSubcollectionInfo = it
+                                    showDeletePopup = !showDeletePopup
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
@@ -628,8 +639,9 @@ fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
 }
 
 @Composable
-fun FilterTextfield(modifier: Modifier, label: String, value: String, onValueChange: (String) -> Unit) {
-    Column() {
+fun FilterTextfield(modifier: Modifier, label: String, value: String, onValueChange: (String) -> Unit,
+                    isError: Boolean) {
+    Column(modifier = modifier) {
         Text(
             text = label,
             modifier = Modifier.fillMaxWidth(),
@@ -637,19 +649,40 @@ fun FilterTextfield(modifier: Modifier, label: String, value: String, onValueCha
             color = Color.Black
         )
 
-        TextField(
+        BasicTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
-                .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)),
-            shape = RoundedCornerShape(8.dp),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-            )
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .background(Color.White, shape = RoundedCornerShape(8.dp)),
+            textStyle = TextStyle(color = Color.Black),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 8.dp,
+                        end = 16.dp,
+                        bottom = 8.dp
+                    )
+                ) {
+                    innerTextField()
+                }
+            },
+
         )
+
+        if (isError) {
+            Text(
+                text = stringResource(R.string.invalid_value_error),
+                color = Color.Red
+            )
+        }
     }
 }
 
