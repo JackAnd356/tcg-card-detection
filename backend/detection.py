@@ -2,8 +2,11 @@ import cv2
 import numpy as np
 import os
 import random
+import sys
 from pycocotools import mask as mask_utils
 import json
+
+"""Usage: Arg1 is number of training images to produce, Arg2 is number of test images to produce"""
 
 def load_detection_training_images(directories):
     lst = []
@@ -11,27 +14,6 @@ def load_detection_training_images(directories):
         for f in os.listdir(directory):
             if f.endswith(('.png', '.jpg', '.jpeg')): lst.append(os.path.join(directory, f))
     return lst
-
-def random_transform_card(card, max_rotation=30, max_scale=1.5, max_skew=0.2):
-    h, w = card.shape[:2]
-
-    # Random rotation
-    angle = random.uniform(-max_rotation, max_rotation)
-    M_rot = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
-
-    # Random scaling
-    scale = random.uniform(0.5, max_scale)
-    card = cv2.warpAffine(card, M_rot, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-
-    # Random skew
-    pts1 = np.float32([[0, 0], [w, 0], [0, h]])
-    skew_x = random.uniform(-max_skew, max_skew) * w
-    skew_y = random.uniform(-max_skew, max_skew) * h
-    pts2 = np.float32([[skew_x, 0], [w - skew_x, skew_y], [0, h - skew_y]])
-    M_skew = cv2.getAffineTransform(pts1, pts2)
-    card = cv2.warpAffine(card, M_skew, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
-
-    return card
 
 def composite_with_segmentation(background, cards, image_id, annotation_id):
     """
@@ -60,14 +42,16 @@ def composite_with_segmentation(background, cards, image_id, annotation_id):
             print(f"Warning: Failed to load {card_path}. Skipping...")
             continue
 
-        h, w = card.shape[:2]
-        ratio = h/w
+        h_orig, w_orig = card.shape[:2]
+        ratio = h_orig/w_orig
 
-        card = cv2.resize(card, (int(600/ratio), 600))
+        card = cv2.resize(card, (int(500/ratio), 500))
         h, w = card.shape[:2]
-        print(f'H:{h}, W:{w}')
-
-        card = add_alpha_channel(card)
+        #print(f'H:{h}, W:{w}')
+        try:
+            card = add_alpha_channel(card)
+        except:
+            continue
 
         # Random skew transformation
         pts1 = np.float32([[0, 0], [w, 0], [0, h]])
@@ -77,7 +61,7 @@ def composite_with_segmentation(background, cards, image_id, annotation_id):
         transform_matrix = cv2.getAffineTransform(pts1, pts2)
 
         # Apply transformation
-        transformed_card = safe_affine_transform(card, transform_matrix)
+        transformed_card, x_min, y_min = safe_affine_transform(card, transform_matrix)
         h_trans, w_trans = transformed_card.shape[:2]
 
 
@@ -91,16 +75,19 @@ def composite_with_segmentation(background, cards, image_id, annotation_id):
             card_region = occupancy_mask[y_offset:y_offset + h_trans, x_offset:x_offset + w_trans]
             overlap = np.sum(card_region)
             # print(overlap)
-            if overlap < 100000:  # Somewhat minimal overlap
+            if overlap < 10000:  # Somewhat minimal overlap
                 break
         else:
             # print(f"Warning: Could not find non-overlapping position for card after {max_attempts} attempts.")
             continue
 
+        # Generate Segmentation mask edges
+        edges = generate_card_edges(w, h, transform_matrix, x_offset, y_offset, x_min, y_min)
+
         # Update the occupancy mask
         cv2.fillConvexPoly(
             occupancy_mask,
-            np.int32(generate_card_edges(w_trans, h_trans, transform_matrix, x_offset, y_offset)).reshape((-1, 2)),
+            np.int32(edges).reshape((-1, 2)),
             1
         )
 
@@ -114,8 +101,11 @@ def composite_with_segmentation(background, cards, image_id, annotation_id):
                     if 0 <= y < bg_h and 0 <= x < bg_w:
                         background[y, x] = transformed_card[i, j, :3]
 
-        # Generate segmentation information (edges of the card)
-        edges = generate_card_edges(w, h, transform_matrix, x_offset, y_offset)
+
+        """for i in range(0, len(edges), 2):
+            cv2.circle(background, (int(edges[i]), int(edges[i + 1])), 5, (0, 255, 0), -1)
+        cv2.imshow('Debug Segmentation Points', background)
+        cv2.waitKey(0)"""
 
         # Add annotation
         annotations.append({
@@ -169,7 +159,7 @@ def safe_affine_transform(card, transform_matrix):
         borderValue=(0, 0, 0)  # Black background for missing areas
     )
 
-    return transformed_card
+    return transformed_card, x_min, y_min
 
 def add_alpha_channel(image):
     if image.shape[-1] != 3:
@@ -182,16 +172,18 @@ def add_alpha_channel(image):
     return np.dstack((image, alpha_channel))
 
 
-def generate_card_edges(w, h, transform_matrix, x_offset, y_offset):
+def generate_card_edges(w, h, transform_matrix, x_offset, y_offset, x_min, y_min):
     """
     Generates the edges of the card after applying transformations and positioning.
-
+    
     Args:
         w (int): Width of the card.
         h (int): Height of the card.
         transform_matrix (np.ndarray): Affine transformation matrix.
         x_offset (int): X offset of the card on the background.
         y_offset (int): Y offset of the card on the background.
+        x_min (int): X shift due to canvas expansion.
+        y_min (int): Y shift due to canvas expansion.
 
     Returns:
         list: Flattened list of edge coordinates [x1, y1, x2, y2, ..., x4, y4].
@@ -207,15 +199,14 @@ def generate_card_edges(w, h, transform_matrix, x_offset, y_offset):
     # Transform the corners
     transformed_corners = cv2.transform(np.array([corners]), transform_matrix)[0]
 
-    # Add offsets
-    transformed_corners[:, 0] += x_offset  # x-coordinates
-    transformed_corners[:, 1] += y_offset  # y-coordinates
+    # Adjust for canvas expansion and offsets
+    transformed_corners[:, 0] += (x_offset - x_min)
+    transformed_corners[:, 1] += (y_offset - y_min)
 
     # Flatten into a list
     return transformed_corners.flatten().tolist()
 
-def create_detection_dataset(output_dir, num_images, card_images, background_images):
-    annotations = []
+def create_detection_dataset(output_image_dir, output_annotations_dir, num_images, card_images, background_images, output_filename):
     images = []
     annotation_id = 1
 
@@ -232,7 +223,7 @@ def create_detection_dataset(output_dir, num_images, card_images, background_ima
 
         # Save the composited image
         image_filename = f"{image_id:06d}.jpg"
-        cv2.imwrite(os.path.join(output_dir, image_filename), composited_image)
+        cv2.imwrite(os.path.join(output_image_dir, image_filename), composited_image)
 
         # Add image metadata
         images.append({
@@ -242,19 +233,17 @@ def create_detection_dataset(output_dir, num_images, card_images, background_ima
             "height": composited_image.shape[0]
         })
 
-        # Add annotations
-        annotations.extend(image_annotations)
-
     # Save annotations to a JSON file
     dataset = {
         "images": images,
-        "annotations": annotations,
+        "annotations": image_annotations,
         "categories": [{"id": 1, "name": "card"}]
     }
-    with open(os.path.join(output_dir, "annotations.json"), "w") as f:
+    with open(os.path.join(output_annotations_dir, f'instances_{output_filename}.json'), "w") as f:
         json.dump(dataset, f, indent=4)
 
 card_dirs = ["../sample_images/yugioh", "../sample_images/mtg", "../sample_images/pokemon"]
 card_images = load_detection_training_images(card_dirs)
 background_imgs = load_detection_training_images(["../sample_images/background"])
-create_detection_dataset("../sample_images/composites", 5, card_images, background_imgs)
+create_detection_dataset("../data/cards/train", "../data/cards/annotations", int(sys.argv[1]), card_images, background_imgs, "train")
+create_detection_dataset("../data/cards/val", "../data/cards/annotations", int(sys.argv[2]), card_images, background_imgs, "val")

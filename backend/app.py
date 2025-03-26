@@ -846,19 +846,12 @@ def processCardImage(cardImagePath):
             payload = '&'.join([k if v is None else f'{k}={v}' for k, v in payload.items()])
             resp = requests.get(url, params=payload)
             if resp.status_code == 200:
-                cardData = resp.json()
-                if fuzz.ratio(cardData['data'][0]['name'], cardName) < 90:
-                    print('Fuzzy ratio is: ', fuzz.ratio(cardData['data'][0]['name'], cardName))
-                    scannedCards.append({'error': 'card search returned wrong card. please try scanning again'})
-                    continue
-                print('Fuzzy ratio is: ', fuzz.ratio(cardData['data'][0]['name'], cardName))
-                for setData in cardData['data'][0]['card_sets']:
-                    if fuzz.ratio(setData['set_code'], cardSetCode) > 95:
-                       setName = setData['set_name']
-                       continue
-                if setName == '':
+                ygoCard = resp.json()
+                cardData = Cards.ygoprodeck_to_card_data(ygoCard, cardSetCode)
+                if cardData is None:
                     scannedCards.append({'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'})
                     continue
+                
                 scannedCards.append(cardData)
                 continue
             scannedCards.append({'error': 'card not found'})
@@ -875,11 +868,13 @@ def processCardImage(cardImagePath):
                 url += scryfallid
                 resp = requests.get(url, headers=headers)
             if resp.status_code == 200:
-                cardData = resp.json()
+                scryfallCard = resp.json()
+                cardData = Cards.scryfall_to_card_data(scryfallCard)
                 if fuzz.ratio(cardData['collector_number'], cardId) < 90:
                    print('Fuzzy ratio is: ', fuzz.ratio(cardData['collector_number'], cardId))
                    scannedCards.append({'error': 'card search returned wrong card. please try scanning again'})
                    continue
+
                 scannedCards.append(cardData)
                 continue
             scannedCards.append({'error': 'card not found'})

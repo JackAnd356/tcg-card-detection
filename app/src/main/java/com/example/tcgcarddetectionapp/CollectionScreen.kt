@@ -3,9 +3,11 @@ package com.example.tcgcarddetectionapp
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -30,6 +36,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,14 +46,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tcgcarddetectionapp.models.CreateSubcollectionModel
@@ -86,24 +98,26 @@ fun CollectionScreen(gameName: String,
             cardCount = 0,
         ),
     ) }
+    val context = LocalContext.current
     var showEditPopup by remember { mutableStateOf(false) }
     var showDeletePopup by remember { mutableStateOf(false) }
     var refreshFlag by remember { mutableStateOf(false) }
+    val leftOffset = LocalConfiguration.current.screenWidthDp * 0.05
+    val cardWidth = 0.9f
 
     Box(
         modifier
-            .background(color = Color.LightGray)
+            .background(color = Color.White)
             .fillMaxWidth()
             .fillMaxHeight(.9f)) {
         Column(
             verticalArrangement = Arrangement.Top,
-            modifier = modifier
+            modifier = Modifier
                 .wrapContentWidth(Alignment.CenterHorizontally)
-                .verticalScroll(state = scrollstate)
         ) {
-            Card(colors = CardDefaults.cardColors(containerColor = Color.White),
-                modifier = modifier
-                    .fillMaxWidth(.8f)
+            Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
+                modifier = Modifier
+                    .fillMaxWidth(cardWidth)
                     .align(Alignment.CenterHorizontally)
                     .padding(vertical = 20.dp)
             ) {
@@ -117,50 +131,79 @@ fun CollectionScreen(gameName: String,
                     textAlign = TextAlign.Center
                 )
             }
-            Card(colors = CardDefaults.cardColors(containerColor = Color.White),
-                modifier = modifier
-                    .fillMaxWidth(.8f)
+            Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
+                modifier = Modifier
+                    .fillMaxWidth(cardWidth)
                     .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 20.dp),
+                    .padding(bottom = 20.dp),
                 onClick = {
                     navController.navigate(CardDetectionScreens.Subcollection.name + "/all/" + gameFilter)
                 }
             ) {
-                Text(
-                    text = String.format(
-                        stringResource(R.string.all_cards_label),
-                        totalCardCount
-                    ),
-                    fontSize = 20.sp,
-                    lineHeight = 25.sp,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = String.format(
-                        stringResource(R.string.total_value_label),
-                        totalCardValue,
-                        "$"
-                    ),
-                    fontSize = 20.sp,
-                    lineHeight = 25.sp,
-                    textAlign = TextAlign.Center
-                )
+                Column(modifier = Modifier.padding(vertical = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = String.format(
+                            stringResource(R.string.all_cards_label),
+                            totalCardCount
+                        ),
+                        modifier = Modifier.fillMaxWidth(1f),
+                        fontSize = 20.sp,
+                        lineHeight = 25.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = String.format(
+                            stringResource(R.string.total_value_label),
+                            totalCardValue,
+                            "$"
+                        ),
+                        modifier = Modifier.fillMaxWidth(1f),
+                        fontSize = 20.sp,
+                        lineHeight = 25.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = String.format(
+                            stringResource(R.string.view_all_collection),
+                            totalCardValue,
+                            "$"
+                        ),
+                        modifier = Modifier.fillMaxWidth(1f),
+                        fontSize = 20.sp,
+                        lineHeight = 25.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
             }
             TextField(
+                modifier = Modifier
+                    .fillMaxWidth(cardWidth)
+                    .align(Alignment.CenterHorizontally),
                 value = searchTerm,
                 onValueChange = { searchTerm = it },
                 label = { Text(stringResource(R.string.search_label)) }
             )
-            Button(onClick = {
-                popUp = true
-            },
-                colors = ButtonColors(
-                    containerColor = colorResource(R.color.lightGreen),
-                    contentColor = Color.Black,
-                    disabledContainerColor = colorResource(R.color.lightGreen),
-                    disabledContentColor = Color.Black),
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = leftOffset.dp, top = 5.dp)
             ) {
-                Text(stringResource(R.string.create_new_collection_label))
+                Button(
+                    onClick = {
+                        popUp = true
+                    },
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonColors(
+                        containerColor = colorResource(R.color.lightGreen),
+                        contentColor = Color.Black,
+                        disabledContainerColor = colorResource(R.color.lightGreen),
+                        disabledContentColor = Color.Black
+                    )
+                ) {
+                    Text(stringResource(R.string.create_new_collection_label))
+                }
             }
 
             if (popUp) {
@@ -198,23 +241,35 @@ fun CollectionScreen(gameName: String,
                     )
                 }
             }
-            
-            subcollections.forEach { subcollection ->
-                if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
-                    CollectionSummary(
-                        subcollection = subcollection,
-                        game = gameFilter,
-                        navController = navController,
-                        onEditSubcollectionInfo = {
-                            selectedSubcollectionInfo = it
-                            showEditPopup = !showEditPopup
-                            },
-                        onDeleteSubcollection = {
-                            selectedSubcollectionInfo = it
-                            showDeletePopup = !showDeletePopup
-                            },
-                        modifier = modifier
-                    )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(1),
+                contentPadding = PaddingValues(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(subcollections) { subcollection ->
+                    if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = leftOffset.dp, end = leftOffset.dp)
+                        ) {
+                            CollectionSummary(
+                                subcollection = subcollection,
+                                game = gameFilter,
+                                navController = navController,
+                                onEditSubcollectionInfo = {
+                                    selectedSubcollectionInfo = it
+                                    showEditPopup = !showEditPopup
+                                },
+                                onDeleteSubcollection = {
+                                    selectedSubcollectionInfo = it
+                                    showDeletePopup = !showDeletePopup
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -234,7 +289,7 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
     val location = subcollection.physLoc
     val totalValue = subcollection.totalValue ?: 0.0
     val subColId = subcollection.subcollectionid
-    Card(colors = CardDefaults.cardColors(containerColor = Color.White),
+    Card(colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gray)),
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 20.dp),
@@ -242,10 +297,20 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
             navController.navigate(CardDetectionScreens.Subcollection.name + "/" + subColId + "/" + game)
         }
     ) {
-        Row {
-            Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .weight(1f) // Allow the column to take up remaining space
+            ) {
                 Text(
                     text = name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     fontSize = 30.sp,
                     lineHeight = 35.sp,
                     textAlign = TextAlign.Left
@@ -258,6 +323,8 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                 )
                 Text(
                     text = String.format(stringResource(R.string.location_label), location),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     fontSize = 20.sp,
                     lineHeight = 25.sp,
                     textAlign = TextAlign.Left
@@ -270,9 +337,13 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                     ),
                     fontSize = 20.sp,
                     lineHeight = 25.sp,
-                    textAlign = TextAlign.Left)
+                    textAlign = TextAlign.Left
+                )
             }
-            Box {
+
+            Box(modifier = Modifier,
+                contentAlignment = Alignment.TopEnd
+            ) {
                 IconButton(
                     onClick = {
                         expanded = !expanded
@@ -280,7 +351,7 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More"
+                        contentDescription = stringResource(R.string.more_options)
                     )
                 }
                 DropdownMenu(
@@ -318,7 +389,7 @@ fun DialogTest(
     var subColName by remember { mutableStateOf("") }
     var subColLocation by remember { mutableStateOf("")}
     var isDeck by remember { mutableStateOf(false)}
-    var context = LocalContext.current
+    val context = LocalContext.current
     Dialog(onDismissRequest = { onDismissRequest() }) {
         // Draw a rectangle shape with rounded corners inside the dialog
         Card(
@@ -565,6 +636,54 @@ fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
         }
 
     })
+}
+
+@Composable
+fun FilterTextfield(modifier: Modifier, label: String, value: String, onValueChange: (String) -> Unit,
+                    isError: Boolean) {
+    Column(modifier = modifier) {
+        Text(
+            text = label,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start,
+            color = Color.Black
+        )
+
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .background(Color.White, shape = RoundedCornerShape(8.dp)),
+            textStyle = TextStyle(color = Color.Black),
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 8.dp,
+                        end = 16.dp,
+                        bottom = 8.dp
+                    )
+                ) {
+                    innerTextField()
+                }
+            },
+
+        )
+
+        if (isError) {
+            Text(
+                text = stringResource(R.string.invalid_value_error),
+                color = Color.Red
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)

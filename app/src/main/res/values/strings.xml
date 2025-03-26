@@ -66,6 +66,10 @@
     <string name="card_image_not_loaded_context">Card Image Could Not Be Loaded</string>
     <string name="edit_option_label">Edit</string>
     <string name="delete_option_label">Delete</string>
+    <string name="scan_network_error">There was a network error in processing your image, try again</string>
+    <string name="take_another_photo_label">Take Another Photo</string>
+    <string name="no_card_error">Cards could not be found within the image, try taking an image in better lighting or closer up.</string>
+    <string name="go_to_collection_label">Go to Yugioh Collection</string>
     <string name="subcol_name_label">Subcollection Name:</string>
     <string name="subcol_physloc_label">Sub-Collection Physical Location:</string>
     <string name="subcol_isdeck_label">Is this collection a Deck?</string>
@@ -83,5 +87,22 @@
     <string name="remove_card_title">Remove Card?</string>
     <string name="remove_card_all_cards_text">Are you sure you want to remove this card from your collection (This Cannot Be Undone)?</string>
     <string name="remove_card_subcollection_text">Are you sure you want to remove this card from %1$s?</string>
-    <string name="labeled_data_entry_ghost_text">Enter %1$s Here...</string>
+    <string name="user_photo_instructions">Some Tips for Taking a Good Photo\n\n 1. Make sure to include all of the card you are trying to scan.\n\n 2. Try not to overlap cards.\n\n 3. Take the photo in a room with good lighting.</string>
+    <string name="labeled_data_entry_ghost_text">Enter %1$s Here&#8230;</string>
+    <string name="scan_screen_heading">Scan</string>
+    <string name="rarity_choice_text">Our scanner could not find the rarity for this card. Please select the image/description which best fits the card.</string>
+    <string name="yugioh_common_description">Name in black/white and no foil on card.</string>
+    <string name="yugioh_rare_description">Name in silver and no foil on card</string>
+    <string name="yugioh_ultra_rare_description">Name in gold and foiling throughout card</string>
+    <string name="yugioh_super_rare_description">Name in black/white and foiling only on picture</string>
+    <string name="yugioh_ultimate_rare_description">Name in gold and embossed. Picture embossed as well.</string>
+    <string name="yugioh_secret_rare_description">Name in silver. Diagonal holographic lines throughout card</string>
+    <string name="yugioh_ghost_rare_description">Gold name. Mirror-like finish which looks white and shows picture when tilted</string>
+    <string name="yugioh_starlight_rare_description">Extremely visible foiling. Lines and rainbows visible throughout</string>
+    <string name="submit">Submit</string>
+    <string name="view_all_collection">Click to View All</string>
+    <string name="ignore_card">Ignore This Card</string>
+    <string name="more_options">More Options</string>
+    <string name="min">Min:</string>
+    <string name="max">Max:</string>
 </resources>

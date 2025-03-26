@@ -1,0 +1,2557 @@
+{
+    "Scourge of Skola Vale": {
+        "name": "Scourge of Skola Vale",
+        "setcode": "BNG",
+        "scryfallId": "baef76dc-7cef-449b-b8a7-e038887129d9"
+    },
+    "Kiora, the Crashing Wave": {
+        "name": "Kiora, the Crashing Wave",
+        "setcode": "BNG",
+        "scryfallId": "f77ac7fa-718d-425f-a0aa-2f8e2bfc0950"
+    },
+    "Yomiji, Who Bars the Way": {
+        "name": "Yomiji, Who Bars the Way",
+        "setcode": "BOK",
+        "scryfallId": "f611af49-3c59-4365-a398-93f7e05ff0d0"
+    },
+    "Prowl, Stoic Strategist // Prowl, Pursuit Vehicle": {
+        "name": "Prowl, Stoic Strategist // Prowl, Pursuit Vehicle",
+        "setcode": "BOT",
+        "scryfallId": "770dea30-cef4-476a-beec-7a7fa967d07b"
+    },
+    "Ratchet, Field Medic // Ratchet, Rescue Racer": {
+        "name": "Ratchet, Field Medic // Ratchet, Rescue Racer",
+        "setcode": "BOT",
+        "scryfallId": "619e0c3a-14aa-43dc-bc55-dc97e3d7ccb4"
+    },
+    "Jetfire, Ingenious Scientist // Jetfire, Air Guardian": {
+        "name": "Jetfire, Ingenious Scientist // Jetfire, Air Guardian",
+        "setcode": "BOT",
+        "scryfallId": "f4362cd5-5b6a-457f-8d73-71dff9f76335"
+    },
+    "Blitzwing, Cruel Tormentor // Blitzwing, Adaptive Assailant": {
+        "name": "Blitzwing, Cruel Tormentor // Blitzwing, Adaptive Assailant",
+        "setcode": "BOT",
+        "scryfallId": "3ea597a5-0057-4328-9f6e-a446cde91ece"
+    },
+    "Starscream, Power Hungry // Starscream, Seeker Leader": {
+        "name": "Starscream, Power Hungry // Starscream, Seeker Leader",
+        "setcode": "BOT",
+        "scryfallId": "90fa398b-f2f7-474f-a840-244238a67c31"
+    },
+    "Slicer, Hired Muscle // Slicer, High-Speed Antagonist": {
+        "name": "Slicer, Hired Muscle // Slicer, High-Speed Antagonist",
+        "setcode": "BOT",
+        "scryfallId": "a35108d8-f6c5-4474-9049-64fd7e3b1310"
+    },
+    "Arcee, Sharpshooter // Arcee, Acrobatic Coupe": {
+        "name": "Arcee, Sharpshooter // Arcee, Acrobatic Coupe",
+        "setcode": "BOT",
+        "scryfallId": "21462db4-7739-4853-845f-0c2aa38fd2a6"
+    },
+    "Blaster, Combat DJ // Blaster, Morale Booster": {
+        "name": "Blaster, Combat DJ // Blaster, Morale Booster",
+        "setcode": "BOT",
+        "scryfallId": "5aacffa9-ee64-4451-9519-10c5f3e5aa86"
+    },
+    "Cyclonus, the Saboteur // Cyclonus, Cybertronian Fighter": {
+        "name": "Cyclonus, the Saboteur // Cyclonus, Cybertronian Fighter",
+        "setcode": "BOT",
+        "scryfallId": "e703b74f-9105-42b3-b38c-8f38da840f0c"
+    },
+    "Flamewar, Brash Veteran // Flamewar, Streetwise Operative": {
+        "name": "Flamewar, Brash Veteran // Flamewar, Streetwise Operative",
+        "setcode": "BOT",
+        "scryfallId": "292e1d00-435e-404b-b10e-0fae965651e9"
+    },
+    "Goldbug, Humanity's Ally // Goldbug, Scrappy Scout": {
+        "name": "Goldbug, Humanity's Ally // Goldbug, Scrappy Scout",
+        "setcode": "BOT",
+        "scryfallId": "67a29ad8-2cca-4dab-ac71-d3b0b2489d79"
+    },
+    "Megatron, Tyrant // Megatron, Destructive Force": {
+        "name": "Megatron, Tyrant // Megatron, Destructive Force",
+        "setcode": "BOT",
+        "scryfallId": "19385c88-9af3-4931-8dfc-6e51a5c5f816"
+    },
+    "Optimus Prime, Hero // Optimus Prime, Autobot Leader": {
+        "name": "Optimus Prime, Hero // Optimus Prime, Autobot Leader",
+        "setcode": "BOT",
+        "scryfallId": "8fc5a3d7-4d5f-4e02-9d00-b9cf5e5cd269"
+    },
+    "Soundwave, Sonic Spy // Soundwave, Superior Captain": {
+        "name": "Soundwave, Sonic Spy // Soundwave, Superior Captain",
+        "setcode": "BOT",
+        "scryfallId": "3c24f9cb-2451-4651-826b-a1cd645af502"
+    },
+    "Ultra Magnus, Tactician // Ultra Magnus, Armored Carrier": {
+        "name": "Ultra Magnus, Tactician // Ultra Magnus, Armored Carrier",
+        "setcode": "BOT",
+        "scryfallId": "73ac68c0-0830-4343-863b-adde0f1b8b61"
+    },
+    "Aetherflux Reservoir": {
+        "name": "Aetherflux Reservoir",
+        "setcode": "BRR",
+        "scryfallId": "7f5342d5-b8a6-46ee-afd7-b333bb836a7c"
+    },
+    "Astral Cornucopia": {
+        "name": "Astral Cornucopia",
+        "setcode": "BRR",
+        "scryfallId": "4ea24f0f-7bda-459c-a962-bde22065d7cf"
+    },
+    "Blackblade Reforged": {
+        "name": "Blackblade Reforged",
+        "setcode": "BRR",
+        "scryfallId": "2cde7ae2-87b9-43d0-87cf-38c8706dd95e"
+    },
+    "Thopter Assembly": {
+        "name": "Thopter Assembly",
+        "setcode": "C18",
+        "scryfallId": "b743c4d6-8bf6-4250-a9c0-d85b0d38572d"
+    },
+    "Storm Herd": {
+        "name": "Storm Herd",
+        "setcode": "C19",
+        "scryfallId": "058a7abf-8112-4f67-b465-317c87ad0d63"
+    },
+    "Jace's Sanctum": {
+        "name": "Jace's Sanctum",
+        "setcode": "C19",
+        "scryfallId": "8148adc6-7946-4abd-8601-b1f4cd6916c2"
+    },
+    "Chaos Warp": {
+        "name": "Chaos Warp",
+        "setcode": "C19",
+        "scryfallId": "725fc7bf-fa82-497a-9256-ad55323d9a5f"
+    },
+    "Biomass Mutation": {
+        "name": "Biomass Mutation",
+        "setcode": "C21",
+        "scryfallId": "80fc2879-c73d-41c7-987c-cbeaca02cc45"
+    },
+    "Liliana, Heretical Healer // Liliana, Defiant Necromancer": {
+        "name": "Liliana, Heretical Healer // Liliana, Defiant Necromancer",
+        "setcode": "V17",
+        "scryfallId": "b101dd14-aff1-4811-bf1b-468930dd2999"
+    },
+    "Decree of Pain": {
+        "name": "Decree of Pain",
+        "setcode": "CM1",
+        "scryfallId": "03c37c68-cccf-4309-80c5-828108b942a4"
+    },
+    "The Battle of Dragon Brothers // Fate Reforged": {
+        "name": "The Battle of Dragon Brothers // Fate Reforged",
+        "setcode": "DA1",
+        "scryfallId": "6ad2d87a-1ddb-4803-8995-c4c6027d9c74"
+    },
+    "Ambitious Farmhand // Seasoned Cathar": {
+        "name": "Ambitious Farmhand // Seasoned Cathar",
+        "setcode": "MID",
+        "scryfallId": "54d4e7c3-294d-4900-8b70-faafda17cc33"
+    },
+    "Beloved Beggar // Generous Soul": {
+        "name": "Beloved Beggar // Generous Soul",
+        "setcode": "MID",
+        "scryfallId": "6109b54e-56c5-4014-9f6d-d5f7a0fd725d"
+    },
+    "Bereaved Survivor // Dauntless Avenger": {
+        "name": "Bereaved Survivor // Dauntless Avenger",
+        "setcode": "MID",
+        "scryfallId": "4adee830-62fd-4ab4-b1c6-a8bbe15331d1"
+    },
+    "Brutal Cathar // Moonrage Brute": {
+        "name": "Brutal Cathar // Moonrage Brute",
+        "setcode": "PMID",
+        "scryfallId": "449d53ab-5e75-4370-a16a-5b03b0c16cc7"
+    },
+    "Chaplain of Alms // Chapel Shieldgeist": {
+        "name": "Chaplain of Alms // Chapel Shieldgeist",
+        "setcode": "MID",
+        "scryfallId": "20e94e17-2e4c-41cd-8cc5-39ab41037287"
+    },
+    "Enduring Angel // Angelic Enforcer": {
+        "name": "Enduring Angel // Angelic Enforcer",
+        "setcode": "PRM",
+        "scryfallId": "729d9ed0-0cd1-4be3-98bf-261711d531dc"
+    },
+    "Lunarch Veteran // Luminous Phantom": {
+        "name": "Lunarch Veteran // Luminous Phantom",
+        "setcode": "MID",
+        "scryfallId": "d2704743-2e23-40b9-a367-c73d2db45afc"
+    },
+    "Mourning Patrol // Morning Apparition": {
+        "name": "Mourning Patrol // Morning Apparition",
+        "setcode": "MID",
+        "scryfallId": "2d3687e2-09e0-4753-aa02-88a19bde3330"
+    },
+    "Baithook Angler // Hook-Haunt Drifter": {
+        "name": "Baithook Angler // Hook-Haunt Drifter",
+        "setcode": "MID",
+        "scryfallId": "36e71d16-0964-489d-bea2-9cec7991fc99"
+    },
+    "Covetous Castaway // Ghostly Castigator": {
+        "name": "Covetous Castaway // Ghostly Castigator",
+        "setcode": "MID",
+        "scryfallId": "03a3ea4b-d292-4602-985f-7a7971ca73ec"
+    },
+    "Delver of Secrets // Insectile Aberration": {
+        "name": "Delver of Secrets // Insectile Aberration",
+        "setcode": "V17",
+        "scryfallId": "28059d09-2c7d-4c61-af55-8942107a7c1f"
+    },
+    "Galedrifter // Waildrifter": {
+        "name": "Galedrifter // Waildrifter",
+        "setcode": "MID",
+        "scryfallId": "eb34c472-c6ff-4d83-ac8b-a8f279593f98"
+    },
+    "Malevolent Hermit // Benevolent Geist": {
+        "name": "Malevolent Hermit // Benevolent Geist",
+        "setcode": "PRM",
+        "scryfallId": "250f05ad-1006-42cf-8003-b3c1d92ce5cb"
+    },
+    "Mysterious Tome // Chilling Chronicle": {
+        "name": "Mysterious Tome // Chilling Chronicle",
+        "setcode": "MID",
+        "scryfallId": "caa57b63-bb11-45e8-8795-de92ca61f4f1"
+    },
+    "Overwhelmed Archivist // Archive Haunt": {
+        "name": "Overwhelmed Archivist // Archive Haunt",
+        "setcode": "MID",
+        "scryfallId": "832288fd-8031-4c2b-ad3e-b1ec9f94d379"
+    },
+    "Poppet Stitcher // Poppet Factory": {
+        "name": "Poppet Stitcher // Poppet Factory",
+        "setcode": "PRM",
+        "scryfallId": "8abac131-f8b2-428e-bda8-a84f3ad8f1ba"
+    },
+    "Suspicious Stowaway // Seafaring Werewolf": {
+        "name": "Suspicious Stowaway // Seafaring Werewolf",
+        "setcode": "PMID",
+        "scryfallId": "6a3f1aae-6046-49a2-84e2-b73d5ed72474"
+    },
+    "Baneblade Scoundrel // Baneclaw Marauder": {
+        "name": "Baneblade Scoundrel // Baneclaw Marauder",
+        "setcode": "MID",
+        "scryfallId": "5b13fbff-8b72-459a-ac72-3429be6e192d"
+    },
+    "Covert Cutpurse // Covetous Geist": {
+        "name": "Covert Cutpurse // Covetous Geist",
+        "setcode": "MID",
+        "scryfallId": "5db99746-8aee-42b8-acb0-ed69933d0ff8"
+    },
+    "Curse of Leeches // Leeching Lurker": {
+        "name": "Curse of Leeches // Leeching Lurker",
+        "setcode": "PRM",
+        "scryfallId": "9b455a54-fbb1-499c-860b-2709b4b3806a"
+    },
+    "Ecstatic Awakener // Awoken Demon": {
+        "name": "Ecstatic Awakener // Awoken Demon",
+        "setcode": "MID",
+        "scryfallId": "bbdad18e-e262-41f9-b252-1cbdcdd1b5f9"
+    },
+    "Graveyard Trespasser // Graveyard Glutton": {
+        "name": "Graveyard Trespasser // Graveyard Glutton",
+        "setcode": "PMID",
+        "scryfallId": "a5a18247-e4e4-42dd-9923-fc7390032b07"
+    },
+    "Heirloom Mirror // Inherited Fiend": {
+        "name": "Heirloom Mirror // Inherited Fiend",
+        "setcode": "MID",
+        "scryfallId": "e6dd05f0-a3c0-4bd6-a1d1-a74540623093"
+    },
+    "Jerren, Corrupted Bishop // Ormendahl, the Corrupter": {
+        "name": "Jerren, Corrupted Bishop // Ormendahl, the Corrupter",
+        "setcode": "PMID",
+        "scryfallId": "27f16142-724c-4312-8621-0bca898112f2"
+    },
+    "Shady Traveler // Stalking Predator": {
+        "name": "Shady Traveler // Stalking Predator",
+        "setcode": "MID",
+        "scryfallId": "b1463082-62bb-4aa6-8763-b865ef1fdb68"
+    },
+    "Vengeful Strangler // Strangling Grasp": {
+        "name": "Vengeful Strangler // Strangling Grasp",
+        "setcode": "MID",
+        "scryfallId": "d4054ae6-0227-4d99-8cb5-72e8b5d0b726"
+    },
+    "Fangblade Brigand // Fangblade Eviscerator": {
+        "name": "Fangblade Brigand // Fangblade Eviscerator",
+        "setcode": "MID",
+        "scryfallId": "35e17f53-021b-484b-9ede-524742fe8aae"
+    },
+    "Flame Channeler // Embodiment of Flame": {
+        "name": "Flame Channeler // Embodiment of Flame",
+        "setcode": "MID",
+        "scryfallId": "be91fcba-4599-4ecb-824d-55112096c34a"
+    },
+    "Harvesttide Infiltrator // Harvesttide Assailant": {
+        "name": "Harvesttide Infiltrator // Harvesttide Assailant",
+        "setcode": "MID",
+        "scryfallId": "28bc2848-b6fb-444d-b909-01c712696547"
+    },
+    "Reckless Stormseeker // Storm-Charged Slasher": {
+        "name": "Reckless Stormseeker // Storm-Charged Slasher",
+        "setcode": "PMID",
+        "scryfallId": "3cd00777-8c2d-4474-a20d-bc6d4b9a16a4"
+    },
+    "Smoldering Egg // Ashmouth Dragon": {
+        "name": "Smoldering Egg // Ashmouth Dragon",
+        "setcode": "PRM",
+        "scryfallId": "0bb8554c-d202-4961-b992-3c95e860c1a1"
+    },
+    "Spellrune Painter // Spellrune Howler": {
+        "name": "Spellrune Painter // Spellrune Howler",
+        "setcode": "MID",
+        "scryfallId": "1d4d2aac-84ed-434e-921e-b724e3854cf2"
+    },
+    "Tavern Ruffian // Tavern Smasher": {
+        "name": "Tavern Ruffian // Tavern Smasher",
+        "setcode": "MID",
+        "scryfallId": "8ca358b8-dee7-462d-aee1-f2e271d38370"
+    },
+    "Village Watch // Village Reavers": {
+        "name": "Village Watch // Village Reavers",
+        "setcode": "MID",
+        "scryfallId": "a622635e-482d-4621-8874-3945af74e9ca"
+    },
+    "Bird Admirer // Wing Shredder": {
+        "name": "Bird Admirer // Wing Shredder",
+        "setcode": "MID",
+        "scryfallId": "7247d5ab-2897-4c89-a030-2947328a0c9e"
+    },
+    "Burly Breaker // Dire-Strain Demolisher": {
+        "name": "Burly Breaker // Dire-Strain Demolisher",
+        "setcode": "MID",
+        "scryfallId": "1b50c98e-6c3b-4129-ae93-10c0bf9270fc"
+    },
+    "Deathbonnet Sprout // Deathbonnet Hulk": {
+        "name": "Deathbonnet Sprout // Deathbonnet Hulk",
+        "setcode": "MID",
+        "scryfallId": "a2cda10b-7cd5-4cf5-87bd-c3b8c6aa2b47"
+    },
+    "Hound Tamer // Untamed Pup": {
+        "name": "Hound Tamer // Untamed Pup",
+        "setcode": "MID",
+        "scryfallId": "83218607-240e-4473-8b0b-6b4670b010e6"
+    },
+    "Outland Liberator // Frenzied Trapbreaker": {
+        "name": "Outland Liberator // Frenzied Trapbreaker",
+        "setcode": "MID",
+        "scryfallId": "f86b7c7e-825a-4634-8a85-3b56f112188c"
+    },
+    "Tireless Hauler // Dire-Strain Brawler": {
+        "name": "Tireless Hauler // Dire-Strain Brawler",
+        "setcode": "MID",
+        "scryfallId": "552bb3a5-0c2c-4dc5-aee8-1048b04e69f9"
+    },
+    "Tovolar's Huntmaster // Tovolar's Packleader": {
+        "name": "Tovolar's Huntmaster // Tovolar's Packleader",
+        "setcode": "PMID",
+        "scryfallId": "03aa5d2a-c194-4ff7-abc6-4df32a48b018"
+    },
+    "Arlinn, the Pack's Hope // Arlinn, the Moon's Fury": {
+        "name": "Arlinn, the Pack's Hope // Arlinn, the Moon's Fury",
+        "setcode": "PRM",
+        "scryfallId": "038c2d23-50d0-4590-87f9-f4099832da06"
+    },
+    "Dennick, Pious Apprentice // Dennick, Pious Apparition": {
+        "name": "Dennick, Pious Apprentice // Dennick, Pious Apparition",
+        "setcode": "PMID",
+        "scryfallId": "261add35-d42d-4ec3-92f7-46136c20a639"
+    },
+    "Devoted Grafkeeper // Departed Soulkeeper": {
+        "name": "Devoted Grafkeeper // Departed Soulkeeper",
+        "setcode": "MID",
+        "scryfallId": "965e6bd5-dc32-406c-bc99-ceb15be4d3f2"
+    },
+    "Kessig Naturalist // Lord of the Ulvenwald": {
+        "name": "Kessig Naturalist // Lord of the Ulvenwald",
+        "setcode": "MID",
+        "scryfallId": "3ee3f0ed-e4ea-483e-bacc-d58bcf9e07b5"
+    },
+    "Ludevic, Necrogenius // Olag, Ludevic's Hubris": {
+        "name": "Ludevic, Necrogenius // Olag, Ludevic's Hubris",
+        "setcode": "PMID",
+        "scryfallId": "0cca6107-af47-4b31-8642-7a1a37afefb2"
+    },
+    "Tovolar, Dire Overlord // Tovolar, the Midnight Scourge": {
+        "name": "Tovolar, Dire Overlord // Tovolar, the Midnight Scourge",
+        "setcode": "SLD",
+        "scryfallId": "54c92a0d-ab6e-45b2-b7a8-e13a5dd4e74e"
+    },
+    "Mystic Skull // Mystic Monstrosity": {
+        "name": "Mystic Skull // Mystic Monstrosity",
+        "setcode": "MID",
+        "scryfallId": "115a9a44-131d-45f3-852a-40fd18e4afb6"
+    },
+    "Hostile Hostel // Creeping Inn": {
+        "name": "Hostile Hostel // Creeping Inn",
+        "setcode": "PRM",
+        "scryfallId": "6e0f348b-fcd5-4c08-be35-2b8547357785"
+    },
+    "Distracting Geist // Clever Distraction": {
+        "name": "Distracting Geist // Clever Distraction",
+        "setcode": "VOW",
+        "scryfallId": "a7fc0939-6286-44de-a727-c83bfd3fa752"
+    },
+    "Drogskol Infantry // Drogskol Armaments": {
+        "name": "Drogskol Infantry // Drogskol Armaments",
+        "setcode": "VOW",
+        "scryfallId": "f88e269e-ff3d-4775-8520-5b7a6dddf23d"
+    },
+    "Faithbound Judge // Sinner's Judgment": {
+        "name": "Faithbound Judge // Sinner's Judgment",
+        "setcode": "VOW",
+        "scryfallId": "2699d2a8-8f17-42d2-9eb2-8c1ab8dda6c4"
+    },
+    "Katilda, Dawnhart Martyr // Katilda's Rising Dawn": {
+        "name": "Katilda, Dawnhart Martyr // Katilda's Rising Dawn",
+        "setcode": "VOW",
+        "scryfallId": "866828f0-71f7-454b-93a7-2f2ea707f53d"
+    },
+    "Kindly Ancestor // Ancestor's Embrace": {
+        "name": "Kindly Ancestor // Ancestor's Embrace",
+        "setcode": "VOW",
+        "scryfallId": "25193485-7f41-4b05-9a69-4c112679f97c"
+    },
+    "Panicked Bystander // Cackling Culprit": {
+        "name": "Panicked Bystander // Cackling Culprit",
+        "setcode": "VOW",
+        "scryfallId": "031c5cff-e579-432a-bcee-864b12eb0558"
+    },
+    "Radiant Grace // Radiant Restraints": {
+        "name": "Radiant Grace // Radiant Restraints",
+        "setcode": "VOW",
+        "scryfallId": "4a708243-42a1-4fa7-8b0b-9d5163da84bb"
+    },
+    "Twinblade Geist // Twinblade Invocation": {
+        "name": "Twinblade Geist // Twinblade Invocation",
+        "setcode": "VOW",
+        "scryfallId": "f1deb24b-3d8f-4251-a901-85eeb891f26f"
+    },
+    "Wedding Announcement // Wedding Festivity": {
+        "name": "Wedding Announcement // Wedding Festivity",
+        "setcode": "VOW",
+        "scryfallId": "f3e60e71-bf44-475b-bfce-815ad8abf9e2"
+    },
+    "Binding Geist // Spectral Binding": {
+        "name": "Binding Geist // Spectral Binding",
+        "setcode": "VOW",
+        "scryfallId": "730e4629-dc54-415d-9493-88885788ca19"
+    },
+    "Biolume Egg // Biolume Serpent": {
+        "name": "Biolume Egg // Biolume Serpent",
+        "setcode": "VOW",
+        "scryfallId": "57039230-bf5a-4489-9dc1-37e27b17bd84"
+    },
+    "Gutter Skulker // Gutter Shortcut": {
+        "name": "Gutter Skulker // Gutter Shortcut",
+        "setcode": "VOW",
+        "scryfallId": "ceb84515-7b8f-444d-b6a9-61231621f9b7"
+    },
+    "Jacob Hauken, Inspector // Hauken's Insight": {
+        "name": "Jacob Hauken, Inspector // Hauken's Insight",
+        "setcode": "VOW",
+        "scryfallId": "c0f0004e-ee4c-4372-be5d-a5102f45210e"
+    },
+    "Lantern Bearer // Lanterns' Lift": {
+        "name": "Lantern Bearer // Lanterns' Lift",
+        "setcode": "VOW",
+        "scryfallId": "a4d3652a-6774-4b16-aa8b-cb11d72ec7aa"
+    },
+    "Mirrorhall Mimic // Ghastly Mimicry": {
+        "name": "Mirrorhall Mimic // Ghastly Mimicry",
+        "setcode": "VOW",
+        "scryfallId": "f4135910-57ba-4f1a-ad48-4e14d44bf2a1"
+    },
+    "Mischievous Catgeist // Catlike Curiosity": {
+        "name": "Mischievous Catgeist // Catlike Curiosity",
+        "setcode": "VOW",
+        "scryfallId": "a3ff628a-ef8e-45c4-84e7-a33ec28f025a"
+    },
+    "Soulcipher Board // Cipherbound Spirit": {
+        "name": "Soulcipher Board // Cipherbound Spirit",
+        "setcode": "VOW",
+        "scryfallId": "3c0fae23-1278-499f-9df7-4a29691726b1"
+    },
+    "Bloodsworn Squire // Bloodsworn Knight": {
+        "name": "Bloodsworn Squire // Bloodsworn Knight",
+        "setcode": "VOW",
+        "scryfallId": "50ea34d6-e690-4087-baf0-0b7a88739760"
+    },
+    "Catapult Fodder // Catapult Captain": {
+        "name": "Catapult Fodder // Catapult Captain",
+        "setcode": "VOW",
+        "scryfallId": "e61b3afa-66e0-4f7b-84bc-7ae2cc6d28d4"
+    },
+    "Concealing Curtains // Revealing Eye": {
+        "name": "Concealing Curtains // Revealing Eye",
+        "setcode": "VOW",
+        "scryfallId": "25f96283-0dab-49d3-a1b1-d77d07c172ae"
+    },
+    "Desperate Farmer // Depraved Harvester": {
+        "name": "Desperate Farmer // Depraved Harvester",
+        "setcode": "VOW",
+        "scryfallId": "467c566e-7f6a-40c9-8fd7-da6ae96df56c"
+    },
+    "Henrika Domnathi // Henrika, Infernal Seer": {
+        "name": "Henrika Domnathi // Henrika, Infernal Seer",
+        "setcode": "VOW",
+        "scryfallId": "aafe47a8-0223-4c0b-b6ce-e25446a07c96"
+    },
+    "Innocent Traveler // Malicious Invader": {
+        "name": "Innocent Traveler // Malicious Invader",
+        "setcode": "VOW",
+        "scryfallId": "7a043975-59b4-490c-bf33-c08bd7b40bd3"
+    },
+    "Ragged Recluse // Odious Witch": {
+        "name": "Ragged Recluse // Odious Witch",
+        "setcode": "VOW",
+        "scryfallId": "7fb728de-0d6e-4b32-b0c4-edd7382d1391"
+    },
+    "Restless Bloodseeker // Bloodsoaked Reveler": {
+        "name": "Restless Bloodseeker // Bloodsoaked Reveler",
+        "setcode": "VOW",
+        "scryfallId": "c05a85ef-5ac0-4bd1-8ef1-de2ff84e448d"
+    },
+    "Voldaren Bloodcaster // Bloodbat Summoner": {
+        "name": "Voldaren Bloodcaster // Bloodbat Summoner",
+        "setcode": "VOW",
+        "scryfallId": "0954ed3d-a5d8-4330-b07c-bf3e51192e4b"
+    },
+    "Alluring Suitor // Deadly Dancer": {
+        "name": "Alluring Suitor // Deadly Dancer",
+        "setcode": "VOW",
+        "scryfallId": "8075878b-b673-4d0c-b335-8a37295cd8d8"
+    },
+    "Ballista Watcher // Ballista Wielder": {
+        "name": "Ballista Watcher // Ballista Wielder",
+        "setcode": "VOW",
+        "scryfallId": "63d96c52-66ce-4b46-9a0b-7cd9a43f9253"
+    },
+    "Fearful Villager // Fearsome Werewolf": {
+        "name": "Fearful Villager // Fearsome Werewolf",
+        "setcode": "VOW",
+        "scryfallId": "5eb3a08e-1d31-4ab9-854f-a86b060696ec"
+    },
+    "Ill-Tempered Loner // Howlpack Avenger": {
+        "name": "Ill-Tempered Loner // Howlpack Avenger",
+        "setcode": "VOW",
+        "scryfallId": "4a1ce3cd-380a-4ecc-b837-7ffeaccd5c91"
+    },
+    "Lambholt Raconteur // Lambholt Ravager": {
+        "name": "Lambholt Raconteur // Lambholt Ravager",
+        "setcode": "VOW",
+        "scryfallId": "0cbee24c-9147-46cb-a5f9-8d919c021aa4"
+    },
+    "Volatile Arsonist // Dire-Strain Anarchist": {
+        "name": "Volatile Arsonist // Dire-Strain Anarchist",
+        "setcode": "VOW",
+        "scryfallId": "52d94eb6-d96c-4b88-9450-b1ee472795fa"
+    },
+    "Voltaic Visionary // Volt-Charged Berserker": {
+        "name": "Voltaic Visionary // Volt-Charged Berserker",
+        "setcode": "VOW",
+        "scryfallId": "a8b85386-462b-46f8-9412-fd47ed1dc1da"
+    },
+    "Weary Prisoner // Wrathful Jailbreaker": {
+        "name": "Weary Prisoner // Wrathful Jailbreaker",
+        "setcode": "VOW",
+        "scryfallId": "e641467b-ac2e-4d29-aed7-5cc227c3b1ce"
+    },
+    "Avabruck Caretaker // Hollowhenge Huntmaster": {
+        "name": "Avabruck Caretaker // Hollowhenge Huntmaster",
+        "setcode": "VOW",
+        "scryfallId": "6b525a96-17cb-427e-a88b-484e23f78537"
+    },
+    "Dormant Grove // Gnarled Grovestrider": {
+        "name": "Dormant Grove // Gnarled Grovestrider",
+        "setcode": "VOW",
+        "scryfallId": "e7d3012e-1798-4f72-8d9a-b2d16f817502"
+    },
+    "Hookhand Mariner // Riphook Raider": {
+        "name": "Hookhand Mariner // Riphook Raider",
+        "setcode": "VOW",
+        "scryfallId": "54a4b031-0919-44aa-a35e-68da7a27235a"
+    },
+    "Howlpack Piper // Wildsong Howler": {
+        "name": "Howlpack Piper // Wildsong Howler",
+        "setcode": "VOW",
+        "scryfallId": "c598c30a-056e-44ca-8469-73304763491c"
+    },
+    "Infestation Expert // Infested Werewolf": {
+        "name": "Infestation Expert // Infested Werewolf",
+        "setcode": "VOW",
+        "scryfallId": "0936761c-7cdc-49ef-8a0d-ed79219f1056"
+    },
+    "Oakshade Stalker // Moonlit Ambusher": {
+        "name": "Oakshade Stalker // Moonlit Ambusher",
+        "setcode": "VOW",
+        "scryfallId": "8bcaa944-4e45-457c-be9c-07377b6ed08b"
+    },
+    "Ulvenwald Oddity // Ulvenwald Behemoth": {
+        "name": "Ulvenwald Oddity // Ulvenwald Behemoth",
+        "setcode": "VOW",
+        "scryfallId": "8e857c4e-9d85-418a-9200-3bdcceff3f6b"
+    },
+    "Weaver of Blossoms // Blossom-Clad Werewolf": {
+        "name": "Weaver of Blossoms // Blossom-Clad Werewolf",
+        "setcode": "VOW",
+        "scryfallId": "73bf2a0a-b97d-4b90-abd6-d1755734ea15"
+    },
+    "Wolfkin Outcast // Wedding Crasher": {
+        "name": "Wolfkin Outcast // Wedding Crasher",
+        "setcode": "VOW",
+        "scryfallId": "7a743426-6333-4ca6-9207-163b325ba435"
+    },
+    "Brine Comber // Brinebound Gift": {
+        "name": "Brine Comber // Brinebound Gift",
+        "setcode": "VOW",
+        "scryfallId": "8d233bc5-8a08-4d38-abd4-21a112141afd"
+    },
+    "Child of the Pack // Savage Packmate": {
+        "name": "Child of the Pack // Savage Packmate",
+        "setcode": "VOW",
+        "scryfallId": "cb168e3c-2c78-4e70-a39b-06aa6a47998c"
+    },
+    "Dorothea, Vengeful Victim // Dorothea's Retribution": {
+        "name": "Dorothea, Vengeful Victim // Dorothea's Retribution",
+        "setcode": "VOW",
+        "scryfallId": "ff66ee02-6b68-405e-a5c0-f59bb8020865"
+    },
+    "Edgar, Charmed Groom // Edgar Markov's Coffin": {
+        "name": "Edgar, Charmed Groom // Edgar Markov's Coffin",
+        "setcode": "VOW",
+        "scryfallId": "10732397-68eb-4f1d-a2e6-10479f66805f"
+    },
+    "Runo Stromkirk // Krothuss, Lord of the Deep": {
+        "name": "Runo Stromkirk // Krothuss, Lord of the Deep",
+        "setcode": "VOW",
+        "scryfallId": "17171779-e5d2-4431-a92d-def5606e9825"
+    },
+    "Foreboding Statue // Forsaken Thresher": {
+        "name": "Foreboding Statue // Forsaken Thresher",
+        "setcode": "VOW",
+        "scryfallId": "a27b9d82-f613-4789-9e8b-f37db5597027"
+    },
+    "River Boa": {
+        "name": "River Boa",
+        "setcode": "DDM",
+        "scryfallId": "edfbf056-c3b7-40e9-8e2b-333585978ac9"
+    },
+    "Quicken": {
+        "name": "Quicken",
+        "setcode": "DDS",
+        "scryfallId": "e6209bbf-5861-4755-abb6-0f04def9527e"
+    },
+    "Loyal Cathar // Unhallowed Cathar": {
+        "name": "Loyal Cathar // Unhallowed Cathar",
+        "setcode": "DKA",
+        "scryfallId": "cb09041b-4d09-4cae-9e85-b859edae885b"
+    },
+    "Soul Seizer // Ghastly Haunting": {
+        "name": "Soul Seizer // Ghastly Haunting",
+        "setcode": "DKA",
+        "scryfallId": "f500cb95-d5ea-4cf2-920a-f1df45a9059b"
+    },
+    "Chosen of Markov // Markov's Servant": {
+        "name": "Chosen of Markov // Markov's Servant",
+        "setcode": "DKA",
+        "scryfallId": "7c5a3c09-5656-4975-ba03-2d809903ed18"
+    },
+    "Ravenous Demon // Archdemon of Greed": {
+        "name": "Ravenous Demon // Archdemon of Greed",
+        "setcode": "PRM",
+        "scryfallId": "72887f7f-4156-4b88-aef5-b96dea57903e"
+    },
+    "Afflicted Deserter // Werewolf Ransacker": {
+        "name": "Afflicted Deserter // Werewolf Ransacker",
+        "setcode": "DKA",
+        "scryfallId": "a2c044c0-3625-4bdf-9445-b462394cecae"
+    },
+    "Hinterland Hermit // Hinterland Scourge": {
+        "name": "Hinterland Hermit // Hinterland Scourge",
+        "setcode": "DKA",
+        "scryfallId": "b6edac85-78e7-4e90-b538-b67c88bb5c62"
+    },
+    "Mondronen Shaman // Tovolar's Magehunter": {
+        "name": "Mondronen Shaman // Tovolar's Magehunter",
+        "setcode": "PRM",
+        "scryfallId": "bfc92a35-9e40-4a7b-a7cb-f0b4537ea996"
+    },
+    "Lambholt Elder // Silverpelt Werewolf": {
+        "name": "Lambholt Elder // Silverpelt Werewolf",
+        "setcode": "DKA",
+        "scryfallId": "932d753d-9584-4ad8-9a5e-a3524184f961"
+    },
+    "Scorned Villager // Moonscarred Werewolf": {
+        "name": "Scorned Villager // Moonscarred Werewolf",
+        "setcode": "INR",
+        "scryfallId": "9152b78f-bd35-4e6a-9bd3-d0a65d898e95"
+    },
+    "Wolfbitten Captive // Krallenhorde Killer": {
+        "name": "Wolfbitten Captive // Krallenhorde Killer",
+        "setcode": "DKA",
+        "scryfallId": "1303e02a-ef69-4817-bca5-02c74774b811"
+    },
+    "Huntmaster of the Fells // Ravager of the Fells": {
+        "name": "Huntmaster of the Fells // Ravager of the Fells",
+        "setcode": "V17",
+        "scryfallId": "4d553078-afaf-42db-879b-fb4cb4d25742"
+    },
+    "Chalice of Life // Chalice of Death": {
+        "name": "Chalice of Life // Chalice of Death",
+        "setcode": "INR",
+        "scryfallId": "d2acf06d-3388-4777-a5a3-7864ec235606"
+    },
+    "Elbrus, the Binding Blade // Withengar Unbound": {
+        "name": "Elbrus, the Binding Blade // Withengar Unbound",
+        "setcode": "V17",
+        "scryfallId": "a66d5ee9-86a7-4052-a868-8dc6398342b3"
+    },
+    "Extricator of Sin // Extricator of Flesh": {
+        "name": "Extricator of Sin // Extricator of Flesh",
+        "setcode": "PIO",
+        "scryfallId": "1d2ec933-cfc9-4ca4-b47b-f82109d89f0a"
+    },
+    "Lone Rider // It That Rides as One": {
+        "name": "Lone Rider // It That Rides as One",
+        "setcode": "SIR",
+        "scryfallId": "9c8c5329-fad0-4c64-a351-d2d445aed13a"
+    },
+    "Curious Homunculus // Voracious Reader": {
+        "name": "Curious Homunculus // Voracious Reader",
+        "setcode": "SIR",
+        "scryfallId": "d1ef7c60-c774-4a94-85a8-17955d6e3de6"
+    },
+    "Docent of Perfection // Final Iteration": {
+        "name": "Docent of Perfection // Final Iteration",
+        "setcode": "SIR",
+        "scryfallId": "2c983363-f900-45f5-b906-d56b91d5c260"
+    },
+    "Grizzled Angler // Grisly Anglerfish": {
+        "name": "Grizzled Angler // Grisly Anglerfish",
+        "setcode": "INR",
+        "scryfallId": "982c0f7b-d707-4fcd-8b5a-dc9bc92d8aa4"
+    },
+    "Take Inventory": {
+        "name": "Take Inventory",
+        "setcode": "EMN",
+        "scryfallId": "a3584150-4f09-4c15-b13e-707bd91b3004"
+    },
+    "Voldaren Pariah // Abolisher of Bloodlines": {
+        "name": "Voldaren Pariah // Abolisher of Bloodlines",
+        "setcode": "SIR",
+        "scryfallId": "9c084f31-c8ef-407a-aeb7-966e3f646143"
+    },
+    "Conduit of Storms // Conduit of Emrakul": {
+        "name": "Conduit of Storms // Conduit of Emrakul",
+        "setcode": "SIR",
+        "scryfallId": "e25455c0-bd9f-4e8e-9d79-41c933e06893"
+    },
+    "Smoldering Werewolf // Erupting Dreadwolf": {
+        "name": "Smoldering Werewolf // Erupting Dreadwolf",
+        "setcode": "INR",
+        "scryfallId": "ca129694-150c-47c6-bdda-c3ba3d1fdc61"
+    },
+    "Vildin-Pack Outcast // Dronepack Kindred": {
+        "name": "Vildin-Pack Outcast // Dronepack Kindred",
+        "setcode": "EMN",
+        "scryfallId": "460f7733-c0a6-4439-a313-7b26ae6ee15b"
+    },
+    "Kessig Prowler // Sinuous Predator": {
+        "name": "Kessig Prowler // Sinuous Predator",
+        "setcode": "EMN",
+        "scryfallId": "f89f116a-1e8e-4ae7-be39-552e4954f229"
+    },
+    "Shrill Howler // Howling Chorus": {
+        "name": "Shrill Howler // Howling Chorus",
+        "setcode": "SIR",
+        "scryfallId": "b7408d54-e15d-4975-8f30-8cd36fca9429"
+    },
+    "Tangleclaw Werewolf // Fibrous Entangler": {
+        "name": "Tangleclaw Werewolf // Fibrous Entangler",
+        "setcode": "EMN",
+        "scryfallId": "ee648500-a213-4aa4-a97c-b7223c11bebd"
+    },
+    "Ulvenwald Captive // Ulvenwald Abomination": {
+        "name": "Ulvenwald Captive // Ulvenwald Abomination",
+        "setcode": "SIR",
+        "scryfallId": "1cde776b-da69-44e8-8c09-d6f118835ec2"
+    },
+    "Ulrich of the Krallenhorde // Ulrich, Uncontested Alpha": {
+        "name": "Ulrich of the Krallenhorde // Ulrich, Uncontested Alpha",
+        "setcode": "SIR",
+        "scryfallId": "56b4708a-9795-4799-82b5-13c69a2611f8"
+    },
+    "Cryptolith Fragment // Aurora of Emrakul": {
+        "name": "Cryptolith Fragment // Aurora of Emrakul",
+        "setcode": "SIR",
+        "scryfallId": "7854d5ec-b8c1-40b5-99a2-e9bcce9fb066"
+    },
+    "Grimlock, Dinobot Leader // Grimlock, Ferocious King": {
+        "name": "Grimlock, Dinobot Leader // Grimlock, Ferocious King",
+        "setcode": "H17",
+        "scryfallId": "f1bb8fb5-32f2-444d-85cb-de84657b21bd"
+    },
+    "Archangel Avacyn // Avacyn, the Purifier": {
+        "name": "Archangel Avacyn // Avacyn, the Purifier",
+        "setcode": "V17",
+        "scryfallId": "24842e29-77ac-4904-bd8f-b2cd163dd357"
+    },
+    "Town Gossipmonger // Incited Rabble": {
+        "name": "Town Gossipmonger // Incited Rabble",
+        "setcode": "SOI",
+        "scryfallId": "d238d324-8c88-43ca-b203-133830d29447"
+    },
+    "Aberrant Researcher // Perfected Form": {
+        "name": "Aberrant Researcher // Perfected Form",
+        "setcode": "SOI",
+        "scryfallId": "b5c9649e-9ae5-4926-bf08-71ba23aa37f1"
+    },
+    "Thing in the Ice // Awoken Horror": {
+        "name": "Thing in the Ice // Awoken Horror",
+        "setcode": "SOI",
+        "scryfallId": "359d1b13-6156-43b0-a9a7-6bfff36c1a91"
+    },
+    "Bloodline Keeper // Lord of Lineage": {
+        "name": "Bloodline Keeper // Lord of Lineage",
+        "setcode": "V17",
+        "scryfallId": "3216d161-a43d-4a55-a14b-098061805409"
+    },
+    "Invasion of Innistrad // Deluge of the Dead": {
+        "name": "Invasion of Innistrad // Deluge of the Dead",
+        "setcode": "PMOM",
+        "scryfallId": "144c4e3b-1679-4937-8637-05a98295168a"
+    },
+    "Geier Reach Bandit // Vildin-Pack Alpha": {
+        "name": "Geier Reach Bandit // Vildin-Pack Alpha",
+        "setcode": "SOI",
+        "scryfallId": "4570117d-c04b-4bdc-b804-21d49154721b"
+    },
+    "Hanweir Watchkeep // Bane of Hanweir": {
+        "name": "Hanweir Watchkeep // Bane of Hanweir",
+        "setcode": "ISD",
+        "scryfallId": "2b14ed17-1a35-4c49-ac46-3cad42d46c14"
+    },
+    "Kruin Outlaw // Terror of Kruin Pass": {
+        "name": "Kruin Outlaw // Terror of Kruin Pass",
+        "setcode": "SIS",
+        "scryfallId": "8d722e19-9aaf-4b47-b175-28f0d5c587a1"
+    },
+    "Village Messenger // Moonrise Intruder": {
+        "name": "Village Messenger // Moonrise Intruder",
+        "setcode": "SOI",
+        "scryfallId": "44deb8cf-b9d1-4a14-aeaf-e62cf3dc9ef2"
+    },
+    "Duskwatch Recruiter // Krallenhorde Howler": {
+        "name": "Duskwatch Recruiter // Krallenhorde Howler",
+        "setcode": "SOI",
+        "scryfallId": "e1915d93-c7dd-4bb7-bd5c-63a359a02b97"
+    },
+    "Garruk Relentless // Garruk, the Veil-Cursed": {
+        "name": "Garruk Relentless // Garruk, the Veil-Cursed",
+        "setcode": "V17",
+        "scryfallId": "bb89599a-1883-45da-a87a-25e3f70c5a33"
+    },
+    "Hinterland Logger // Timber Shredder": {
+        "name": "Hinterland Logger // Timber Shredder",
+        "setcode": "SOI",
+        "scryfallId": "14529bed-9632-4d58-8edc-c5a1359f6604"
+    },
+    "Mayor of Avabruck // Howlpack Alpha": {
+        "name": "Mayor of Avabruck // Howlpack Alpha",
+        "setcode": "SIS",
+        "scryfallId": "af4bf1fc-19fe-4300-9842-9828178c419a"
+    },
+    "Villagers of Estwald // Howlpack of Estwald": {
+        "name": "Villagers of Estwald // Howlpack of Estwald",
+        "setcode": "ISD",
+        "scryfallId": "e42a0a3d-a987-4b24-b9d4-27380a12e093"
+    },
+    "Arlinn Kord // Arlinn, Embraced by the Moon": {
+        "name": "Arlinn Kord // Arlinn, Embraced by the Moon",
+        "setcode": "V17",
+        "scryfallId": "ce0a6fa9-f664-4263-8deb-8112f860814c"
+    },
+    "Harvest Hand // Scrounged Scythe": {
+        "name": "Harvest Hand // Scrounged Scythe",
+        "setcode": "SOI",
+        "scryfallId": "0d200f98-3377-46a3-9197-3cbd95d03dbf"
+    },
+    "Neglected Heirloom // Ashmouth Blade": {
+        "name": "Neglected Heirloom // Ashmouth Blade",
+        "setcode": "SOI",
+        "scryfallId": "5cc2ac21-d31f-4a0d-956a-dabb6e1f3b5a"
+    },
+    "Westvale Abbey // Ormendahl, Profane Prince": {
+        "name": "Westvale Abbey // Ormendahl, Profane Prince",
+        "setcode": "SOI",
+        "scryfallId": "c1f53d7a-9dad-46e8-b686-cd1362867445"
+    },
+    "Cloistered Youth // Unholy Fiend": {
+        "name": "Cloistered Youth // Unholy Fiend",
+        "setcode": "ISD",
+        "scryfallId": "f8b8f0b4-71e1-4822-99a1-b1b3c2f10cb2"
+    },
+    "Thraben Sentry // Thraben Militia": {
+        "name": "Thraben Sentry // Thraben Militia",
+        "setcode": "ISD",
+        "scryfallId": "58ae9cbc-d88d-42df-ab76-63ab5d05c023"
+    },
+    "Civilized Scholar // Homicidal Brute": {
+        "name": "Civilized Scholar // Homicidal Brute",
+        "setcode": "ISD",
+        "scryfallId": "7bf864db-4754-433d-9d77-6695f78f6c09"
+    },
+    "Ludevic's Test Subject // Ludevic's Abomination": {
+        "name": "Ludevic's Test Subject // Ludevic's Abomination",
+        "setcode": "PRM",
+        "scryfallId": "870e6492-3e4d-4680-9a78-a99782039876"
+    },
+    "Screeching Bat // Stalking Vampire": {
+        "name": "Screeching Bat // Stalking Vampire",
+        "setcode": "ISD",
+        "scryfallId": "88db324f-11f1-43d3-a897-f4e3caf8d642"
+    },
+    "Instigator Gang // Wildblood Pack": {
+        "name": "Instigator Gang // Wildblood Pack",
+        "setcode": "ISD",
+        "scryfallId": "bb90a6f1-c7f2-4c2e-ab1e-59c5c7937841"
+    },
+    "Reckless Waif // Merciless Predator": {
+        "name": "Reckless Waif // Merciless Predator",
+        "setcode": "ISD",
+        "scryfallId": "028aeebc-4073-4595-94da-02f9f96ea148"
+    },
+    "Tormented Pariah // Rampaging Werewolf": {
+        "name": "Tormented Pariah // Rampaging Werewolf",
+        "setcode": "ISD",
+        "scryfallId": "6151cae7-92a4-4891-a952-21def412d3e4"
+    },
+    "Village Ironsmith // Ironfang": {
+        "name": "Village Ironsmith // Ironfang",
+        "setcode": "ISD",
+        "scryfallId": "cd5435d0-789f-4c42-8efc-165c072404a2"
+    },
+    "Daybreak Ranger // Nightfall Predator": {
+        "name": "Daybreak Ranger // Nightfall Predator",
+        "setcode": "ISD",
+        "scryfallId": "25b54a1d-e201-453b-9173-b04e06ee6fb7"
+    },
+    "Gatstaf Shepherd // Gatstaf Howler": {
+        "name": "Gatstaf Shepherd // Gatstaf Howler",
+        "setcode": "ISD",
+        "scryfallId": "57f0907f-74f4-4d86-93df-f2e50c9d0b2f"
+    },
+    "Grizzled Outcasts // Krallenhorde Wantons": {
+        "name": "Grizzled Outcasts // Krallenhorde Wantons",
+        "setcode": "ISD",
+        "scryfallId": "4b43b0cb-a5a3-47b4-9b6b-9d2638222bb6"
+    },
+    "Ulvenwald Mystics // Ulvenwald Primordials": {
+        "name": "Ulvenwald Mystics // Ulvenwald Primordials",
+        "setcode": "ISD",
+        "scryfallId": "8325c570-4d74-4e65-891c-3e153abf4bf9"
+    },
+    "Hanweir Militia Captain // Westvale Cult Leader": {
+        "name": "Hanweir Militia Captain // Westvale Cult Leader",
+        "setcode": "SOI",
+        "scryfallId": "7e137566-5033-48e8-88ba-65e3821b3cec"
+    },
+    "Heir of Falkenrath // Heir to the Night": {
+        "name": "Heir of Falkenrath // Heir to the Night",
+        "setcode": "SOI",
+        "scryfallId": "cf2ad186-4d85-4628-ae84-3c58c88d34cb"
+    },
+    "Spore Crawler": {
+        "name": "Spore Crawler",
+        "setcode": "J25",
+        "scryfallId": "86ad9c05-65e9-48a2-ad60-486876c8217a"
+    },
+    "Halvar, God of Battle // Sword of the Realms": {
+        "name": "Halvar, God of Battle // Sword of the Realms",
+        "setcode": "PRM",
+        "scryfallId": "fb1fbad0-94c8-4411-bd53-a8d27679a53a"
+    },
+    "Reidane, God of the Worthy // Valkmira, Protector's Shield": {
+        "name": "Reidane, God of the Worthy // Valkmira, Protector's Shield",
+        "setcode": "PRM",
+        "scryfallId": "96d9532f-fe2c-4465-83f7-e186388656f8"
+    },
+    "Alrund, God of the Cosmos // Hakka, Whispering Raven": {
+        "name": "Alrund, God of the Cosmos // Hakka, Whispering Raven",
+        "setcode": "PRM",
+        "scryfallId": "09551fee-6389-42be-936a-67371531d9ea"
+    },
+    "A-Alrund, God of the Cosmos // A-Hakka, Whispering Raven": {
+        "name": "A-Alrund, God of the Cosmos // A-Hakka, Whispering Raven",
+        "setcode": "KHM",
+        "scryfallId": "b443504e-1b25-4565-bad7-2575826c7bb9"
+    },
+    "Cosima, God of the Voyage // The Omenkeel": {
+        "name": "Cosima, God of the Voyage // The Omenkeel",
+        "setcode": "PRM",
+        "scryfallId": "d2045590-0fea-405e-8aa6-515c6d313594"
+    },
+    "Egon, God of Death // Throne of Death": {
+        "name": "Egon, God of Death // Throne of Death",
+        "setcode": "PRM",
+        "scryfallId": "5de35ba3-4f34-429b-bf40-b8cf2f34c662"
+    },
+    "Tergrid, God of Fright // Tergrid's Lantern": {
+        "name": "Tergrid, God of Fright // Tergrid's Lantern",
+        "setcode": "PRM",
+        "scryfallId": "529451ef-2c7e-4566-8627-a1f25e010829"
+    },
+    "Valki, God of Lies // Tibalt, Cosmic Impostor": {
+        "name": "Valki, God of Lies // Tibalt, Cosmic Impostor",
+        "setcode": "PRM",
+        "scryfallId": "1bf41c85-48d0-4a5d-a6c4-5742080061c5"
+    },
+    "Birgi, God of Storytelling // Harnfel, Horn of Bounty": {
+        "name": "Birgi, God of Storytelling // Harnfel, Horn of Bounty",
+        "setcode": "PRM",
+        "scryfallId": "8d10fc47-9551-4643-bb3c-d35b858a6844"
+    },
+    "Toralf, God of Fury // Toralf's Hammer": {
+        "name": "Toralf, God of Fury // Toralf's Hammer",
+        "setcode": "PRM",
+        "scryfallId": "e71fdafd-7548-4be6-a6a6-146c4d4ca0b3"
+    },
+    "Esika, God of the Tree // The Prismatic Bridge": {
+        "name": "Esika, God of the Tree // The Prismatic Bridge",
+        "setcode": "SLD",
+        "scryfallId": "86f54b82-0168-421e-bcde-d13d48b7d9ff"
+    },
+    "Jorn, God of Winter // Kaldring, the Rimestaff": {
+        "name": "Jorn, God of Winter // Kaldring, the Rimestaff",
+        "setcode": "PRM",
+        "scryfallId": "e17e81ab-b33a-4ad1-89fb-941a19bf4e8e"
+    },
+    "Kolvori, God of Kinship // The Ringhart Crest": {
+        "name": "Kolvori, God of Kinship // The Ringhart Crest",
+        "setcode": "PRM",
+        "scryfallId": "b65efcce-7745-4bb7-81bc-29c07ac4ddbd"
+    },
+    "Barkchannel Pathway // Tidechannel Pathway": {
+        "name": "Barkchannel Pathway // Tidechannel Pathway",
+        "setcode": "SLU",
+        "scryfallId": "79631e0a-b962-48f1-98fa-d871b2862866"
+    },
+    "Blightstep Pathway // Searstep Pathway": {
+        "name": "Blightstep Pathway // Searstep Pathway",
+        "setcode": "SLU",
+        "scryfallId": "022c7fe3-45bb-4efe-9b0c-2e4807d607b8"
+    },
+    "Darkbore Pathway // Slitherbore Pathway": {
+        "name": "Darkbore Pathway // Slitherbore Pathway",
+        "setcode": "SLU",
+        "scryfallId": "e3d06331-a819-40d8-a0b4-bbc97ba1f42c"
+    },
+    "Hengegate Pathway // Mistgate Pathway": {
+        "name": "Hengegate Pathway // Mistgate Pathway",
+        "setcode": "SLU",
+        "scryfallId": "8b13ff20-1dad-4c6a-979b-4d2662af5e74"
+    },
+    "Altar of the Wretched // Wretched Bonemass": {
+        "name": "Altar of the Wretched // Wretched Bonemass",
+        "setcode": "LCC",
+        "scryfallId": "5842332a-b27b-49ac-948d-f88a21deb1de"
+    },
+    "Ore-Rich Stalactite // Cosmium Catalyst": {
+        "name": "Ore-Rich Stalactite // Cosmium Catalyst",
+        "setcode": "LCC",
+        "scryfallId": "8fb0fe36-ae6f-4ebf-badf-9b2fd5047c54"
+    },
+    "Tetzin, Gnome Champion // The Golden-Gear Colossus": {
+        "name": "Tetzin, Gnome Champion // The Golden-Gear Colossus",
+        "setcode": "LCC",
+        "scryfallId": "53b2e955-0106-4c28-8897-bcdafd96195f"
+    },
+    "Eye of Ojer Taq // Apex Observatory": {
+        "name": "Eye of Ojer Taq // Apex Observatory",
+        "setcode": "LCC",
+        "scryfallId": "b5f9954b-6bfc-43fc-849f-bb6b0ac0c4f3"
+    },
+    "Paleontologist's Pick-Axe // Dinosaur Headdress": {
+        "name": "Paleontologist's Pick-Axe // Dinosaur Headdress",
+        "setcode": "LCC",
+        "scryfallId": "34fad975-8b45-41c7-bee3-7cf0573ee299"
+    },
+    "Clay-Fired Bricks // Cosmium Kiln": {
+        "name": "Clay-Fired Bricks // Cosmium Kiln",
+        "setcode": "LCI",
+        "scryfallId": "8aece300-656b-4e0d-a45f-aa7feaff0a4e"
+    },
+    "Ojer Taq, Deepest Foundation // Temple of Civilization": {
+        "name": "Ojer Taq, Deepest Foundation // Temple of Civilization",
+        "setcode": "LCI",
+        "scryfallId": "e87dff94-71ed-469e-a10e-3ddfbd4a8bec"
+    },
+    "Oteclan Landmark // Oteclan Levitator": {
+        "name": "Oteclan Landmark // Oteclan Levitator",
+        "setcode": "LCI",
+        "scryfallId": "099a1d1c-72ba-468e-9385-8f93e1fce001"
+    },
+    "Spring-Loaded Sawblades // Bladewheel Chariot": {
+        "name": "Spring-Loaded Sawblades // Bladewheel Chariot",
+        "setcode": "LCI",
+        "scryfallId": "24417388-f2bb-4783-bdce-264774531838"
+    },
+    "Thousand Moons Smithy // Barracks of the Thousand": {
+        "name": "Thousand Moons Smithy // Barracks of the Thousand",
+        "setcode": "LCI",
+        "scryfallId": "89a0f7fe-6bff-4c0a-b419-1f4f457c194c"
+    },
+    "Unstable Glyphbridge // Sandswirl Wanderglyph": {
+        "name": "Unstable Glyphbridge // Sandswirl Wanderglyph",
+        "setcode": "LCI",
+        "scryfallId": "a8a23e3f-57c8-4cbb-bb6c-d5fdf49a2d9c"
+    },
+    "Braided Net // Braided Quipu": {
+        "name": "Braided Net // Braided Quipu",
+        "setcode": "LCI",
+        "scryfallId": "c8157978-259e-4af1-890e-ea56a55a9997"
+    },
+    "The Enigma Jewel // Locus of Enlightenment": {
+        "name": "The Enigma Jewel // Locus of Enlightenment",
+        "setcode": "LCI",
+        "scryfallId": "8d9cbb83-a89f-411b-88c8-c01718f265e0"
+    },
+    "The Everflowing Well // The Myriad Pools": {
+        "name": "The Everflowing Well // The Myriad Pools",
+        "setcode": "LCI",
+        "scryfallId": "581327f5-6e79-4720-9695-198b287a92bb"
+    },
+    "Inverted Iceberg // Iceberg Titan": {
+        "name": "Inverted Iceberg // Iceberg Titan",
+        "setcode": "LCI",
+        "scryfallId": "ac5e9a53-cc4f-4ced-8088-5a73d619eae3"
+    },
+    "Lodestone Needle // Guidestone Compass": {
+        "name": "Lodestone Needle // Guidestone Compass",
+        "setcode": "LCI",
+        "scryfallId": "dedd7a22-92e2-41fd-aa80-944c69653a5e"
+    },
+    "Ojer Pakpatiq, Deepest Epoch // Temple of Cyclical Time": {
+        "name": "Ojer Pakpatiq, Deepest Epoch // Temple of Cyclical Time",
+        "setcode": "LCI",
+        "scryfallId": "a1fbfb8f-600e-4b29-98c5-7c6714d35347"
+    },
+    "Waterlogged Hulk // Watertight Gondola": {
+        "name": "Waterlogged Hulk // Watertight Gondola",
+        "setcode": "LCI",
+        "scryfallId": "7ea89d3c-8d47-4bbb-9271-8cdfd9296e2f"
+    },
+    "Aclazotz, Deepest Betrayal // Temple of the Dead": {
+        "name": "Aclazotz, Deepest Betrayal // Temple of the Dead",
+        "setcode": "LCI",
+        "scryfallId": "95775b13-2761-424e-9828-2275ec987368"
+    },
+    "Grasping Shadows // Shadows' Lair": {
+        "name": "Grasping Shadows // Shadows' Lair",
+        "setcode": "LCI",
+        "scryfallId": "81b8b9c9-725d-476d-a3cf-55e3dc3e433d"
+    },
+    "Tarrian's Journal // The Tomb of Aclazotz": {
+        "name": "Tarrian's Journal // The Tomb of Aclazotz",
+        "setcode": "LCI",
+        "scryfallId": "3577ac1a-7c14-4463-a8c0-530f37f3d935"
+    },
+    "Tithing Blade // Consuming Sepulcher": {
+        "name": "Tithing Blade // Consuming Sepulcher",
+        "setcode": "LCI",
+        "scryfallId": "dbaa9a2d-e9fd-4746-a26c-f99ae731f024"
+    },
+    "Visage of Dread // Dread Osseosaur": {
+        "name": "Visage of Dread // Dread Osseosaur",
+        "setcode": "LCI",
+        "scryfallId": "3d4b61c6-3e88-49f5-9e16-aa8a59653327"
+    },
+    "Brass's Tunnel-Grinder // Tecutlan, the Searing Rift": {
+        "name": "Brass's Tunnel-Grinder // Tecutlan, the Searing Rift",
+        "setcode": "LCI",
+        "scryfallId": "db940d06-5e3d-4831-a200-de614c093aca"
+    },
+    "Dire Flail // Dire Blunderbuss": {
+        "name": "Dire Flail // Dire Blunderbuss",
+        "setcode": "LCI",
+        "scryfallId": "c3c5e4a1-7668-41a0-acd3-d45809b6a95e"
+    },
+    "Dowsing Device // Geode Grotto": {
+        "name": "Dowsing Device // Geode Grotto",
+        "setcode": "LCI",
+        "scryfallId": "3d715e9f-223d-462e-8ce3-eebbaf1cd021"
+    },
+    "Idol of the Deep King // Sovereign's Macuahuitl": {
+        "name": "Idol of the Deep King // Sovereign's Macuahuitl",
+        "setcode": "LCI",
+        "scryfallId": "d1d8d8ef-c8b2-4e7c-89e4-b381dff20584"
+    },
+    "Ojer Axonil, Deepest Might // Temple of Power": {
+        "name": "Ojer Axonil, Deepest Might // Temple of Power",
+        "setcode": "LCI",
+        "scryfallId": "5140d5d0-15ad-45b2-8ae8-aa53b1cd8132"
+    },
+    "Saheeli's Lattice // Mastercraft Raptor": {
+        "name": "Saheeli's Lattice // Mastercraft Raptor",
+        "setcode": "LCI",
+        "scryfallId": "0bdc79c6-1193-46bd-931d-2c2a0381e420"
+    },
+    "Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun": {
+        "name": "Growing Rites of Itlimoc // Itlimoc, Cradle of the Sun",
+        "setcode": "XLN",
+        "scryfallId": "b3b87bfc-f97f-4734-94f6-e3e2f335fc4d"
+    },
+    "Huatli, Poet of Unity // Roar of the Fifth People": {
+        "name": "Huatli, Poet of Unity // Roar of the Fifth People",
+        "setcode": "LCI",
+        "scryfallId": "3cdeebd8-28d4-42a5-9a99-3c72771359ea"
+    },
+    "Jade Seedstones // Jadeheart Attendant": {
+        "name": "Jade Seedstones // Jadeheart Attendant",
+        "setcode": "LCI",
+        "scryfallId": "bb95ffc2-ef35-49bf-8211-c5354d176051"
+    },
+    "Kaslem's Stonetree // Kaslem's Strider": {
+        "name": "Kaslem's Stonetree // Kaslem's Strider",
+        "setcode": "LCI",
+        "scryfallId": "78b1b412-228a-4e05-a4b3-8159ebf54dc6"
+    },
+    "Ojer Kaslem, Deepest Growth // Temple of Cultivation": {
+        "name": "Ojer Kaslem, Deepest Growth // Temple of Cultivation",
+        "setcode": "LCI",
+        "scryfallId": "d6ed63e0-d6f1-455a-b29c-e2c91dcfcc6e"
+    },
+    "Twists and Turns // Mycoid Maze": {
+        "name": "Twists and Turns // Mycoid Maze",
+        "setcode": "LCI",
+        "scryfallId": "3cdf691e-96a5-45c7-9b94-6f04af81c8e4"
+    },
+    "Master's Guide-Mural // Master's Manufactory": {
+        "name": "Master's Guide-Mural // Master's Manufactory",
+        "setcode": "LCI",
+        "scryfallId": "f7a41343-7cdb-49aa-a9d1-7460195355d8"
+    },
+    "Matzalantli, the Great Door // The Core": {
+        "name": "Matzalantli, the Great Door // The Core",
+        "setcode": "LCI",
+        "scryfallId": "5e03b08d-f0f1-40e8-af48-1622430bab38"
+    },
+    "Sunbird Standard // Sunbird Effigy": {
+        "name": "Sunbird Standard // Sunbird Effigy",
+        "setcode": "LCI",
+        "scryfallId": "e0b6d40a-fded-4625-b03c-765c88d75766"
+    },
+    "Throne of the Grim Captain // The Grim Captain": {
+        "name": "Throne of the Grim Captain // The Grim Captain",
+        "setcode": "LCI",
+        "scryfallId": "4f7a6892-5f6b-49aa-9b4f-3fcf20236306"
+    },
+    "Treasure Map // Treasure Cove": {
+        "name": "Treasure Map // Treasure Cove",
+        "setcode": "XLN",
+        "scryfallId": "c0f9c733-0818-4a03-8f0c-a163d09e0fff"
+    },
+    "Nicol Bolas, the Ravager // Nicol Bolas, the Arisen": {
+        "name": "Nicol Bolas, the Ravager // Nicol Bolas, the Arisen",
+        "setcode": "SLD",
+        "scryfallId": "3374707f-c203-4a96-aa0d-eef3eca7c17a"
+    },
+    "Liliana's Other Contract // Liliana's Undead Minion": {
+        "name": "Liliana's Other Contract // Liliana's Undead Minion",
+        "setcode": "MB2",
+        "scryfallId": "c9c1e5c2-8706-4c46-8b25-b045020a3a7f"
+    },
+    "Plant a Sapling // Fully-Grown Treefolk": {
+        "name": "Plant a Sapling // Fully-Grown Treefolk",
+        "setcode": "MB2",
+        "scryfallId": "062bb64d-b256-48c9-8159-8146bc0549ef"
+    },
+    "Ajani, Nacatl Pariah // Ajani, Nacatl Avenger": {
+        "name": "Ajani, Nacatl Pariah // Ajani, Nacatl Avenger",
+        "setcode": "PMH3",
+        "scryfallId": "047f196b-a9d1-4cd3-b665-3b304cc59767"
+    },
+    "Razorgrass Ambush // Razorgrass Field": {
+        "name": "Razorgrass Ambush // Razorgrass Field",
+        "setcode": "MH3",
+        "scryfallId": "57065dca-f90e-4184-bbc4-95d726a4160b"
+    },
+    "Witch Enchanter // Witch-Blessed Meadow": {
+        "name": "Witch Enchanter // Witch-Blessed Meadow",
+        "setcode": "MH3",
+        "scryfallId": "62061e7c-cf19-4f03-b8fa-2bdba62d6b0b"
+    },
+    "Hydroelectric Specimen // Hydroelectric Laboratory": {
+        "name": "Hydroelectric Specimen // Hydroelectric Laboratory",
+        "setcode": "MH3",
+        "scryfallId": "8689ecd7-e9a6-458b-99d2-6dbaca527f00"
+    },
+    "Sink into Stupor // Soporific Springs": {
+        "name": "Sink into Stupor // Soporific Springs",
+        "setcode": "MH3",
+        "scryfallId": "5358b87a-1a29-426d-b165-40c97da2c14d"
+    },
+    "Tamiyo, Inquisitive Student // Tamiyo, Seasoned Scholar": {
+        "name": "Tamiyo, Inquisitive Student // Tamiyo, Seasoned Scholar",
+        "setcode": "PMH3",
+        "scryfallId": "de7f58e4-c7f8-459e-8901-fedfefc957fa"
+    },
+    "Boggart Trawler // Boggart Bog": {
+        "name": "Boggart Trawler // Boggart Bog",
+        "setcode": "MH3",
+        "scryfallId": "d0d484a6-5610-4f1d-95ec-eda273c255e4"
+    },
+    "Fell the Profane // Fell Mire": {
+        "name": "Fell the Profane // Fell Mire",
+        "setcode": "MH3",
+        "scryfallId": "a3cb782d-c459-468d-9779-9b5669abc337"
+    },
+    "Sorin of House Markov // Sorin, Ravenous Neonate": {
+        "name": "Sorin of House Markov // Sorin, Ravenous Neonate",
+        "setcode": "PMH3",
+        "scryfallId": "42353f71-9c79-4105-a117-c12b3f4ac895"
+    },
+    "Pinnacle Monk // Mystic Peak": {
+        "name": "Pinnacle Monk // Mystic Peak",
+        "setcode": "MH3",
+        "scryfallId": "24d4f26e-7f96-4b38-867e-4fac819b2679"
+    },
+    "Ral, Monsoon Mage // Ral, Leyline Prodigy": {
+        "name": "Ral, Monsoon Mage // Ral, Leyline Prodigy",
+        "setcode": "PURL",
+        "scryfallId": "5b6195d2-1adf-42f8-80a5-7315311ee1ee"
+    },
+    "Sundering Eruption // Volcanic Fissure": {
+        "name": "Sundering Eruption // Volcanic Fissure",
+        "setcode": "MH3",
+        "scryfallId": "50686ac7-346c-43d1-bdaa-28d46a12ad93"
+    },
+    "Bridgeworks Battle // Tanglespan Bridgeworks": {
+        "name": "Bridgeworks Battle // Tanglespan Bridgeworks",
+        "setcode": "MH3",
+        "scryfallId": "ebef3db0-2b58-4581-a79c-fbca9a059e63"
+    },
+    "Disciple of Freyalise // Garden of Freyalise": {
+        "name": "Disciple of Freyalise // Garden of Freyalise",
+        "setcode": "MH3",
+        "scryfallId": "a8e9ea5a-5e10-4b77-baef-0352ff035483"
+    },
+    "Grist, Voracious Larva // Grist, the Plague Swarm": {
+        "name": "Grist, Voracious Larva // Grist, the Plague Swarm",
+        "setcode": "PMH3",
+        "scryfallId": "60d0e035-72bf-40fb-b0fb-7bd2733e4c30"
+    },
+    "Bloodsoaked Insight // Sanguine Morass": {
+        "name": "Bloodsoaked Insight // Sanguine Morass",
+        "setcode": "MH3",
+        "scryfallId": "0a08e0d2-1e60-47f5-9228-4c11a127089d"
+    },
+    "Drowner of Truth // Drowned Jungle": {
+        "name": "Drowner of Truth // Drowned Jungle",
+        "setcode": "MH3",
+        "scryfallId": "7a1d3c1d-1373-4ac4-bb26-9780976efc4f"
+    },
+    "Glasswing Grace // Age-Graced Chapel": {
+        "name": "Glasswing Grace // Age-Graced Chapel",
+        "setcode": "MH3",
+        "scryfallId": "90630b20-fc83-475f-bcd5-8bcfee0cf241"
+    },
+    "Legion Leadership // Legion Stronghold": {
+        "name": "Legion Leadership // Legion Stronghold",
+        "setcode": "MH3",
+        "scryfallId": "7676abd9-0a3d-4721-b17b-778d2e3c2e25"
+    },
+    "Revitalizing Repast // Old-Growth Grove": {
+        "name": "Revitalizing Repast // Old-Growth Grove",
+        "setcode": "MH3",
+        "scryfallId": "03522b6b-31ec-4126-8885-5dbb2248688b"
+    },
+    "Rush of Inspiration // Crackling Falls": {
+        "name": "Rush of Inspiration // Crackling Falls",
+        "setcode": "MH3",
+        "scryfallId": "70a25a3a-c12a-49d3-8a91-a108dfa9d3c5"
+    },
+    "Strength of the Harvest // Haven of the Harvest": {
+        "name": "Strength of the Harvest // Haven of the Harvest",
+        "setcode": "MH3",
+        "scryfallId": "a7143aa7-b16d-4e63-910c-6ceec55483f3"
+    },
+    "Stump Stomp // Burnwillow Clearing": {
+        "name": "Stump Stomp // Burnwillow Clearing",
+        "setcode": "MH3",
+        "scryfallId": "49974246-0a3b-4ec9-b5ea-2a89df9bb0b5"
+    },
+    "Suppression Ray // Orderly Plaza": {
+        "name": "Suppression Ray // Orderly Plaza",
+        "setcode": "MH3",
+        "scryfallId": "0cccd328-457a-48ab-97fb-4bc319db2e60"
+    },
+    "Waterlogged Teachings // Inundated Archive": {
+        "name": "Waterlogged Teachings // Inundated Archive",
+        "setcode": "MH3",
+        "scryfallId": "060f9675-4921-4cbb-bae2-54c85c679fd4"
+    },
+    "A-Devoted Grafkeeper // A-Departed Soulkeeper": {
+        "name": "A-Devoted Grafkeeper // A-Departed Soulkeeper",
+        "setcode": "MID",
+        "scryfallId": "5132a045-fe39-4e45-8abd-d0c1069caee7"
+    },
+    "Call a Surprise Witness": {
+        "name": "Call a Surprise Witness",
+        "setcode": "MKM",
+        "scryfallId": "e9e844d2-80de-4473-acd3-c39c1b11246f"
+    },
+    "Invasion of Ravnica // Guildpact Paragon": {
+        "name": "Invasion of Ravnica // Guildpact Paragon",
+        "setcode": "PMOM",
+        "scryfallId": "573cc5ec-4892-4f24-ba65-82d51198af89"
+    },
+    "Elesh Norn // The Argent Etchings": {
+        "name": "Elesh Norn // The Argent Etchings",
+        "setcode": "PMOM",
+        "scryfallId": "a05ba5e3-46f0-41eb-be63-ce25f1985dd6"
+    },
+    "Heliod, the Radiant Dawn // Heliod, the Warped Eclipse": {
+        "name": "Heliod, the Radiant Dawn // Heliod, the Warped Eclipse",
+        "setcode": "PMOM",
+        "scryfallId": "72c7aa34-ba14-4e8c-8859-e2598ae00261"
+    },
+    "Invasion of Belenon // Belenon War Anthem": {
+        "name": "Invasion of Belenon // Belenon War Anthem",
+        "setcode": "MOM",
+        "scryfallId": "4fb0eb2d-9cb7-4e72-a970-5009b046df2a"
+    },
+    "Invasion of Dominaria // Serra Faithkeeper": {
+        "name": "Invasion of Dominaria // Serra Faithkeeper",
+        "setcode": "MOM",
+        "scryfallId": "7e784d3d-0c6d-4ce5-beb5-edd2adb32385"
+    },
+    "Invasion of Gobakhan // Lightshield Array": {
+        "name": "Invasion of Gobakhan // Lightshield Array",
+        "setcode": "PMOM",
+        "scryfallId": "a0baccde-b9ca-42e5-9ed6-29d1acf43d7f"
+    },
+    "Invasion of Theros // Ephara, Ever-Sheltering": {
+        "name": "Invasion of Theros // Ephara, Ever-Sheltering",
+        "setcode": "PMOM",
+        "scryfallId": "b45a1e7b-716a-4a32-b573-765e4f677476"
+    },
+    "Seraph of New Capenna // Seraph of New Phyrexia": {
+        "name": "Seraph of New Capenna // Seraph of New Phyrexia",
+        "setcode": "MOM",
+        "scryfallId": "fbd9ed1d-1972-4db8-bc43-b05b94956aa0"
+    },
+    "Sun-Blessed Guardian // Furnace-Blessed Conqueror": {
+        "name": "Sun-Blessed Guardian // Furnace-Blessed Conqueror",
+        "setcode": "MOM",
+        "scryfallId": "630ce82b-0d09-4a12-8cba-0b0ed8415128"
+    },
+    "Tarkir Duneshaper // Burnished Dunestomper": {
+        "name": "Tarkir Duneshaper // Burnished Dunestomper",
+        "setcode": "MOM",
+        "scryfallId": "fdc37acc-05ba-4457-8a03-d635497bfb1b"
+    },
+    "Captive Weird // Compleated Conjurer": {
+        "name": "Captive Weird // Compleated Conjurer",
+        "setcode": "MOM",
+        "scryfallId": "70668650-0fb1-4486-a4e6-ab9a12be5626"
+    },
+    "Invasion of Arcavios // Invocation of the Founders": {
+        "name": "Invasion of Arcavios // Invocation of the Founders",
+        "setcode": "PMOM",
+        "scryfallId": "94598f7c-5142-49f2-b3b8-137b246492b9"
+    },
+    "Invasion of Kamigawa // Rooftop Saboteurs": {
+        "name": "Invasion of Kamigawa // Rooftop Saboteurs",
+        "setcode": "MOM",
+        "scryfallId": "3140320d-b932-441f-bff3-9bdf4419b88a"
+    },
+    "Invasion of Segovia // Caetus, Sea Tyrant of Segovia": {
+        "name": "Invasion of Segovia // Caetus, Sea Tyrant of Segovia",
+        "setcode": "PMOM",
+        "scryfallId": "f622a58b-e41f-4173-81b2-7e24afd235ec"
+    },
+    "Invasion of Vryn // Overloaded Mage-Ring": {
+        "name": "Invasion of Vryn // Overloaded Mage-Ring",
+        "setcode": "MOM",
+        "scryfallId": "c0ef6737-8e85-42ca-8ee6-6a34f9462de3"
+    },
+    "Jin-Gitaxias // The Great Synthesis": {
+        "name": "Jin-Gitaxias // The Great Synthesis",
+        "setcode": "PMOM",
+        "scryfallId": "68e79831-5780-46b6-9bb5-e87857b68336"
+    },
+    "Order of the Mirror // Order of the Alabaster Host": {
+        "name": "Order of the Mirror // Order of the Alabaster Host",
+        "setcode": "MOM",
+        "scryfallId": "103295ed-5ddc-4528-8848-4fd2cfec4b88"
+    },
+    "Rona, Herald of Invasion // Rona, Tolarian Obliterator": {
+        "name": "Rona, Herald of Invasion // Rona, Tolarian Obliterator",
+        "setcode": "PMOM",
+        "scryfallId": "0f0b2d53-455d-400d-b0d5-e9bf410f8d7e"
+    },
+    "Skyclave Aerialist // Skyclave Invader": {
+        "name": "Skyclave Aerialist // Skyclave Invader",
+        "setcode": "MOM",
+        "scryfallId": "cd1c8e1a-bd38-47a2-a55a-682ebaede960"
+    },
+    "Aetherblade Agent // Gitaxian Mindstinger": {
+        "name": "Aetherblade Agent // Gitaxian Mindstinger",
+        "setcode": "MOM",
+        "scryfallId": "dad34ae5-56b4-4394-be02-e043dc1cc23d"
+    },
+    "Ayara, Widow of the Realm // Ayara, Furnace Queen": {
+        "name": "Ayara, Widow of the Realm // Ayara, Furnace Queen",
+        "setcode": "PMOM",
+        "scryfallId": "34fed46d-eddc-4aac-869d-a87075de62b5"
+    },
+    "Blightreaper Thallid // Blightsower Thallid": {
+        "name": "Blightreaper Thallid // Blightsower Thallid",
+        "setcode": "MOM",
+        "scryfallId": "f1150ea9-02b5-4767-a529-6149d758830e"
+    },
+    "Invasion of Eldraine // Prickle Faeries": {
+        "name": "Invasion of Eldraine // Prickle Faeries",
+        "setcode": "MOM",
+        "scryfallId": "92f5b177-b0c6-4573-b860-f75dad1941bd"
+    },
+    "Invasion of Fiora // Marchesa, Resolute Monarch": {
+        "name": "Invasion of Fiora // Marchesa, Resolute Monarch",
+        "setcode": "PMOM",
+        "scryfallId": "05a292df-4323-4789-bba4-7f4599e24027"
+    },
+    "Invasion of Ulgrotha // Grandmother Ravi Sengir": {
+        "name": "Invasion of Ulgrotha // Grandmother Ravi Sengir",
+        "setcode": "MOM",
+        "scryfallId": "49ec5e00-22f4-486e-8e99-e950725f6fbc"
+    },
+    "Nezumi Freewheeler // Hideous Fleshwheeler": {
+        "name": "Nezumi Freewheeler // Hideous Fleshwheeler",
+        "setcode": "MOM",
+        "scryfallId": "76b5e289-6bc4-48ee-8d5b-6989bab9f901"
+    },
+    "Sheoldred // The True Scriptures": {
+        "name": "Sheoldred // The True Scriptures",
+        "setcode": "PMOM",
+        "scryfallId": "1b5fb738-ce58-4309-9068-53d01d1fb45e"
+    },
+    "Etali, Primal Conqueror // Etali, Primal Sickness": {
+        "name": "Etali, Primal Conqueror // Etali, Primal Sickness",
+        "setcode": "PMOM",
+        "scryfallId": "c2a1cf33-74c8-40c0-ab98-dbce32d2ff17"
+    },
+    "Harried Artisan // Phyrexian Skyflayer": {
+        "name": "Harried Artisan // Phyrexian Skyflayer",
+        "setcode": "MOM",
+        "scryfallId": "73e92389-4bd2-492e-b4d6-d7cb6baedc41"
+    },
+    "Invasion of Kaldheim // Pyre of the World Tree": {
+        "name": "Invasion of Kaldheim // Pyre of the World Tree",
+        "setcode": "PMOM",
+        "scryfallId": "b7848601-5b0d-4c1a-b3b3-79572d7a0a1c"
+    },
+    "Invasion of Karsus // Refraction Elemental": {
+        "name": "Invasion of Karsus // Refraction Elemental",
+        "setcode": "PMOM",
+        "scryfallId": "cdcf86b1-2dbd-457a-b1ac-368e107b2180"
+    },
+    "Invasion of Mercadia // Kyren Flamewright": {
+        "name": "Invasion of Mercadia // Kyren Flamewright",
+        "setcode": "MOM",
+        "scryfallId": "407d6723-bf58-403e-b2ac-ba52c51d356f"
+    },
+    "Invasion of Regatha // Disciples of the Inferno": {
+        "name": "Invasion of Regatha // Disciples of the Inferno",
+        "setcode": "MOM",
+        "scryfallId": "ada79e04-bb69-4c92-a829-014f02b1e06a"
+    },
+    "Invasion of Tarkir // Defiant Thundermaw": {
+        "name": "Invasion of Tarkir // Defiant Thundermaw",
+        "setcode": "PMOM",
+        "scryfallId": "f90afaac-dd66-42b0-bde7-74a829fb6689"
+    },
+    "Khenra Spellspear // Gitaxian Spellstalker": {
+        "name": "Khenra Spellspear // Gitaxian Spellstalker",
+        "setcode": "MOM",
+        "scryfallId": "dc1454ce-bb49-4b4f-bbca-d77387fa4966"
+    },
+    "Pyretic Prankster // Glistening Goremonger": {
+        "name": "Pyretic Prankster // Glistening Goremonger",
+        "setcode": "MOM",
+        "scryfallId": "0ee40c4b-2ca3-4cda-bc9e-451455c17adc"
+    },
+    "Urabrask // The Great Work": {
+        "name": "Urabrask // The Great Work",
+        "setcode": "PMOM",
+        "scryfallId": "1956d6c4-4dca-4110-8de3-a31a1e4ec98f"
+    },
+    "Bonded Herdbeast // Plated Kilnbeast": {
+        "name": "Bonded Herdbeast // Plated Kilnbeast",
+        "setcode": "MOM",
+        "scryfallId": "61972ddb-3421-4f22-a47a-89cea944dd02"
+    },
+    "Gnottvold Hermit // Chrome Host Hulk": {
+        "name": "Gnottvold Hermit // Chrome Host Hulk",
+        "setcode": "MOM",
+        "scryfallId": "70b2cdc5-35b9-443d-b499-c8b75c0d0a64"
+    },
+    "Herbology Instructor // Malady Invoker": {
+        "name": "Herbology Instructor // Malady Invoker",
+        "setcode": "MOM",
+        "scryfallId": "40ab763d-05ee-408d-aeba-eaf18c4f2e21"
+    },
+    "Invasion of Ikoria // Zilortha, Apex of Ikoria": {
+        "name": "Invasion of Ikoria // Zilortha, Apex of Ikoria",
+        "setcode": "PMOM",
+        "scryfallId": "e277f9d2-b809-4edd-aa8f-e28e13a6d349"
+    },
+    "Invasion of Ixalan // Belligerent Regisaur": {
+        "name": "Invasion of Ixalan // Belligerent Regisaur",
+        "setcode": "PMOM",
+        "scryfallId": "3befb543-547a-46ac-8488-a7f2069d3d88"
+    },
+    "Invasion of Muraganda // Primordial Plasm": {
+        "name": "Invasion of Muraganda // Primordial Plasm",
+        "setcode": "MOM",
+        "scryfallId": "93345804-dda4-42a2-84d4-8fcd376dd2d4"
+    },
+    "Invasion of Shandalar // Leyline Surge": {
+        "name": "Invasion of Shandalar // Leyline Surge",
+        "setcode": "PMOM",
+        "scryfallId": "a210f17a-154b-457b-a89f-d60c583ccbf5"
+    },
+    "Invasion of Zendikar // Awakened Skyclave": {
+        "name": "Invasion of Zendikar // Awakened Skyclave",
+        "setcode": "MOM",
+        "scryfallId": "8fed056f-a8f5-41ec-a7d2-a80a238872d1"
+    },
+    "Polukranos Reborn // Polukranos, Engine of Ruin": {
+        "name": "Polukranos Reborn // Polukranos, Engine of Ruin",
+        "setcode": "PMOM",
+        "scryfallId": "af0c39f4-350f-45b1-8ae8-dde21b745409"
+    },
+    "Vorinclex // The Grand Evolution": {
+        "name": "Vorinclex // The Grand Evolution",
+        "setcode": "PMOM",
+        "scryfallId": "95a239e4-07f8-4b26-bb51-2b245c07e6bf"
+    },
+    "Invasion of Alara // Awaken the Maelstrom": {
+        "name": "Invasion of Alara // Awaken the Maelstrom",
+        "setcode": "PMOM",
+        "scryfallId": "4b717f04-4162-4d80-a739-5d848481d2bf"
+    },
+    "Invasion of Amonkhet // Lazotep Convert": {
+        "name": "Invasion of Amonkhet // Lazotep Convert",
+        "setcode": "MOM",
+        "scryfallId": "981f091a-17f8-412e-9752-69070ebed4ea"
+    },
+    "Invasion of Azgol // Ashen Reaper": {
+        "name": "Invasion of Azgol // Ashen Reaper",
+        "setcode": "MOM",
+        "scryfallId": "ae2e1244-f05b-45f9-8afc-59f190524798"
+    },
+    "Invasion of Ergamon // Truga Cliffcharger": {
+        "name": "Invasion of Ergamon // Truga Cliffcharger",
+        "setcode": "MOM",
+        "scryfallId": "b3e0fc49-f765-4bd1-a2b9-23e703388b50"
+    },
+    "Invasion of Kaladesh // Aetherwing, Golden-Scale Flagship": {
+        "name": "Invasion of Kaladesh // Aetherwing, Golden-Scale Flagship",
+        "setcode": "MOM",
+        "scryfallId": "4f7231f6-8adc-4a68-9984-e56b974c087b"
+    },
+    "Invasion of Kylem // Valor's Reach Tag Team": {
+        "name": "Invasion of Kylem // Valor's Reach Tag Team",
+        "setcode": "MOM",
+        "scryfallId": "a7ac3a39-b6a6-4647-bb6e-e82057704f8b"
+    },
+    "Invasion of Lorwyn // Winnowing Forces": {
+        "name": "Invasion of Lorwyn // Winnowing Forces",
+        "setcode": "MOM",
+        "scryfallId": "93f623da-616e-4067-9ea8-5dfbeef8ce0b"
+    },
+    "Invasion of Moag // Bloomwielder Dryads": {
+        "name": "Invasion of Moag // Bloomwielder Dryads",
+        "setcode": "MOM",
+        "scryfallId": "e454bf31-5aa0-4109-a3f5-c3f9cc838682"
+    },
+    "Invasion of New Capenna // Holy Frazzle-Cannon": {
+        "name": "Invasion of New Capenna // Holy Frazzle-Cannon",
+        "setcode": "MOM",
+        "scryfallId": "f5926c8e-8049-418e-9a84-f8558e5ba9d1"
+    },
+    "Invasion of New Phyrexia // Teferi Akosa of Zhalfir": {
+        "name": "Invasion of New Phyrexia // Teferi Akosa of Zhalfir",
+        "setcode": "PMOM",
+        "scryfallId": "cc0c163b-1fce-422d-bd70-ee8aa7f250f2"
+    },
+    "Invasion of Pyrulea // Gargantuan Slabhorn": {
+        "name": "Invasion of Pyrulea // Gargantuan Slabhorn",
+        "setcode": "MOM",
+        "scryfallId": "50180fda-6d67-41e9-8b2b-2e7c5876b8ab"
+    },
+    "Invasion of Tolvada // The Broken Sky": {
+        "name": "Invasion of Tolvada // The Broken Sky",
+        "setcode": "PMOM",
+        "scryfallId": "bb7bbe0f-3b19-42a4-981c-97164711f63c"
+    },
+    "Invasion of Xerex // Vertex Paladin": {
+        "name": "Invasion of Xerex // Vertex Paladin",
+        "setcode": "MOM",
+        "scryfallId": "6c8c9c33-569c-4b67-a18d-4cd0f18d01f4"
+    },
+    "Befriending the Moths // Imperial Moth": {
+        "name": "Befriending the Moths // Imperial Moth",
+        "setcode": "NEO",
+        "scryfallId": "8ad44884-ae0d-40ae-87a9-bad043d4e9ad"
+    },
+    "Era of Enlightenment // Hand of Enlightenment": {
+        "name": "Era of Enlightenment // Hand of Enlightenment",
+        "setcode": "NEO",
+        "scryfallId": "74f43827-2b9b-4fc9-a6e2-c682dfbf14f7"
+    },
+    "The Fall of Lord Konda // Fragment of Konda": {
+        "name": "The Fall of Lord Konda // Fragment of Konda",
+        "setcode": "NEO",
+        "scryfallId": "4d784409-df6d-45d4-8f8b-6e3fd57a8fde"
+    },
+    "Michiko's Reign of Truth // Portrait of Michiko": {
+        "name": "Michiko's Reign of Truth // Portrait of Michiko",
+        "setcode": "NEO",
+        "scryfallId": "74f12c23-5c15-4ae6-8f4d-c5e6c1878817"
+    },
+    "The Restoration of Eiganjo // Architect of Restoration": {
+        "name": "The Restoration of Eiganjo // Architect of Restoration",
+        "setcode": "PRM",
+        "scryfallId": "003b8c93-54d2-4f23-961e-a52d63d0a54b"
+    },
+    "Behold the Unspeakable // Vision of the Unspeakable": {
+        "name": "Behold the Unspeakable // Vision of the Unspeakable",
+        "setcode": "NEO",
+        "scryfallId": "e4d52701-e0dc-474e-b08f-88147200d210"
+    },
+    "Inventive Iteration // Living Breakthrough": {
+        "name": "Inventive Iteration // Living Breakthrough",
+        "setcode": "PRM",
+        "scryfallId": "306efda0-2aa6-48e8-98a4-bd2c573dd573"
+    },
+    "The Modern Age // Vector Glider": {
+        "name": "The Modern Age // Vector Glider",
+        "setcode": "NEO",
+        "scryfallId": "ee60a8e9-3201-4a7e-8aa4-2c5e1042c8a5"
+    },
+    "Life of Toshiro Umezawa // Memory of Toshiro": {
+        "name": "Life of Toshiro Umezawa // Memory of Toshiro",
+        "setcode": "NEO",
+        "scryfallId": "f7f4adf7-b871-417b-8904-7f024ca21486"
+    },
+    "The Long Reach of Night // Animus of Night's Reach": {
+        "name": "The Long Reach of Night // Animus of Night's Reach",
+        "setcode": "NEO",
+        "scryfallId": "4ec18bf7-bd80-408d-acc4-ffaaf7ef6b5b"
+    },
+    "Okiba Reckoner Raid // Nezumi Road Captain": {
+        "name": "Okiba Reckoner Raid // Nezumi Road Captain",
+        "setcode": "NEO",
+        "scryfallId": "4f0582b4-d951-4450-b158-4a34109e48cd"
+    },
+    "Tribute to Horobi // Echo of Death's Wail": {
+        "name": "Tribute to Horobi // Echo of Death's Wail",
+        "setcode": "PRM",
+        "scryfallId": "14b13f8f-003d-4b06-a1ed-505b68311e93"
+    },
+    "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki": {
+        "name": "Fable of the Mirror-Breaker // Reflection of Kiki-Jiki",
+        "setcode": "PRM",
+        "scryfallId": "c604ee2e-5d26-4706-968b-75e84e7168f6"
+    },
+    "Kumano Faces Kakkazan // Etching of Kumano": {
+        "name": "Kumano Faces Kakkazan // Etching of Kumano",
+        "setcode": "NEO",
+        "scryfallId": "28d92cad-45b0-479d-97fc-c175f3a3f259"
+    },
+    "The Shattered States Era // Nameless Conqueror": {
+        "name": "The Shattered States Era // Nameless Conqueror",
+        "setcode": "NEO",
+        "scryfallId": "517392f6-d3fd-4c59-8317-2a3595ab7562"
+    },
+    "Azusa's Many Journeys // Likeness of the Seeker": {
+        "name": "Azusa's Many Journeys // Likeness of the Seeker",
+        "setcode": "NEO",
+        "scryfallId": "e8a51d2a-1582-4bad-995c-e7fe9f810149"
+    },
+    "Boseiju Reaches Skyward // Branch of Boseiju": {
+        "name": "Boseiju Reaches Skyward // Branch of Boseiju",
+        "setcode": "NEO",
+        "scryfallId": "1144014b-f13b-4397-97ed-a8de46371a2c"
+    },
+    "The Dragon-Kami Reborn // Dragon-Kami's Egg": {
+        "name": "The Dragon-Kami Reborn // Dragon-Kami's Egg",
+        "setcode": "PRM",
+        "scryfallId": "30442b97-a382-496d-b93c-8547557aff12"
+    },
+    "Jugan Defends the Temple // Remnant of the Rising Star": {
+        "name": "Jugan Defends the Temple // Remnant of the Rising Star",
+        "setcode": "PRM",
+        "scryfallId": "ef8937fa-a7cc-452a-a31b-c857a7ad3745"
+    },
+    "Tales of Master Seshiro // Seshiro's Living Legacy": {
+        "name": "Tales of Master Seshiro // Seshiro's Living Legacy",
+        "setcode": "NEO",
+        "scryfallId": "512bc867-3a86-4da2-93f0-dd76d6a6f30d"
+    },
+    "Teachings of the Kirin // Kirin-Touched Orochi": {
+        "name": "Teachings of the Kirin // Kirin-Touched Orochi",
+        "setcode": "PRM",
+        "scryfallId": "8454624b-58bc-47c8-b0e6-6d4f0931a1ad"
+    },
+    "Hidetsugu Consumes All // Vessel of the All-Consuming": {
+        "name": "Hidetsugu Consumes All // Vessel of the All-Consuming",
+        "setcode": "PRM",
+        "scryfallId": "34371a46-5c75-4286-aa06-7246273be481"
+    },
+    "The Kami War // O-Kagachi Made Manifest": {
+        "name": "The Kami War // O-Kagachi Made Manifest",
+        "setcode": "PRM",
+        "scryfallId": "2f3fe863-ba96-4c6e-a584-5960d2b12f49"
+    },
+    "Kytheon, Hero of Akros // Gideon, Battle-Forged": {
+        "name": "Kytheon, Hero of Akros // Gideon, Battle-Forged",
+        "setcode": "V17",
+        "scryfallId": "6473e356-2685-4f91-ab42-cca8c6be0816"
+    },
+    "Jace, Vryn's Prodigy // Jace, Telepath Unbound": {
+        "name": "Jace, Vryn's Prodigy // Jace, Telepath Unbound",
+        "setcode": "V17",
+        "scryfallId": "cc750c64-fd83-4b7b-9a40-a99213e6fa6d"
+    },
+    "Chandra, Fire of Kaladesh // Chandra, Roaring Flame": {
+        "name": "Chandra, Fire of Kaladesh // Chandra, Roaring Flame",
+        "setcode": "V17",
+        "scryfallId": "7e0cfe44-9b57-4b9a-b23f-18d3237bd7ee"
+    },
+    "Nissa, Vastwood Seer // Nissa, Sage Animist": {
+        "name": "Nissa, Vastwood Seer // Nissa, Sage Animist",
+        "setcode": "V17",
+        "scryfallId": "63b2b7cd-a51d-4e50-b794-a52731196973"
+    },
+    "Kabira Takedown // Kabira Plateau": {
+        "name": "Kabira Takedown // Kabira Plateau",
+        "setcode": "ZNR",
+        "scryfallId": "366e9845-019d-47cc-adb8-8fbbaad35b6d"
+    },
+    "Sejiri Shelter // Sejiri Glacier": {
+        "name": "Sejiri Shelter // Sejiri Glacier",
+        "setcode": "ZNR",
+        "scryfallId": "f25d56f9-aa54-4657-9ac9-e93fbba3e715"
+    },
+    "Jwari Disruption // Jwari Ruins": {
+        "name": "Jwari Disruption // Jwari Ruins",
+        "setcode": "ZNR",
+        "scryfallId": "301750a7-d1fd-435e-bfa8-9d2fb22ad627"
+    },
+    "Silundi Vision // Silundi Isle": {
+        "name": "Silundi Vision // Silundi Isle",
+        "setcode": "ZNR",
+        "scryfallId": "11568cdf-6148-494c-8b98-f5ca5797d775"
+    },
+    "Blackbloom Rogue // Blackbloom Bog": {
+        "name": "Blackbloom Rogue // Blackbloom Bog",
+        "setcode": "ZNR",
+        "scryfallId": "32779721-b021-4bd4-95d1-4a19b78d9faa"
+    },
+    "Pelakka Predation // Pelakka Caverns": {
+        "name": "Pelakka Predation // Pelakka Caverns",
+        "setcode": "ZNR",
+        "scryfallId": "e63f8b20-f45b-4293-9aac-cdc021939be6"
+    },
+    "Akoum Warrior // Akoum Teeth": {
+        "name": "Akoum Warrior // Akoum Teeth",
+        "setcode": "ZNR",
+        "scryfallId": "d8ed0335-daa6-4dbe-a94d-4d56c8cfd093"
+    },
+    "Valakut Awakening // Valakut Stoneforge": {
+        "name": "Valakut Awakening // Valakut Stoneforge",
+        "setcode": "ZNR",
+        "scryfallId": "a156b510-8879-4a7b-b15b-71374cb1e6f7"
+    },
+    "Bala Ged Recovery // Bala Ged Sanctuary": {
+        "name": "Bala Ged Recovery // Bala Ged Sanctuary",
+        "setcode": "ZNR",
+        "scryfallId": "c5cb3052-358d-44a7-8cfd-cd31b236494a"
+    },
+    "Khalni Ambush // Khalni Territory": {
+        "name": "Khalni Ambush // Khalni Territory",
+        "setcode": "ZNR",
+        "scryfallId": "99535539-aa73-41ed-86ab-21c97b92620d"
+    },
+    "Legion's Landing // Adanto, the First Fort": {
+        "name": "Legion's Landing // Adanto, the First Fort",
+        "setcode": "XLN",
+        "scryfallId": "05e2a5e6-3aaa-4096-bdd0-fcc1afe5a36c"
+    },
+    "Ondu Inversion // Ondu Skyruins": {
+        "name": "Ondu Inversion // Ondu Skyruins",
+        "setcode": "ZNR",
+        "scryfallId": "7b300a1d-22a6-410c-9fe4-293fefe49969"
+    },
+    "Search for Azcanta // Azcanta, the Sunken Ruin": {
+        "name": "Search for Azcanta // Azcanta, the Sunken Ruin",
+        "setcode": "XLN",
+        "scryfallId": "1a7e242e-bb48-4134-a1c2-6033713d658f"
+    },
+    "Hagra Mauling // Hagra Broodpit": {
+        "name": "Hagra Mauling // Hagra Broodpit",
+        "setcode": "ZNR",
+        "scryfallId": "b2274cda-b97f-4027-9cd8-c35eeaa0b5e6"
+    },
+    "Mila, Crafty Companion // Lukka, Wayward Bonder": {
+        "name": "Mila, Crafty Companion // Lukka, Wayward Bonder",
+        "setcode": "STX",
+        "scryfallId": "34332dc9-d81c-4b16-bf59-2c75eaa05c21"
+    },
+    "Plargg, Dean of Chaos // Augusta, Dean of Order": {
+        "name": "Plargg, Dean of Chaos // Augusta, Dean of Order",
+        "setcode": "STX",
+        "scryfallId": "e92c8175-50be-412e-b42e-9fe92aa8d4f1"
+    },
+    "Hadana's Climb // Winged Temple of Orazca": {
+        "name": "Hadana's Climb // Winged Temple of Orazca",
+        "setcode": "RIX",
+        "scryfallId": "8e7554bc-8583-4059-8895-c3845bc27ae3"
+    },
+    "Shaile, Dean of Radiance // Embrose, Dean of Shadow": {
+        "name": "Shaile, Dean of Radiance // Embrose, Dean of Shadow",
+        "setcode": "STX",
+        "scryfallId": "c18ebfe1-f953-4aa3-933e-eee58fc4a0dd"
+    },
+    "Journey to Eternity // Atzal, Cave of Eternity": {
+        "name": "Journey to Eternity // Atzal, Cave of Eternity",
+        "setcode": "RIX",
+        "scryfallId": "d81c4b3f-81c2-403b-8a5d-c9415f73a1f9"
+    },
+    "Valentin, Dean of the Vein // Lisette, Dean of the Root": {
+        "name": "Valentin, Dean of the Vein // Lisette, Dean of the Root",
+        "setcode": "STX",
+        "scryfallId": "297696bb-0610-45fb-92d3-5b7d9a7da290"
+    },
+    "Azor's Gateway // Sanctum of the Sun": {
+        "name": "Azor's Gateway // Sanctum of the Sun",
+        "setcode": "RIX",
+        "scryfallId": "303d51ab-b9c4-4647-950f-291daabe7b81"
+    },
+    "Dowsing Dagger // Lost Vale": {
+        "name": "Dowsing Dagger // Lost Vale",
+        "setcode": "XLN",
+        "scryfallId": "514d53be-6ade-4f73-a844-e9ae2dafd6ce"
+    },
+    "Thaumatic Compass // Spires of Orazca": {
+        "name": "Thaumatic Compass // Spires of Orazca",
+        "setcode": "XLN",
+        "scryfallId": "392af78e-34d5-4b1b-8b29-0e702271e4d7"
+    },
+    "Branchloft Pathway // Boulderloft Pathway": {
+        "name": "Branchloft Pathway // Boulderloft Pathway",
+        "setcode": "ZNR",
+        "scryfallId": "738ebafa-04be-4ba9-ae65-5f85e00c645a"
+    },
+    "Brightclimb Pathway // Grimclimb Pathway": {
+        "name": "Brightclimb Pathway // Grimclimb Pathway",
+        "setcode": "ZNR",
+        "scryfallId": "eb55e544-ab9d-403d-93ee-19e792a256c5"
+    },
+    "Clearwater Pathway // Murkwater Pathway": {
+        "name": "Clearwater Pathway // Murkwater Pathway",
+        "setcode": "ZNR",
+        "scryfallId": "b0fe4b53-18f6-42eb-b03f-cab3e5a7fba6"
+    },
+    "Cragcrown Pathway // Timbercrown Pathway": {
+        "name": "Cragcrown Pathway // Timbercrown Pathway",
+        "setcode": "ZNR",
+        "scryfallId": "050602c0-b5b7-4076-af33-0f7a58d0b260"
+    },
+    "Needleverge Pathway // Pillarverge Pathway": {
+        "name": "Needleverge Pathway // Pillarverge Pathway",
+        "setcode": "ZNR",
+        "scryfallId": "edc71870-656c-40f9-b2b0-f69a46bf8c51"
+    },
+    "Riverglide Pathway // Lavaglide Pathway": {
+        "name": "Riverglide Pathway // Lavaglide Pathway",
+        "setcode": "ZNR",
+        "scryfallId": "78792607-0872-4de4-a9d8-92f1d58f4a71"
+    },
+    "Tangled Florahedron // Tangled Vale": {
+        "name": "Tangled Florahedron // Tangled Vale",
+        "setcode": "ZNR",
+        "scryfallId": "235d1ffc-72aa-40a2-95dc-3f6a8d495061"
+    },
+    "Path of Mettle // Metzali, Tower of Triumph": {
+        "name": "Path of Mettle // Metzali, Tower of Triumph",
+        "setcode": "RIX",
+        "scryfallId": "66d9d524-3611-48d9-86c9-48e509e8ae70"
+    },
+    "Profane Procession // Tomb of the Dusk Rose": {
+        "name": "Profane Procession // Tomb of the Dusk Rose",
+        "setcode": "RIX",
+        "scryfallId": "1d94ff37-f04e-48ee-8253-d62ab07f0632"
+    },
+    "Storm the Vault // Vault of Catlacan": {
+        "name": "Storm the Vault // Vault of Catlacan",
+        "setcode": "RIX",
+        "scryfallId": "c16ba84e-a0cc-4c6c-9b80-713247b8fef9"
+    },
+    "Golden Guardian // Gold-Forge Garrison": {
+        "name": "Golden Guardian // Gold-Forge Garrison",
+        "setcode": "RIX",
+        "scryfallId": "397ba02d-f347-46f7-b028-dd4ba55faa2f"
+    },
+    "Elusive Tormentor // Insidious Mist": {
+        "name": "Elusive Tormentor // Insidious Mist",
+        "setcode": "SOI",
+        "scryfallId": "a32ce90d-9138-4aca-aa3c-a558dd16fad8"
+    },
+    "Kazandu Mammoth // Kazandu Valley": {
+        "name": "Kazandu Mammoth // Kazandu Valley",
+        "setcode": "ZNR",
+        "scryfallId": "09c8c150-a0d8-4254-9169-7697e9c540da"
+    },
+    "Emeria's Call // Emeria, Shattered Skyclave": {
+        "name": "Emeria's Call // Emeria, Shattered Skyclave",
+        "setcode": "ZNR",
+        "scryfallId": "ca50edb2-e50e-4601-ae18-1a313e041105"
+    },
+    "Sea Gate Restoration // Sea Gate, Reborn": {
+        "name": "Sea Gate Restoration // Sea Gate, Reborn",
+        "setcode": "ZNR",
+        "scryfallId": "a910d400-8053-4c90-82e7-bf3e22e81633"
+    },
+    "Agadeem's Awakening // Agadeem, the Undercrypt": {
+        "name": "Agadeem's Awakening // Agadeem, the Undercrypt",
+        "setcode": "ZNR",
+        "scryfallId": "499c2b20-e83e-40ff-919e-1d134ad50c0a"
+    },
+    "Shatterskull Smashing // Shatterskull, the Hammer Pass": {
+        "name": "Shatterskull Smashing // Shatterskull, the Hammer Pass",
+        "setcode": "ZNR",
+        "scryfallId": "243d374f-5b40-4cff-99f5-079ba873d44b"
+    },
+    "Turntimber Symbiosis // Turntimber, Serpentine Wood": {
+        "name": "Turntimber Symbiosis // Turntimber, Serpentine Wood",
+        "setcode": "ZNR",
+        "scryfallId": "90df87c1-59df-4244-8653-15e7f13cdacc"
+    },
+    "Glasspool Mimic // Glasspool Shore": {
+        "name": "Glasspool Mimic // Glasspool Shore",
+        "setcode": "ZNR",
+        "scryfallId": "fee79733-4df7-4870-9e42-03407b5e1528"
+    },
+    "Selfless Glyphweaver // Deadly Vanity": {
+        "name": "Selfless Glyphweaver // Deadly Vanity",
+        "setcode": "STX",
+        "scryfallId": "5b09d444-a687-4712-b193-265148748aaf"
+    },
+    "Pestilent Cauldron // Restorative Burst": {
+        "name": "Pestilent Cauldron // Restorative Burst",
+        "setcode": "STX",
+        "scryfallId": "f1ebfe27-d5a4-4fc9-8049-fcebe65dd592"
+    },
+    "Augmenter Pugilist // Echoing Equation": {
+        "name": "Augmenter Pugilist // Echoing Equation",
+        "setcode": "STX",
+        "scryfallId": "b120e3c2-21b1-43e3-b685-9cf62bd7aa07"
+    },
+    "Kianne, Dean of Substance // Imbraham, Dean of Theory": {
+        "name": "Kianne, Dean of Substance // Imbraham, Dean of Theory",
+        "setcode": "STX",
+        "scryfallId": "1d96ade2-fb2a-420e-a14f-e96c47f903ce"
+    },
+    "Torrent Sculptor // Flamethrower Sonata": {
+        "name": "Torrent Sculptor // Flamethrower Sonata",
+        "setcode": "STX",
+        "scryfallId": "77e7417d-36b9-4a47-b6d2-aa589711a5ba"
+    },
+    "Uvilda, Dean of Perfection // Nassari, Dean of Expression": {
+        "name": "Uvilda, Dean of Perfection // Nassari, Dean of Expression",
+        "setcode": "STX",
+        "scryfallId": "298a4109-4f8d-449c-b13d-e678c1113b90"
+    },
+    "Flamescroll Celebrant // Revel in Silence": {
+        "name": "Flamescroll Celebrant // Revel in Silence",
+        "setcode": "STX",
+        "scryfallId": "8c917201-4691-4f31-a8e4-ca0192d5ff71"
+    },
+    "Extus, Oriq Overlord // Awaken the Blood Avatar": {
+        "name": "Extus, Oriq Overlord // Awaken the Blood Avatar",
+        "setcode": "STX",
+        "scryfallId": "786156ce-544c-4aa4-8381-756042d0bcda"
+    },
+    "Blex, Vexing Pest // Search for Blex": {
+        "name": "Blex, Vexing Pest // Search for Blex",
+        "setcode": "STX",
+        "scryfallId": "930d3b70-7e8e-4a39-b60d-7d14196912e0"
+    },
+    "Jadzi, Oracle of Arcavios // Journey to the Oracle": {
+        "name": "Jadzi, Oracle of Arcavios // Journey to the Oracle",
+        "setcode": "STX",
+        "scryfallId": "b0a96416-9ee5-4202-a99f-e09db8794567"
+    },
+    "Rowan, Scholar of Sparks // Will, Scholar of Frost": {
+        "name": "Rowan, Scholar of Sparks // Will, Scholar of Frost",
+        "setcode": "STX",
+        "scryfallId": "2cca8cf1-27f8-408d-b4bc-1d4090837f8a"
+    },
+    "Wandering Archaic // Explore the Vastlands": {
+        "name": "Wandering Archaic // Explore the Vastlands",
+        "setcode": "STX",
+        "scryfallId": "63bd0484-4089-4d33-aa8b-3730791061c3"
+    },
+    "Startled Awake // Persistent Nightmare": {
+        "name": "Startled Awake // Persistent Nightmare",
+        "setcode": "SOI",
+        "scryfallId": "e630fc56-a96f-4abf-be8d-f0f40d5a9edf"
+    },
+    "Sage of Ancient Lore // Werewolf of Ancient Hunger": {
+        "name": "Sage of Ancient Lore // Werewolf of Ancient Hunger",
+        "setcode": "SOI",
+        "scryfallId": "94c5f7fe-9ca6-4040-bf7c-062ab22e6a02"
+    },
+    "Nightmare Moon // Princess Luna": {
+        "name": "Nightmare Moon // Princess Luna",
+        "setcode": "PTG",
+        "scryfallId": "5646ea19-0025-4f88-ad22-36968a1d3b89"
+    },
+    "Arguel's Blood Fast // Temple of Aclazotz": {
+        "name": "Arguel's Blood Fast // Temple of Aclazotz",
+        "setcode": "XLN",
+        "scryfallId": "c4ac7570-e74e-4081-ac53-cf41e695b7eb"
+    },
+    "Vance's Blasting Cannons // Spitfire Bastion": {
+        "name": "Vance's Blasting Cannons // Spitfire Bastion",
+        "setcode": "XLN",
+        "scryfallId": "9e8c0009-787f-480b-84b6-bf297f1fb466"
+    },
+    "Conqueror's Galleon // Conqueror's Foothold": {
+        "name": "Conqueror's Galleon // Conqueror's Foothold",
+        "setcode": "XLN",
+        "scryfallId": "02bb4b2a-3c9f-48ab-b2a5-ae31f06b82d9"
+    },
+    "Primal Amulet // Primal Wellspring": {
+        "name": "Primal Amulet // Primal Wellspring",
+        "setcode": "XLN",
+        "scryfallId": "d4d379b5-7f56-4a7d-a4ac-131fc3d579c6"
+    },
+    "Welcome to . . . // Jurassic Park": {
+        "name": "Welcome to . . . // Jurassic Park",
+        "setcode": "REX",
+        "scryfallId": "6d84e2d4-38bf-4d46-99a6-37c2dda66b16"
+    },
+    "Plains // Plains": {
+        "name": "Plains // Plains",
+        "setcode": "REX",
+        "scryfallId": "6620b5f4-b1e5-4d1b-bbf2-c6ad9c8284c5"
+    },
+    "Island // Island": {
+        "name": "Island // Island",
+        "setcode": "REX",
+        "scryfallId": "76c343f5-6955-4ba2-a435-36d55182d1dd"
+    },
+    "Swamp // Swamp": {
+        "name": "Swamp // Swamp",
+        "setcode": "REX",
+        "scryfallId": "843b35ec-7b59-4a22-8fee-2e876a02306b"
+    },
+    "Mountain // Mountain": {
+        "name": "Mountain // Mountain",
+        "setcode": "REX",
+        "scryfallId": "aae84079-b65b-4132-86fb-e82503bb6c7b"
+    },
+    "Forest // Forest": {
+        "name": "Forest // Forest",
+        "setcode": "REX",
+        "scryfallId": "7e703632-5ed0-4509-a12b-594269f865f1"
+    },
+    "Command Tower // Command Tower": {
+        "name": "Command Tower // Command Tower",
+        "setcode": "REX",
+        "scryfallId": "bffbe9ec-edbc-43ed-a3bf-60635e7e625c"
+    },
+    "Path of Peace": {
+        "name": "Path of Peace",
+        "setcode": "S99",
+        "scryfallId": "d9c55cbd-c59e-4cab-b425-2d735ed88f28"
+    },
+    "Daring Sleuth // Bearer of Overwhelming Truths": {
+        "name": "Daring Sleuth // Bearer of Overwhelming Truths",
+        "setcode": "SOI",
+        "scryfallId": "440f9f10-6999-4cff-ab98-8aed77813b07"
+    },
+    "Accursed Witch // Infectious Curse": {
+        "name": "Accursed Witch // Infectious Curse",
+        "setcode": "SOI",
+        "scryfallId": "8093f8b0-5d50-48ca-b616-e92535a47138"
+    },
+    "Kindly Stranger // Demon-Possessed Witch": {
+        "name": "Kindly Stranger // Demon-Possessed Witch",
+        "setcode": "SOI",
+        "scryfallId": "e326d5f4-63e1-45fa-8c48-6fdc05709c52"
+    },
+    "Gatstaf Arsonists // Gatstaf Ravagers": {
+        "name": "Gatstaf Arsonists // Gatstaf Ravagers",
+        "setcode": "SOI",
+        "scryfallId": "6ab67098-d3d5-4799-ae03-c734244f370e"
+    },
+    "Zndrsplt, Eye of Wisdom // Zndrsplt, Eye of Wisdom": {
+        "name": "Zndrsplt, Eye of Wisdom // Zndrsplt, Eye of Wisdom",
+        "setcode": "SLD",
+        "scryfallId": "e25ce640-baf5-442b-8b75-d05dd9fb20dd"
+    },
+    "Okaun, Eye of Chaos // Okaun, Eye of Chaos": {
+        "name": "Okaun, Eye of Chaos // Okaun, Eye of Chaos",
+        "setcode": "SLD",
+        "scryfallId": "8421ad46-dc7f-4b66-800b-e41c30835300"
+    },
+    "Propaganda // Propaganda": {
+        "name": "Propaganda // Propaganda",
+        "setcode": "SLD",
+        "scryfallId": "3e3f0bcd-0796-494d-bf51-94b33c1671e9"
+    },
+    "Stitch in Time // Stitch in Time": {
+        "name": "Stitch in Time // Stitch in Time",
+        "setcode": "SLD",
+        "scryfallId": "087c3a0d-c710-4451-989e-596b55352184"
+    },
+    "Krark's Thumb // Krark's Thumb": {
+        "name": "Krark's Thumb // Krark's Thumb",
+        "setcode": "SLD",
+        "scryfallId": "9f63277b-e139-46c8-b9e3-0cfb647f44cc"
+    },
+    "Havengul Laboratory // Havengul Mystery": {
+        "name": "Havengul Laboratory // Havengul Mystery",
+        "setcode": "SLX",
+        "scryfallId": "823b019e-10c0-4712-8167-d4f37a71e782"
+    },
+    "Ajani Goldmane // Ajani Goldmane": {
+        "name": "Ajani Goldmane // Ajani Goldmane",
+        "setcode": "SLD",
+        "scryfallId": "acdb72e2-c000-4b92-b5ea-73115969020f"
+    },
+    "Jace Beleren // Jace Beleren": {
+        "name": "Jace Beleren // Jace Beleren",
+        "setcode": "SLD",
+        "scryfallId": "3cb0824c-57cc-46bf-bd43-425d58b8a762"
+    },
+    "Liliana Vess // Liliana Vess": {
+        "name": "Liliana Vess // Liliana Vess",
+        "setcode": "SLD",
+        "scryfallId": "d5f7a626-7b6b-41ba-a0f5-3aefe511b267"
+    },
+    "Chandra Nalaar // Chandra Nalaar": {
+        "name": "Chandra Nalaar // Chandra Nalaar",
+        "setcode": "SLD",
+        "scryfallId": "5ab0412a-2b2f-430f-8830-002a42125148"
+    },
+    "Garruk Wildspeaker // Garruk Wildspeaker": {
+        "name": "Garruk Wildspeaker // Garruk Wildspeaker",
+        "setcode": "SLD",
+        "scryfallId": "caf8d01d-07aa-43da-a26e-4a2ba3a76f2d"
+    },
+    "Terror // Terror": {
+        "name": "Terror // Terror",
+        "setcode": "SLD",
+        "scryfallId": "60c92f1b-0c78-4809-9365-e1ffa515cb4b"
+    },
+    "Norin the Wary // Norin the Wary": {
+        "name": "Norin the Wary // Norin the Wary",
+        "setcode": "SLD",
+        "scryfallId": "3d89c9be-2489-47e4-8e53-f980c82442b4"
+    },
+    "Blightsteel Colossus // Blightsteel Colossus": {
+        "name": "Blightsteel Colossus // Blightsteel Colossus",
+        "setcode": "SLD",
+        "scryfallId": "4d227cd3-ebfe-4dd3-929a-4f8ff7c8981e"
+    },
+    "Doubling Cube // Doubling Cube": {
+        "name": "Doubling Cube // Doubling Cube",
+        "setcode": "SLD",
+        "scryfallId": "9052f5c7-ee3b-457d-97ca-ac6b4518997c"
+    },
+    "Darksteel Colossus // Darksteel Colossus": {
+        "name": "Darksteel Colossus // Darksteel Colossus",
+        "setcode": "SLD",
+        "scryfallId": "8b5341ab-85a6-44b2-b738-1110e699c02b"
+    },
+    "Ulamog, the Ceaseless Hunger // Ulamog, the Ceaseless Hunger": {
+        "name": "Ulamog, the Ceaseless Hunger // Ulamog, the Ceaseless Hunger",
+        "setcode": "SLD",
+        "scryfallId": "82fa24fb-aecc-4c33-9e79-c29651ddafbe"
+    },
+    "Etali, Primal Storm // Etali, Primal Storm": {
+        "name": "Etali, Primal Storm // Etali, Primal Storm",
+        "setcode": "SLD",
+        "scryfallId": "b96d6ea4-a3a4-4e33-be97-b3767f2bb63a"
+    },
+    "Ghalta, Primal Hunger // Ghalta, Primal Hunger": {
+        "name": "Ghalta, Primal Hunger // Ghalta, Primal Hunger",
+        "setcode": "SLD",
+        "scryfallId": "0489be0d-2117-46a8-97ab-31fe480685e2"
+    },
+    "Casal, Lurkwood Pathfinder // Casal, Pathbreaker Owlbear": {
+        "name": "Casal, Lurkwood Pathfinder // Casal, Pathbreaker Owlbear",
+        "setcode": "SLX",
+        "scryfallId": "d571c367-c786-41f9-9cdb-cb02594fa413"
+    },
+    "Estrid's Invocation // Estrid's Invocation": {
+        "name": "Estrid's Invocation // Estrid's Invocation",
+        "setcode": "SLD",
+        "scryfallId": "9680a2d6-1d66-4f69-b400-a79fea4187d8"
+    },
+    "Steely Resolve // Steely Resolve": {
+        "name": "Steely Resolve // Steely Resolve",
+        "setcode": "SLD",
+        "scryfallId": "36ea852d-ed2b-4c56-9b73-52dce8a3e520"
+    },
+    "Estrid, the Masked // Estrid, the Masked": {
+        "name": "Estrid, the Masked // Estrid, the Masked",
+        "setcode": "SLD",
+        "scryfallId": "a724ebbc-0f77-42e9-95e0-b3e7cb130148"
+    },
+    "Tuvasa the Sunlit // Tuvasa the Sunlit": {
+        "name": "Tuvasa the Sunlit // Tuvasa the Sunlit",
+        "setcode": "SLD",
+        "scryfallId": "048ddb71-e9ea-4f11-9b8a-c53961cf3a2c"
+    },
+    "Death Baron // Death Baron": {
+        "name": "Death Baron // Death Baron",
+        "setcode": "SLD",
+        "scryfallId": "f4e7b3a4-a346-4177-9cfe-0142b40ef4a6"
+    },
+    "Noxious Ghoul // Noxious Ghoul": {
+        "name": "Noxious Ghoul // Noxious Ghoul",
+        "setcode": "SLD",
+        "scryfallId": "9e69f9e0-4981-4fc0-955f-7ebe04264fca"
+    },
+    "Zombie Master // Zombie Master": {
+        "name": "Zombie Master // Zombie Master",
+        "setcode": "SLD",
+        "scryfallId": "8bcf942f-5afd-414e-a50d-00d884fe59da"
+    },
+    "Grimgrin, Corpse-Born // Grimgrin, Corpse-Born": {
+        "name": "Grimgrin, Corpse-Born // Grimgrin, Corpse-Born",
+        "setcode": "SLD",
+        "scryfallId": "fe388da5-9197-4d07-be7f-c49fcdf56dfa"
+    },
+    "Unholy Grotto // Unholy Grotto": {
+        "name": "Unholy Grotto // Unholy Grotto",
+        "setcode": "SLD",
+        "scryfallId": "6c69ecd2-cb36-4628-802b-fd5ff7405f22"
+    },
+    "Rin and Seri, Inseparable // Rin and Seri, Inseparable": {
+        "name": "Rin and Seri, Inseparable // Rin and Seri, Inseparable",
+        "setcode": "SLD",
+        "scryfallId": "a4a2dd5b-6143-4b8d-ae71-e148cf19b66c"
+    },
+    "Jetmir, Nexus of Revels // Jetmir, Nexus of Revels": {
+        "name": "Jetmir, Nexus of Revels // Jetmir, Nexus of Revels",
+        "setcode": "SLD",
+        "scryfallId": "eff6a02b-04ff-48da-b940-d3344134b45d"
+    },
+    "Jinnie Fay, Jetmir's Second // Jinnie Fay, Jetmir's Second": {
+        "name": "Jinnie Fay, Jetmir's Second // Jinnie Fay, Jetmir's Second",
+        "setcode": "SLD",
+        "scryfallId": "018830b2-dff9-45f3-9cc2-dc5b2eec0e54"
+    },
+    "Anointed Procession // Anointed Procession": {
+        "name": "Anointed Procession // Anointed Procession",
+        "setcode": "SLD",
+        "scryfallId": "236e9bcf-ced2-4bee-8188-41dd94df02da"
+    },
+    "Sol Ring // Sol Ring": {
+        "name": "Sol Ring // Sol Ring",
+        "setcode": "SLD",
+        "scryfallId": "d74a72a2-d46a-41c2-a400-70571197b020"
+    },
+    "Sakashima of a Thousand Faces // Sakashima of a Thousand Faces": {
+        "name": "Sakashima of a Thousand Faces // Sakashima of a Thousand Faces",
+        "setcode": "SLD",
+        "scryfallId": "f973a1f3-6dcb-470d-89d2-6ddbf2426999"
+    },
+    "Yargle, Glutton of Urborg // Yargle, Glutton of Urborg": {
+        "name": "Yargle, Glutton of Urborg // Yargle, Glutton of Urborg",
+        "setcode": "SLD",
+        "scryfallId": "d002b29b-c3a6-4c91-86e1-96a50ce29966"
+    },
+    "Krark, the Thumbless // Krark, the Thumbless": {
+        "name": "Krark, the Thumbless // Krark, the Thumbless",
+        "setcode": "SLD",
+        "scryfallId": "67574bb4-c443-40fa-b7e6-05e9965c98b8"
+    },
+    "Adrix and Nev, Twincasters // Adrix and Nev, Twincasters": {
+        "name": "Adrix and Nev, Twincasters // Adrix and Nev, Twincasters",
+        "setcode": "SLD",
+        "scryfallId": "6adadbc9-4a08-4c1d-adf7-edee73799d9e"
+    },
+    "Birds of Paradise // Birds of Paradise": {
+        "name": "Birds of Paradise // Birds of Paradise",
+        "setcode": "SLD",
+        "scryfallId": "dae8751c-4c72-4034-a192-a1e166f20246"
+    },
+    "Kardur, Doomscourge // Kardur, Doomscourge": {
+        "name": "Kardur, Doomscourge // Kardur, Doomscourge",
+        "setcode": "SLD",
+        "scryfallId": "9d943cf2-0462-4f31-9a92-d76fe4971b17"
+    },
+    "Avacynian Missionaries // Lunarch Inquisitors": {
+        "name": "Avacynian Missionaries // Lunarch Inquisitors",
+        "setcode": "SOI",
+        "scryfallId": "1001e708-e4f9-456a-8b9d-3421a2a3833d"
+    },
+    "Pious Evangel // Wayward Disciple": {
+        "name": "Pious Evangel // Wayward Disciple",
+        "setcode": "SOI",
+        "scryfallId": "7ac2a5aa-71c3-482b-9431-5f0b228cf64d"
+    },
+    "Uninvited Geist // Unimpeded Trespasser": {
+        "name": "Uninvited Geist // Unimpeded Trespasser",
+        "setcode": "SOI",
+        "scryfallId": "4dea7c9f-ce66-447b-9f1b-d9bca5806153"
+    },
+    "Breakneck Rider // Neck Breaker": {
+        "name": "Breakneck Rider // Neck Breaker",
+        "setcode": "SOI",
+        "scryfallId": "fe9f85e8-1e4c-4478-8344-71fae357b694"
+    },
+    "Convicted Killer // Branded Howler": {
+        "name": "Convicted Killer // Branded Howler",
+        "setcode": "SOI",
+        "scryfallId": "f43f5f02-1b29-4e75-a6af-378dcc88c3df"
+    },
+    "Kessig Forgemaster // Flameheart Werewolf": {
+        "name": "Kessig Forgemaster // Flameheart Werewolf",
+        "setcode": "SOI",
+        "scryfallId": "33e542ce-1106-489d-9563-bd62886b8ed3"
+    },
+    "Skin Invasion // Skin Shedder": {
+        "name": "Skin Invasion // Skin Shedder",
+        "setcode": "SOI",
+        "scryfallId": "c0243401-e3ae-41c6-a3a0-9cd4b330c200"
+    },
+    "Autumnal Gloom // Ancient of the Equinox": {
+        "name": "Autumnal Gloom // Ancient of the Equinox",
+        "setcode": "SOI",
+        "scryfallId": "d41b07c8-f0c8-4654-bcc2-00c785c8c628"
+    },
+    "Hermit of the Natterknolls // Lone Wolf of the Natterknolls": {
+        "name": "Hermit of the Natterknolls // Lone Wolf of the Natterknolls",
+        "setcode": "SOI",
+        "scryfallId": "d5e84d80-b5a6-4cd1-9f31-f6ca46bf2c0c"
+    },
+    "Lambholt Pacifist // Lambholt Butcher": {
+        "name": "Lambholt Pacifist // Lambholt Butcher",
+        "setcode": "SOI",
+        "scryfallId": "23f3fa96-6276-463e-8033-a64c8f06c933"
+    },
+    "Solitary Hunter // One of the Pack": {
+        "name": "Solitary Hunter // One of the Pack",
+        "setcode": "SOI",
+        "scryfallId": "6c200ef1-ea08-48d4-ab50-77940a0e08c3"
+    },
+    "Thraben Gargoyle // Stonewing Antagonizer": {
+        "name": "Thraben Gargoyle // Stonewing Antagonizer",
+        "setcode": "SOI",
+        "scryfallId": "f2687683-2986-4e22-97d9-7820c870475b"
+    },
+    "A-Rowan, Scholar of Sparks // A-Will, Scholar of Frost": {
+        "name": "A-Rowan, Scholar of Sparks // A-Will, Scholar of Frost",
+        "setcode": "STX",
+        "scryfallId": "6168bf9a-8a2e-46a5-ba87-7f88a4edc526"
+    },
+    "A-Binding Geist // A-Spectral Binding": {
+        "name": "A-Binding Geist // A-Spectral Binding",
+        "setcode": "VOW",
+        "scryfallId": "6e40e8f7-38f9-454a-9127-164b39737cb8"
+    },
+    "A-Gutter Skulker // A-Gutter Shortcut": {
+        "name": "A-Gutter Skulker // A-Gutter Shortcut",
+        "setcode": "VOW",
+        "scryfallId": "f7c3cf39-c49f-4055-87e6-c82a224b273c"
+    },
+    "A-Lantern Bearer // A-Lanterns' Lift": {
+        "name": "A-Lantern Bearer // A-Lanterns' Lift",
+        "setcode": "VOW",
+        "scryfallId": "942d9122-f380-4bc0-8bf1-2ba6f49fd3ee"
+    },
+    "A-Mischievous Catgeist // A-Catlike Curiosity": {
+        "name": "A-Mischievous Catgeist // A-Catlike Curiosity",
+        "setcode": "VOW",
+        "scryfallId": "4dd4f872-1af1-4bb7-81e7-409861c45b20"
+    },
+    "A-Brine Comber // A-Brinebound Gift": {
+        "name": "A-Brine Comber // A-Brinebound Gift",
+        "setcode": "VOW",
+        "scryfallId": "d0e03cdb-1082-448b-ae5c-501fb8bc3f3b"
+    },
+    "A-Dorothea, Vengeful Victim // A-Dorothea's Retribution": {
+        "name": "A-Dorothea, Vengeful Victim // A-Dorothea's Retribution",
+        "setcode": "VOW",
+        "scryfallId": "9b21d350-9b89-41d0-8def-00ef5189449c"
+    },
+    "Rahilda, Wanted Cutthroat // Rahilda, Feral Outlaw": {
+        "name": "Rahilda, Wanted Cutthroat // Rahilda, Feral Outlaw",
+        "setcode": "YMID",
+        "scryfallId": "2f986406-bfe3-4e59-bcb6-839ef5f1fbc4"
+    },
+    "Makindi Stampede // Makindi Mesas": {
+        "name": "Makindi Stampede // Makindi Mesas",
+        "setcode": "ZNR",
+        "scryfallId": "ada9a974-8f1f-4148-bd61-200fc14714b2"
+    },
+    "Skyclave Cleric // Skyclave Basilica": {
+        "name": "Skyclave Cleric // Skyclave Basilica",
+        "setcode": "ZNR",
+        "scryfallId": "014027c4-7f9d-4096-b308-ea4be574c0d4"
+    },
+    "Beyeen Veil // Beyeen Coast": {
+        "name": "Beyeen Veil // Beyeen Coast",
+        "setcode": "ZNR",
+        "scryfallId": "5f411f08-45dd-4d73-8894-daf51c175150"
+    },
+    "Umara Wizard // Umara Skyfalls": {
+        "name": "Umara Wizard // Umara Skyfalls",
+        "setcode": "ZNR",
+        "scryfallId": "890eee8d-a339-4143-adfa-1b17ec10c099"
+    },
+    "Malakir Rebirth // Malakir Mire": {
+        "name": "Malakir Rebirth // Malakir Mire",
+        "setcode": "ZNR",
+        "scryfallId": "609d3ecf-f88d-4268-a8d3-4bf2bcf5df60"
+    },
+    "Zof Consumption // Zof Bloodbog": {
+        "name": "Zof Consumption // Zof Bloodbog",
+        "setcode": "ZNR",
+        "scryfallId": "98496d5b-1519-4f0c-8b46-0a43be643dfb"
+    },
+    "Kazuul's Fury // Kazuul's Cliffs": {
+        "name": "Kazuul's Fury // Kazuul's Cliffs",
+        "setcode": "ZNR",
+        "scryfallId": "75240bbc-adc7-48ff-9523-c79776d710d3"
+    },
+    "Song-Mad Treachery // Song-Mad Ruins": {
+        "name": "Song-Mad Treachery // Song-Mad Ruins",
+        "setcode": "ZNR",
+        "scryfallId": "782ca27f-9f18-476c-b582-89c06fb2e322"
+    },
+    "Spikefield Hazard // Spikefield Cave": {
+        "name": "Spikefield Hazard // Spikefield Cave",
+        "setcode": "ZNR",
+        "scryfallId": "a69541db-3f4e-412f-aa8e-dec1e74f74dc"
+    },
+    "Vastwood Fortification // Vastwood Thicket": {
+        "name": "Vastwood Fortification // Vastwood Thicket",
+        "setcode": "ZNR",
+        "scryfallId": "3a7fd24e-84d8-405d-86e4-0571a9e23cc2"
+    }
+}
