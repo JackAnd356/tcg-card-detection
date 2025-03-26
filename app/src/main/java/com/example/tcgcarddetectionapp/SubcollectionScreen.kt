@@ -259,8 +259,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 .wrapContentWidth(Alignment.CenterHorizontally)
         ) {
             Spacer(modifier = modifier.height(20.dp))
-            Button(modifier = Modifier.padding(start = leftOffset.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
-                onClick = { navBack() }
+            Button(
+                modifier = Modifier.padding(start = leftOffset.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
+                onClick = { navBack() },
+                colors = ButtonDefaults.buttonColors(colorResource(R.color.darkGray))
             ) {
                 Text(stringResource(R.string.back_to_main_collections_button_label))
             }
@@ -355,6 +357,23 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
 
             }
 
+            if(!allCardsFlag) {
+                Row(modifier = Modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally)) {
+                    Button(
+                        shape = RoundedCornerShape(10),
+                        modifier = Modifier,
+                        onClick = {
+                            showAllCardAddToSubcollection = !showAllCardAddToSubcollection
+                        },
+                        colors = ButtonDefaults.buttonColors(colorResource(R.color.lightGreen))
+                    ) {
+                        Text(
+                            text = stringResource(R.string.add_from_all_cards_button_label),
+                            color = Color.Black)
+                    }
+                }
+            }
+
             Row(modifier = Modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically) {
                 TextField(
@@ -374,20 +393,6 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     colors = ButtonDefaults.buttonColors(colorResource(R.color.darkGray))
                 ) {
                     Text(stringResource(R.string.filter_button_label))
-                }
-            }
-
-            Row(modifier = modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally)) {
-
-                if(!allCardsFlag) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    Button(
-                        onClick = {
-                            showAllCardAddToSubcollection = !showAllCardAddToSubcollection
-                        }
-                    ) {
-                        Text(stringResource(R.string.add_from_all_cards_button_label))
-                    }
                 }
             }
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -207,7 +208,7 @@ fun CollectionScreen(gameName: String,
             }
 
             if (popUp) {
-                DialogTest(onDismissRequest = {
+                CreateNewCollectionPopup(onDismissRequest = {
                     popUp = false
                 },
                 onSubmitRequest = {
@@ -379,7 +380,7 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
 }
 
 @Composable
-fun DialogTest(
+fun CreateNewCollectionPopup(
     onDismissRequest: () -> Unit,
     onSubmitRequest: () -> Unit,
     userid: String,
@@ -391,38 +392,40 @@ fun DialogTest(
     var isDeck by remember { mutableStateOf(false)}
     val context = LocalContext.current
     Dialog(onDismissRequest = { onDismissRequest() }) {
-        // Draw a rectangle shape with rounded corners inside the dialog
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(375.dp)
-                .padding(16.dp),
+                .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Create A New Subcollection",
-                    modifier = Modifier.padding(16.dp),
+                    text = stringResource(R.string.create_new_collection_label),
+                    fontSize = 28.sp,
+                    lineHeight = 40.sp,
+                    textAlign = TextAlign.Center
                 )
 
-                TextField(
+                FilterTextfield(
+                    modifier = Modifier.fillMaxWidth(.9f),
+                    label = stringResource(R.string.collection_name_placeholder),
                     value = subColName,
                     onValueChange = {subColName = it},
-                    label = {Text(stringResource(R.string.subcol_name_label))}
+                    isError = false
                 )
 
-                TextField(
+                FilterTextfield(
+                    modifier = Modifier.fillMaxWidth(.9f),
+                    label = stringResource(R.string.subcol_physloc_label),
                     value = subColLocation,
                     onValueChange = {subColLocation = it},
-                    label = {Text(stringResource(R.string.subcol_physloc_label))}
+                    isError = false
                 )
 
                 Row(
+                    modifier = Modifier.fillMaxWidth(.9f),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(
@@ -436,16 +439,28 @@ fun DialogTest(
 
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
+                        .fillMaxWidth(.9f),
                 ) {
-                    TextButton(
-                        onClick = { onDismissRequest() },
-                        modifier = Modifier.padding(8.dp),
+                    Button(
+                        modifier = Modifier.weight(.45f),
+                        onClick = {
+                            onDismissRequest()
+                        },
+                        shape = RoundedCornerShape(10),
+                        colors = ButtonColors(
+                            containerColor = colorResource(R.color.gray),
+                            contentColor = Color.Black,
+                            disabledContainerColor = colorResource(R.color.gray),
+                            disabledContentColor = Color.Black
+                        )
                     ) {
-                        Text("Dismiss")
+                        Text(stringResource(R.string.dismiss))
                     }
-                    TextButton(
+
+                    Spacer(modifier = Modifier.weight(.1f))
+
+                    Button(
+                        modifier = Modifier.weight(.45f),
                         onClick = {
                             if (subColName != "") {
                                 createNewSubcollectionPost(gameName = gameName, userid = userid, isDeck = isDeck, subcolName = subColName, physLoc = subColLocation, onUserSubColInfoChange = onUserSubColInfoChange)
@@ -454,10 +469,17 @@ fun DialogTest(
                                 Toast.makeText(context, "Fill out all required fields", Toast.LENGTH_SHORT).show()
                             }
                         },
-                        modifier = Modifier.padding(8.dp),
+                        shape = RoundedCornerShape(10),
+                        colors = ButtonColors(
+                            containerColor = colorResource(R.color.lightGreen),
+                            contentColor = Color.Black,
+                            disabledContainerColor = colorResource(R.color.lightGreen),
+                            disabledContentColor = Color.Black
+                        )
                     ) {
-                        Text("Confirm")
+                        Text(stringResource(R.string.create))
                     }
+
                 }
             }
         }
@@ -481,7 +503,7 @@ fun EditSubcollectionPopup(
         TextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text(stringResource(R.string.subcol_name_label))}
+            label = { Text(stringResource(R.string.collection_name_placeholder))}
         )
         TextField(
             value = physloc,

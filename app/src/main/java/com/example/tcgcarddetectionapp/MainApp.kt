@@ -2,6 +2,10 @@ package com.example.tcgcarddetectionapp
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Create
@@ -50,22 +54,25 @@ fun CardDetectionBottomBar(
     navigateProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    BottomAppBar(
+    BottomAppBar(modifier = modifier.fillMaxWidth(),
         actions = {
-            IconButton(onClick = { navigateScan() }) {
-                Icon(Icons.Filled.AddCircle, contentDescription = "Scan Card")
-            }
-            IconButton(onClick = { navigateYugioh() }) {
-                Icon(Icons.Filled.ShoppingCart, contentDescription = "YuGiOh Collection")
-            }
-            IconButton(onClick = { navigateMTG() }) {
-                Icon(Icons.Filled.Create, contentDescription = "MTG Collection")
-            }
-            IconButton(onClick = { navigatePokemon() }) {
-                Icon(Icons.Filled.Face, contentDescription = "Pokemon Collection")
-            }
-            IconButton(onClick = { navigateProfile() }) {
-                Icon(Icons.Filled.Person, contentDescription = "YuGiOh Collection")
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly) {
+                IconButton(onClick = { navigateScan() }) {
+                    Icon(Icons.Filled.AddCircle, contentDescription = "Scan Card")
+                }
+                IconButton(onClick = { navigateYugioh() }) {
+                    Icon(Icons.Filled.ShoppingCart, contentDescription = "YuGiOh Collection")
+                }
+                IconButton(onClick = { navigateMTG() }) {
+                    Icon(Icons.Filled.Create, contentDescription = "MTG Collection")
+                }
+                IconButton(onClick = { navigatePokemon() }) {
+                    Icon(Icons.Filled.Face, contentDescription = "Pokemon Collection")
+                }
+                IconButton(onClick = { navigateProfile() }) {
+                    Icon(Icons.Filled.Person, contentDescription = "YuGiOh Collection")
+                }
             }
         }
     )
@@ -103,7 +110,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             )
         }
         composable(route = CardDetectionScreens.YugiohCollection.name) {
-            Scaffold(
+            Scaffold(modifier = Modifier.fillMaxSize(),
                 bottomBar = {
                     CardDetectionBottomBar(
                         navigateScan = { navController.navigate(CardDetectionScreens.Scan.name) },
@@ -181,7 +188,7 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
             Scaffold(
                 bottomBar = {
                     CardDetectionBottomBar(
-                        navigateScan = { },
+                        navigateScan = { navController.navigate(CardDetectionScreens.Scan.name) },
                         navigateYugioh = { navController.navigate(CardDetectionScreens.YugiohCollection.name) },
                         navigateMTG = { navController.navigate(CardDetectionScreens.MagicCollection.name) },
                         navigatePokemon = { navController.navigate(CardDetectionScreens.PokemonCollection.name) },
