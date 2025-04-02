@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Log
 import android.view.RoundedCorner
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -55,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -65,9 +67,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -402,7 +407,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     .background(color = colorResource(R.color.darkGray))
                     .align(Alignment.CenterHorizontally),
                     horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(modifier = Modifier.padding(vertical = 10.dp)) {
+                    Row(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp)) {
                         MinMaxIntComponent(
                             minVal = selectedMinQuantity,
                             maxVal = selectedMaxQuantity,
@@ -416,7 +421,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             modifier = Modifier.clip(RoundedCornerShape(10.dp))
                                 .background(Color.White)
                                 .padding(5.dp)
-                                .fillMaxWidth(.9f)
+                                .weight(.48f),
                         ) {
                             filterList.clear()
                             recalculateFilterList(
@@ -433,8 +438,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 filterList.add(func)
                             }
                         }
-                    }
-                    Row(modifier = Modifier.padding(vertical = 10.dp)) {
+
+                        Spacer(modifier = Modifier.weight(.04f))
+
                         MinMaxDoubleComponent(
                             minVal = selectedMinPrice,
                             maxVal = selectedMaxPrice,
@@ -447,7 +453,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             modifier = Modifier.clip(RoundedCornerShape(10.dp))
                                 .background(Color.White)
                                 .padding(5.dp)
-                                .fillMaxWidth(.9f),
+                                .weight(.48f),
                             onMaxErrChange = { maxPriceErr = it }
                         ) {
                             filterList.clear()
@@ -623,7 +629,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         setFocusedCard = { currentFocusedCard = it },
                         showCardPopup = { showCardPopup = !showCardPopup },
                         modifier = Modifier
-                            .padding(vertical = 10.dp, horizontal = 10.dp)
+                            .padding(vertical = 10.dp, horizontal = 10.dp),
+                        allCardsFlag = allCardsFlag
                     )
                 }
             }
@@ -634,38 +641,48 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
 
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
-fun CardImage(cardData: CardData,
-              setFocusedCard: (CardData) -> Unit,
-              showCardPopup: () -> Unit,
-              modifier: Modifier) {
-    if (cardData.image != "nocardimage" && cardData.image != null) {
-        val decodedString = Base64.decode(cardData.image!!, 0)
-        val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        Image(
-            bitmap = img.asImageBitmap(),
-            contentDescription = "Card",
-            modifier
-                .size(120.dp, 200.dp)
-                .clickable {
-                    setFocusedCard(cardData)
-                    showCardPopup()
-                }
-        )
-    }
-    else {
-        Image(
-            painter = painterResource(R.drawable.nocardimage),
-            contentDescription = stringResource(R.string.card_image_not_loaded_context),
-            modifier.clickable {
-                setFocusedCard(cardData)
-                showCardPopup()
-            }
-        )
+fun CardImage(
+    cardData: CardData,
+    setFocusedCard: (CardData) -> Unit,
+    showCardPopup: () -> Unit,
+    modifier: Modifier,
+    allCardsFlag: Boolean
+) {
+    Box(modifier = modifier.clickable {
+        setFocusedCard(cardData)
+        showCardPopup()
+    }) {
+        if (cardData.image != "nocardimage" && cardData.image != null) {
+            val decodedString = Base64.decode(cardData.image!!, 0)
+            val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+            Image(
+                bitmap = img.asImageBitmap(),
+                contentDescription = "Card",
+                modifier = Modifier.size(120.dp, 200.dp)
+            )
+        } else {
+            Image(
+                painter = painterResource(R.drawable.nocardimage),
+                contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                modifier = Modifier.size(120.dp, 200.dp)
+            )
+        }
+
+        if (allCardsFlag) {
+            Text(
+                text = "${cardData.quantity}x",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .background(Color.Black.copy(alpha = 0.7f), shape = RoundedCornerShape(4.dp))
+                    .padding(4.dp)
+            )
+        }
     }
 }
 
-
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun CardPopup(cardData: CardData,
               subcollections: Array<SubcollectionInfo>,
@@ -680,17 +697,7 @@ fun CardPopup(cardData: CardData,
               navWebsite: (String) -> Unit,
               refreshUI: () -> Unit,
               showCardPopup: () -> Unit) {
-    val optionInfo = subcollections.filter( predicate = {
-        it.game == game
-    })
-    val context = LocalContext.current
-    val optionList = optionInfo.map { it.name }
-    var selectedOption by remember { mutableStateOf("") }
-    var selectedIndex by remember { mutableStateOf(1) }
-    var responseText by remember { mutableStateOf("")}
-    val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
-    var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
-    var cardQuantErr by remember { mutableStateOf(false) }
+
     var subColQuant by remember { mutableStateOf(cardData.subcollections?.count{ it == subcolInfo.subcollectionid}.toString()) }
     var showCardDeletePopup by remember { mutableStateOf(false) }
 
@@ -700,427 +707,26 @@ fun CardPopup(cardData: CardData,
     ) {
         when (cardData.game) {
             "yugioh" -> {
-                Row {
-                    Column {
-                        if (cardData.image != "nocardimage" && cardData.image != null) {
-                            val decodedString = Base64.decode(cardData.image!!, 0)
-                            val img =
-                                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                            Image(
-                                bitmap = img.asImageBitmap(),
-                                contentDescription = "Card",
-                                modifier
-                                    .size(120.dp, 200.dp)
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(R.drawable.nocardimage),
-                                contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                                modifier
-                                    .size(120.dp, 200.dp)
-                            )
-                        }
-                        Text(cardData.cardname)
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.card_id_label),
-                                cardData.cardid
-                            ),
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp,
-                        )
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.card_setcode_label),
-                                cardData.setcode
-                            ),
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp,
-                        )
-                    }
-                    Column {
-                        Text(stringResource(R.string.price_header))
-                        Text(
-                            String.format(
-                                stringResource(R.string.card_price_label),
-                                cardData.price,
-                                "$"
-                            )
-                        )
-                        Button(
-                            onClick = {
-                                if (cardData.purchaseurl != null) {
-                                    navWebsite(cardData.purchaseurl!!)
-                                }
-                            }
-                        ) {
-                            Text(stringResource(R.string.tcgplayer_label))
-                        }
-                        if (cardData.level != null) {
-                            Row {
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.level_label),
-                                        cardData.level
-                                    )
-                                )
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.attribute_label),
-                                        cardData.attribute
-                                    )
-                                )
-                            }
-                        }
-                        Text(String.format(stringResource(R.string.type_label), cardData.type))
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = Color.Gray)
-                        ) {
-                            Text(cardData.description!!.replace("\\n", "\n"))
-                        }
-                        if (cardData.atk != null) {
-                            Row {
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.atk_label),
-                                        cardData.atk
-                                    )
-                                )
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.def_label),
-                                        cardData.def
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            "mtg" -> {
-                Row {
-                    Column {
-                        if (cardData.image != "nocardimage" && cardData.image != null) {
-                            val decodedString = Base64.decode(cardData.image!!, 0)
-                            val img =
-                                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                            Image(
-                                bitmap = img.asImageBitmap(),
-                                contentDescription = "Card",
-                                modifier
-                                    .size(120.dp, 200.dp)
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(R.drawable.nocardimage),
-                                contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                                modifier
-                                    .size(120.dp, 200.dp)
-                            )
-                        }
-                        Text(cardData.cardname)
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.card_setcode_label),
-                                cardData.setcode
-                            ),
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp,
-                        )
-                    }
-                    Column {
-                        Text(stringResource(R.string.price_header))
-                        Text(
-                            String.format(
-                                stringResource(R.string.card_price_label),
-                                cardData.price,
-                                "$"
-                            )
-                        )
-                        Button(
-                            onClick = {
-                                if (cardData.purchaseurl != null) {
-                                    navWebsite(cardData.purchaseurl!!)
-                                }
-                            }
-                        ) {
-                            Text(stringResource(R.string.tcgplayer_label))
-                        }
-                        Row {
-                            Text(String.format(stringResource(R.string.cost_label), cardData.cost))
-                            Text(
-                                String.format(
-                                    stringResource(R.string.color_label),
-                                    cardData.attribute
-                                )
-                            )
-                        }
-                        Text(String.format(stringResource(R.string.type_label), cardData.type))
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = Color.Gray)
-                        ) {
-                            Text(cardData.description!!.replace("\\n", "\n"))
-                        }
-                        if (cardData.atk != null) {
-                            Row {
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.power_label),
-                                        cardData.atk
-                                    )
-                                )
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.toughness_label),
-                                        cardData.def
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            else -> { //Pokemon
-                Row {
-                    Column {
-                        if (cardData.image != "nocardimage" && cardData.image != null) {
-                            val decodedString = Base64.decode(cardData.image!!, 0)
-                            val img =
-                                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                            Image(
-                                bitmap = img.asImageBitmap(),
-                                contentDescription = "Card",
-                                modifier
-                                    .size(120.dp, 200.dp)
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(R.drawable.nocardimage),
-                                contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                                modifier
-                                    .size(120.dp, 200.dp)
-                            )
-                        }
-                        Text(cardData.cardname)
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.card_id_label),
-                                cardData.cardid
-                            ),
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp,
-                        )
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.card_setcode_label),
-                                cardData.setcode
-                            ),
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp,
-                        )
-                        Text(
-                            text = String.format(stringResource(R.string.hp), cardData.hp),
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp,
-                        )
-                        cardData.weaknesses!!.forEach { weakness ->
-                            Text(
-                                text = String.format(
-                                    stringResource(R.string.weakness_label),
-                                    weakness.type,
-                                    weakness.value
-                                ),
-                                fontSize = 10.sp,
-                                lineHeight = 15.sp,
-                            )
-                        }
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.retreat),
-                                arrToPrintableString(cardData.retreat!!)
-                            ),
-                            fontSize = 10.sp,
-                            lineHeight = 15.sp,
-                        )
-
-                    }
-                    Column {
-                        Text(stringResource(R.string.price_header))
-                        Text(
-                            String.format(
-                                stringResource(R.string.card_price_label),
-                                cardData.price,
-                                "$"
-                            )
-                        )
-                        Button(
-                            onClick = {
-                                if (cardData.purchaseurl != null) {
-                                    navWebsite(cardData.purchaseurl!!)
-                                }
-                            }
-                        ) {
-                            Text(stringResource(R.string.tcgplayer_label))
-                        }
-
-                        Text(
-                            String.format(
-                                stringResource(R.string.attribute_label),
-                                cardData.attribute
-                            )
-                        )
-
-                        Text(String.format(stringResource(R.string.type_label), cardData.type))
-                        Card(
-                            colors = CardDefaults.cardColors(containerColor = Color.Gray)
-                        ) {
-                            cardData.attacks!!.forEach { attack ->
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.cost_label),
-                                        arrToPrintableString(attack.cost)
-                                    )
-                                )
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.card_name_label),
-                                        attack.name
-                                    )
-                                )
-                                Text(
-                                    String.format(
-                                        stringResource(R.string.damage_label),
-                                        attack.damage
-                                    )
-                                )
-                                if (attack.text != null) {
-                                    Text(
-                                        String.format(
-                                            stringResource(R.string.effect_label),
-                                            attack.text
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+                YugiohCardPopupInfo(cardData, navWebsite, Modifier)
+            } "mtg" -> {
+                MTGCardPopupInfo(cardData, navWebsite, Modifier)
+            } else -> { //Pokemon
+                PokemonCardPopupInfo(cardData, navWebsite, Modifier)
             }
         }
         if(allCardsFlag) {
-            UserDropdownSelector(
-                label = stringResource(R.string.subcollection_page),
-                data = 1,
-                onUserStorefrontChange = {
-                    selectedOption = optionInfo.get(it - 1).subcollectionid
-                    selectedIndex = it - 1
-                },
-                options = optionList,
-            )
-            Button(
-                onClick = {
-                    saveToSubcollectionPost(
-                        card = cardData,
-                        userid = userid,
-                        subcollection = selectedOption,
-                        subcolInfo = optionInfo.get(selectedIndex),
-                        refreshUI = { }
-                    )
-                    responseText = staticResponseText
-                },
-                enabled = selectedOption != ""
-            ) {
-                Text(stringResource(R.string.add_to_subcollection_button_label))
-            }
-            Row {
-                Text(stringResource(R.string.quantity_filter_label) + ": ")
-                Button(
-                    onClick = {
-                        if (cardData.quantity > 1) {
-                            removeFromCollectionPost(
-                                card = cardData,
-                                userid = userid,
-                                game = cardData.game,
-                                quantity = 1,
-                                fullCardPool = fullCardPool,
-                                onCollectionChange = onCollectionChange,
-                                removeCard = removeCard,
-                                subcolInfo = subcolInfo,
-                                refreshUI = refreshUI,
-                            )
-                            cardQuantity = (cardQuantity.toInt() - 1).toString()
-                        }
-                        else {
-                            showCardDeletePopup = true
-                        }
-                    }
-                ) { Text("-")}
-                TextField(
-                    value = cardQuantity,
-                    onValueChange = {
-                        if (it != "" && it.toInt() > 0) {
-                            cardQuantErr = false
-                            val quantityChange = (it.toInt() - cardData.quantity)
-                            if (quantityChange > 0) {
-                                increaseQuantityPost(
-                                    userid = userid,
-                                    card = cardData,
-                                    quantityChange = quantityChange
-                                )
-                            }
-                            else {
-                                removeFromCollectionPost(
-                                    card = cardData,
-                                    userid = userid,
-                                    game = cardData.game,
-                                    quantity = (quantityChange * -1),
-                                    fullCardPool = fullCardPool,
-                                    onCollectionChange = onCollectionChange,
-                                    removeCard = removeCard,
-                                    subcolInfo = subcolInfo,
-                                    refreshUI = refreshUI,
-                                )
-                            }
-                        }
-                        else {
-                            cardQuantErr = true
-                        }
-                        cardQuantity = it
-                                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = modifier.fillMaxWidth(.25f),
-                    isError = cardQuantErr,
-                    supportingText = {
-                        if (cardQuantErr) {
-                            Text(
-                                text = stringResource(R.string.invalid_value_error),
-                                color = Color.Red
-                            )
-                        }
-                    }
+            AddCardToSubcollectionPopup(modifier = Modifier,
+                cardData = cardData,
+                userid = userid,
+                game = game,
+                subcollections = subcollections,
+                fullCardPool = fullCardPool,
+                onCollectionChange = onCollectionChange,
+                removeCard = removeCard,
+                subcolInfo = subcolInfo,
+                refreshUI = refreshUI,
+                showCardDeletePopup = { showCardDeletePopup = true }
                 )
-                Button(
-                    onClick = {
-                        increaseQuantityPost(
-                            userid = userid,
-                            card = cardData,
-                            quantityChange = 1
-                        )
-                        cardQuantity = (cardQuantity.toInt() + 1).toString()
-                    }
-                ) { Text("+")}
-            }
-            /*Column {
-                Button(onClick = {
-                    showCardPopup()
-                    val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, removeCard = removeCard, subcolInfo = subcolInfo, refreshUI = refreshUI)
-                    if (successful) Toast.makeText(context, "Card Successfully Deleted", Toast.LENGTH_SHORT).show()
-                    else Toast.makeText(context, "Card Deletion Failed", Toast.LENGTH_SHORT).show()
-                }, modifier = Modifier.align(Alignment.End)) {
-                    Text(text="Delete")
-                }
-            }*/
         } else {
             Row {
                 Text(stringResource(R.string.subcollection_quantity_label) + ": ")
@@ -1175,26 +781,427 @@ fun CardPopup(cardData: CardData,
         }
     }
     if (showCardDeletePopup) {
-        AlertDialog(
-            onDismissRequest = { showCardDeletePopup = false },
-            title = { Text(stringResource(R.string.remove_card_title)) },
-            text = {
-                if (allCardsFlag) {
-                    Text(stringResource(R.string.remove_card_all_cards_text))
+        RemoveFromCollectionPopup(modifier = Modifier,
+            cardData = cardData,
+            onDismissRequest = {showCardDeletePopup = false},
+            allCardsFlag = allCardsFlag,
+            subcolInfo = subcolInfo,
+            userid = userid,
+            fullCardPool = fullCardPool,
+            onCollectionChange = onCollectionChange,
+            removeCard = removeCard,
+            refreshUI = refreshUI,
+            showCardPopup = showCardPopup)
+    }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+@Composable
+fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
+    Row(modifier = modifier.padding(3.dp)) {
+        Column(modifier = Modifier.weight(.4f)) {
+            if (cardData.image != "nocardimage" && cardData.image != null) {
+                val decodedString = Base64.decode(cardData.image!!, 0)
+                val img =
+                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                Image(
+                    bitmap = img.asImageBitmap(),
+                    contentDescription = "Card",
+                    Modifier
+                        .size(120.dp, 200.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(R.drawable.nocardimage),
+                    contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                    Modifier
+                        .size(120.dp, 200.dp)
+                )
+            }
+            Text(cardData.cardname)
+            CardPriceComponent(cardData, navWebsite)
+            CardInfoBox(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                infoType = stringResource(R.string.card_id_label),
+                infoData = cardData.cardid,
+                split = .3f
+            )
+
+            CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                infoType = stringResource(R.string.card_setcode_label),
+                infoData = cardData.setcode,
+                split = .3f)
+        }
+        Column(modifier = Modifier.weight(.6f)) {
+            Card(modifier = Modifier.height(220.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Gray)
+            ) {
+                AutoResizeText(text = cardData.description!!.replace("\\n", "\n"),
+                    fontSizeRange = FontSizeRange(10.sp, 30.sp, 3.sp),
+                    modifier = Modifier,
+                    color = Color.Black,
+                )
+            }
+
+            if (cardData.level != null) {
+                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                    infoType = stringResource(R.string.level_label),
+                    infoData = cardData.level)
+            }
+
+            if (cardData.attribute != null) {
+                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                    infoType = stringResource(R.string.attribute_label),
+                    infoData = cardData.attribute)
+            }
+
+            if (cardData.type != null) {
+                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                    infoType = stringResource(R.string.type_label),
+                    infoData = cardData.type)
+            }
+
+            if (cardData.atk != null) {
+                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                    infoType = stringResource(R.string.atk_label),
+                    infoData = cardData.atk)
+            }
+
+            if (cardData.def != null) {
+                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                    infoType = stringResource(R.string.def_label),
+                    infoData = cardData.def)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+@Composable
+fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
+    Row(modifier = modifier) {
+        Column {
+            if (cardData.image != "nocardimage" && cardData.image != null) {
+                val decodedString = Base64.decode(cardData.image!!, 0)
+                val img =
+                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                Image(
+                    bitmap = img.asImageBitmap(),
+                    contentDescription = "Card",
+                    Modifier
+                        .size(120.dp, 200.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(R.drawable.nocardimage),
+                    contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                    Modifier
+                        .size(120.dp, 200.dp)
+                )
+            }
+            Text(cardData.cardname)
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_setcode_label),
+                    cardData.setcode
+                ),
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+            )
+        }
+        Column {
+            Text(stringResource(R.string.price_header))
+            Text(
+                String.format(
+                    stringResource(R.string.card_price_label),
+                    cardData.price,
+                    "$"
+                )
+            )
+            Button(
+                onClick = {
+                    if (cardData.purchaseurl != null) {
+                        navWebsite(cardData.purchaseurl!!)
+                    }
+                }
+            ) {
+                Text(stringResource(R.string.tcgplayer_label))
+            }
+            Row {
+                Text(String.format(stringResource(R.string.cost_label), cardData.cost))
+                Text(
+                    String.format(
+                        stringResource(R.string.color_label),
+                        cardData.attribute
+                    )
+                )
+            }
+            Text(String.format(stringResource(R.string.type_label), cardData.type))
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color.Gray)
+            ) {
+                Text(cardData.description!!.replace("\\n", "\n"))
+            }
+            if (cardData.atk != null) {
+                Row {
+                    Text(
+                        String.format(
+                            stringResource(R.string.power_label),
+                            cardData.atk
+                        )
+                    )
+                    Text(
+                        String.format(
+                            stringResource(R.string.toughness_label),
+                            cardData.def
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+@Composable
+fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
+    Row(modifier = modifier) {
+        Column {
+            if (cardData.image != "nocardimage" && cardData.image != null) {
+                val decodedString = Base64.decode(cardData.image!!, 0)
+                val img =
+                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                Image(
+                    bitmap = img.asImageBitmap(),
+                    contentDescription = "Card",
+                    Modifier
+                        .size(120.dp, 200.dp)
+                )
+            } else {
+                Image(
+                    painter = painterResource(R.drawable.nocardimage),
+                    contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                    Modifier
+                        .size(120.dp, 200.dp)
+                )
+            }
+            Text(cardData.cardname)
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_id_label),
+                    cardData.cardid
+                ),
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+            )
+            Text(
+                text = String.format(
+                    stringResource(R.string.card_setcode_label),
+                    cardData.setcode
+                ),
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+            )
+            Text(
+                text = String.format(stringResource(R.string.hp), cardData.hp),
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+            )
+            cardData.weaknesses!!.forEach { weakness ->
+                Text(
+                    text = String.format(
+                        stringResource(R.string.weakness_label),
+                        weakness.type,
+                        weakness.value
+                    ),
+                    fontSize = 10.sp,
+                    lineHeight = 15.sp,
+                )
+            }
+            Text(
+                text = String.format(
+                    stringResource(R.string.retreat),
+                    arrToPrintableString(cardData.retreat!!)
+                ),
+                fontSize = 10.sp,
+                lineHeight = 15.sp,
+            )
+
+        }
+        Column {
+            Text(stringResource(R.string.price_header))
+            Text(
+                String.format(
+                    stringResource(R.string.card_price_label),
+                    cardData.price,
+                    "$"
+                )
+            )
+            Button(
+                onClick = {
+                    if (cardData.purchaseurl != null) {
+                        navWebsite(cardData.purchaseurl!!)
+                    }
+                }
+            ) {
+                Text(stringResource(R.string.tcgplayer_label))
+            }
+
+            Text(
+                String.format(
+                    stringResource(R.string.attribute_label),
+                    cardData.attribute
+                )
+            )
+
+            Text(String.format(stringResource(R.string.type_label), cardData.type))
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color.Gray)
+            ) {
+                cardData.attacks!!.forEach { attack ->
+                    Text(
+                        String.format(
+                            stringResource(R.string.cost_label),
+                            arrToPrintableString(attack.cost)
+                        )
+                    )
+                    Text(
+                        String.format(
+                            stringResource(R.string.card_name_label),
+                            attack.name
+                        )
+                    )
+                    Text(
+                        String.format(
+                            stringResource(R.string.damage_label),
+                            attack.damage
+                        )
+                    )
+                    if (attack.text != null) {
+                        Text(
+                            String.format(
+                                stringResource(R.string.effect_label),
+                                attack.text
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: String,
+                icons: Array<String>? = null, split: Float = 0.4f) {
+    Card(
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+        ) {
+            Box(modifier = Modifier.weight(split).background(colorResource(R.color.textLightGrey))) {
+                Text(
+                    modifier = Modifier.padding(start = 5.dp),
+                    text = infoType,
+                )
+            }
+            Box(modifier = Modifier.weight(1-split).background(colorResource(R.color.gray))) {
+                if (icons != null) {
+                    Text(modifier = Modifier.padding(start = 5.dp),
+                        text = icons[0])
+                } else {
+                    Text(modifier = Modifier.padding(start = 5.dp),
+                        text = infoData)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: String, game: String,
+                                subcollections: Array<SubcollectionInfo>, fullCardPool: Array<CardData>,
+                                onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit,
+                                subcolInfo: SubcollectionInfo, refreshUI: () -> Unit,
+                                showCardDeletePopup: () -> Unit) {
+    val optionInfo = subcollections.filter( predicate = {
+        it.game == game
+    })
+    val context = LocalContext.current
+    val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
+    val optionList = optionInfo.map { it.name }
+    var selectedOption by remember { mutableStateOf("") }
+    var selectedIndex by remember { mutableStateOf(1) }
+    var responseText by remember { mutableStateOf("")}
+    var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
+    var cardQuantErr by remember { mutableStateOf(false) }
+
+    UserDropdownSelector(
+        label = stringResource(R.string.subcollection_page),
+        data = 1,
+        onUserStorefrontChange = {
+            selectedOption = optionInfo.get(it - 1).subcollectionid
+            selectedIndex = it - 1
+        },
+        options = optionList,
+    )
+    Button(
+        onClick = {
+            saveToSubcollectionPost(
+                card = cardData,
+                userid = userid,
+                subcollection = selectedOption,
+                subcolInfo = optionInfo.get(selectedIndex),
+                refreshUI = { }
+            )
+            responseText = staticResponseText
+        },
+        enabled = selectedOption != ""
+    ) {
+        Text(stringResource(R.string.add_to_subcollection_button_label))
+    }
+    Row {
+        Text(stringResource(R.string.quantity_filter_label) + ": ")
+        Button(
+            onClick = {
+                if (cardData.quantity > 1) {
+                    removeFromCollectionPost(
+                        card = cardData,
+                        userid = userid,
+                        game = cardData.game,
+                        quantity = 1,
+                        fullCardPool = fullCardPool,
+                        onCollectionChange = onCollectionChange,
+                        removeCard = removeCard,
+                        subcolInfo = subcolInfo,
+                        refreshUI = refreshUI,
+                    )
+                    cardQuantity = (cardQuantity.toInt() - 1).toString()
                 }
                 else {
-                    Text(String.format(stringResource(R.string.remove_card_subcollection_text), subcolInfo.name))
+                    showCardDeletePopup()
                 }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showCardDeletePopup = false
-                    if (allCardsFlag) {
+            }
+        ) { Text("-")}
+        TextField(
+            value = cardQuantity,
+            onValueChange = {
+                if (it != "" && it.toInt() > 0) {
+                    cardQuantErr = false
+                    val quantityChange = (it.toInt() - cardData.quantity)
+                    if (quantityChange > 0) {
+                        increaseQuantityPost(
+                            userid = userid,
+                            card = cardData,
+                            quantityChange = quantityChange
+                        )
+                    }
+                    else {
                         removeFromCollectionPost(
                             card = cardData,
                             userid = userid,
                             game = cardData.game,
-                            quantity = 1,
+                            quantity = (quantityChange * -1),
                             fullCardPool = fullCardPool,
                             onCollectionChange = onCollectionChange,
                             removeCard = removeCard,
@@ -1202,29 +1209,45 @@ fun CardPopup(cardData: CardData,
                             refreshUI = refreshUI,
                         )
                     }
-                    else {
-                        removeFromSubcollectionPost(
-                            card = cardData,
-                            userid = userid,
-                            subcolInfo = subcolInfo,
-                            game = cardData.game,
-                            refreshUI = {
-                                refreshUI()
-                            },
-                        )
-                    }
-                    showCardPopup()
-                }) {
-                    Text(stringResource(R.string.yes_label))
                 }
+                else {
+                    cardQuantErr = true
+                }
+                cardQuantity = it
             },
-            dismissButton = {
-                TextButton(onClick = { showCardDeletePopup = false }) {
-                    Text(stringResource(R.string.no_label))
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = modifier.fillMaxWidth(.25f),
+            isError = cardQuantErr,
+            supportingText = {
+                if (cardQuantErr) {
+                    Text(
+                        text = stringResource(R.string.invalid_value_error),
+                        color = Color.Red
+                    )
                 }
             }
         )
+        Button(
+            onClick = {
+                increaseQuantityPost(
+                    userid = userid,
+                    card = cardData,
+                    quantityChange = 1
+                )
+                cardQuantity = (cardQuantity.toInt() + 1).toString()
+            }
+        ) { Text("+")}
     }
+    /*Column {
+        Button(onClick = {
+            showCardPopup()
+            val successful = removeFromCollectionPost(card = cardData, userid = userid, game = game, quantity = 1, fullCardPool = fullCardPool, onCollectionChange = onCollectionChange, removeCard = removeCard, subcolInfo = subcolInfo, refreshUI = refreshUI)
+            if (successful) Toast.makeText(context, "Card Successfully Deleted", Toast.LENGTH_SHORT).show()
+            else Toast.makeText(context, "Card Deletion Failed", Toast.LENGTH_SHORT).show()
+        }, modifier = Modifier.align(Alignment.End)) {
+            Text(text="Delete")
+        }
+    }*/
 }
 
 @Composable
@@ -1278,6 +1301,90 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
 }
 
 @Composable
+fun RemoveFromCollectionPopup(modifier: Modifier, cardData: CardData, onDismissRequest: () -> Unit, allCardsFlag: Boolean,
+                              subcolInfo: SubcollectionInfo, userid: String, fullCardPool: Array<CardData>,
+                              onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit, refreshUI: () -> Unit,
+                              showCardPopup: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(stringResource(R.string.remove_card_title)) },
+        text = {
+            if (allCardsFlag) {
+                Text(stringResource(R.string.remove_card_all_cards_text))
+            }
+            else {
+                Text(String.format(stringResource(R.string.remove_card_subcollection_text), subcolInfo.name))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onDismissRequest()
+                if (allCardsFlag) {
+                    removeFromCollectionPost(
+                        card = cardData,
+                        userid = userid,
+                        game = cardData.game,
+                        quantity = 1,
+                        fullCardPool = fullCardPool,
+                        onCollectionChange = onCollectionChange,
+                        removeCard = removeCard,
+                        subcolInfo = subcolInfo,
+                        refreshUI = refreshUI,
+                    )
+                }
+                else {
+                    removeFromSubcollectionPost(
+                        card = cardData,
+                        userid = userid,
+                        subcolInfo = subcolInfo,
+                        game = cardData.game,
+                        refreshUI = {
+                            refreshUI()
+                        },
+                    )
+                }
+                showCardPopup()
+            }) {
+                Text(stringResource(R.string.yes_label))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.no_label))
+            }
+        }
+    )
+}
+
+@Composable
+fun CardPriceComponent(cardData: CardData, navWebsite: (String) -> Unit) {
+    Card(modifier = Modifier,
+        onClick = {
+            if (cardData.purchaseurl != null) {
+                navWebsite(cardData.purchaseurl!!)
+            }
+        },
+        shape = RectangleShape,
+        border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(Color.White)
+    ) {
+        Row(modifier = Modifier.padding(vertical = 1.dp, horizontal = 3.dp)) {
+            Text(
+                String.format(
+                    stringResource(R.string.card_price_label),
+                    cardData.price,
+                    "$"
+                )
+            )
+            Image(modifier = Modifier.size(25.dp, 25.dp),
+                painter = painterResource(R.drawable.tcg_player_icon),
+                contentDescription = stringResource(R.string.tcgplayer_label),
+            )
+        }
+    }
+}
+
+@Composable
 fun MinMaxIntComponent(minVal: String,
                        maxVal: String,
                        onMinValChange: (String) -> Unit,
@@ -1289,53 +1396,67 @@ fun MinMaxIntComponent(minVal: String,
                        onMaxErrChange: (Boolean) -> Unit,
                        modifier: Modifier,
                        recalculateFilter: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier) {
-        Text(modifier = Modifier.weight(.2f),
-            text = label)
-        FilterTextfield(modifier = Modifier.weight(.3f), label = stringResource(R.string.min), value = minVal,
-            onValueChange = {
-                if (it.isDigitsOnly()) {
-                    onMinValChange(it)
-                    if (it == "") {
-                        onMinErrChange(false)
-                        recalculateFilter()
-                    } else if (it.toInt() < 0 || (maxVal != "" && maxVal.toInt() < it.toInt())) {
-                        onMinErrChange(true)
-                    } else {
-                        onMinErrChange(false)
-                        recalculateFilter()
+    Column(modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = label)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            FilterTextfield(
+                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                label = stringResource(R.string.min),
+                value = minVal,
+                onValueChange = {
+                    if (it.isDigitsOnly()) {
+                        onMinValChange(it)
+                        if (it == "") {
+                            onMinErrChange(false)
+                            recalculateFilter()
+                        } else if (it.toInt() < 0 || (maxVal != "" && maxVal.toInt() < it.toInt())) {
+                            onMinErrChange(true)
+                        } else {
+                            onMinErrChange(false)
+                            recalculateFilter()
+                        }
                     }
-                }
-            },
-            isError = minError,
-        )
+                },
+                isError = minError,
+            )
 
-        Spacer(modifier = Modifier.weight(.09f))
-        Column(modifier = Modifier.weight(.11f).height(30.dp),
-            verticalArrangement = Arrangement.Center) {
-            Spacer(modifier = Modifier.weight(.5f))
-            Text(modifier = Modifier.weight(.5f),
-                text = "-")
+            Spacer(modifier = Modifier.weight(.09f))
+            Column(
+                modifier = Modifier.weight(.11f).height(30.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.weight(.5f))
+                Text(
+                    modifier = Modifier.weight(.5f),
+                    text = "-"
+                )
+            }
+
+            FilterTextfield(
+                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                label = stringResource(R.string.max),
+                value = maxVal,
+                onValueChange = {
+                    if (it.isDigitsOnly()) {
+                        onMaxValChange(it)
+                        if (it == "") {
+                            onMaxErrChange(false)
+                            recalculateFilter()
+                        } else if (it.toInt() < 0 || (minVal != "" && minVal.toInt() > it.toInt())) {
+                            onMaxErrChange(true)
+                        } else {
+                            onMaxErrChange(false)
+                            recalculateFilter()
+                        }
+                    }
+                },
+                isError = maxError,
+            )
         }
-
-        FilterTextfield(modifier = Modifier.weight(.3f), label = stringResource(R.string.max), value = maxVal,
-            onValueChange = {
-                if (it.isDigitsOnly()) {
-                    onMaxValChange(it)
-                    if (it == "") {
-                        onMaxErrChange(false)
-                        recalculateFilter()
-                    } else if (it.toInt() < 0 || (minVal != "" && minVal.toInt() > it.toInt())) {
-                        onMaxErrChange(true)
-                    } else {
-                        onMaxErrChange(false)
-                        recalculateFilter()
-                    }
-                }
-            },
-            isError = maxError,
-        )
     }
 }
 @Composable
@@ -1350,49 +1471,127 @@ fun MinMaxDoubleComponent(minVal: String,
                        onMaxErrChange: (Boolean) -> Unit,
                        modifier: Modifier,
                        recalculateFilter: () -> Unit) {
-    Row(modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically) {
-        Text(modifier = Modifier.weight(.2f),
-            text = label)
-        FilterTextfield(modifier = Modifier.weight(.3f), label = stringResource(R.string.min), value = minVal,
-            onValueChange = {
-                onMinValChange(it)
-                if (it == "") {
-                    onMinErrChange(false)
-                    recalculateFilter()
-                } else if (it.toDouble() < 0 || (maxVal != "" && maxVal.toDouble() < it.toDouble())) {
-                    onMinErrChange(true)
-                } else {
-                    onMinErrChange(false)
-                    recalculateFilter()
-                }
-            },
-            isError = minError
-        )
+    Column(modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = label)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FilterTextfield(
+                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                label = stringResource(R.string.min),
+                value = minVal,
+                onValueChange = {
+                    onMinValChange(it)
+                    if (it == "") {
+                        onMinErrChange(false)
+                        recalculateFilter()
+                    } else if (it.toDouble() < 0 || (maxVal != "" && maxVal.toDouble() < it.toDouble())) {
+                        onMinErrChange(true)
+                    } else {
+                        onMinErrChange(false)
+                        recalculateFilter()
+                    }
+                },
+                isError = minError
+            )
 
-        Spacer(modifier = Modifier.weight(.09f))
-        Column(modifier = Modifier.weight(.11f).height(30.dp),
-            verticalArrangement = Arrangement.Center) {
-            Spacer(modifier = Modifier.weight(.5f))
-            Text(modifier = Modifier.weight(.5f),
-                text = "-")
+            Spacer(modifier = Modifier.weight(.09f))
+            Column(
+                modifier = Modifier.weight(.11f).height(30.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.weight(.5f))
+                Text(
+                    modifier = Modifier.weight(.5f),
+                    text = "-"
+                )
+            }
+
+            FilterTextfield(
+                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                label = stringResource(R.string.max),
+                value = maxVal,
+                onValueChange = {
+                    onMaxValChange(it)
+                    if (it == "") {
+                        onMaxErrChange(false)
+                        recalculateFilter()
+                    } else if (it.toDouble() < 0 || (minVal != "" && minVal.toDouble() > it.toDouble())) {
+                        onMaxErrChange(true)
+                    } else {
+                        onMaxErrChange(false)
+                        recalculateFilter()
+                    }
+                },
+                isError = maxError
+            )
         }
+    }
+}
 
-        FilterTextfield(modifier = Modifier.weight(.3f), label = stringResource(R.string.max), value = maxVal,
-            onValueChange = {
-                onMaxValChange(it)
-                if (it == "") {
-                    onMaxErrChange(false)
-                    recalculateFilter()
-                } else if (it.toDouble() < 0 || (minVal != "" && minVal.toDouble() > it.toDouble())) {
-                    onMaxErrChange(true)
+
+@Composable
+fun AutoResizeText(
+    text: String,
+    fontSizeRange: FontSizeRange,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+) {
+    var fontSizeValue by remember { mutableStateOf(fontSizeRange.max.value) }
+    var readyToDraw by remember { mutableStateOf(false) }
+    var enableScrolling by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier.then(
+            if (enableScrolling) Modifier.verticalScroll(rememberScrollState()) else Modifier
+        )
+    ) {
+        Text(
+            text = text,
+            color = color,
+            fontStyle = fontStyle,
+            fontWeight = fontWeight,
+            fontSize = fontSizeValue.sp,
+            lineHeight = lineHeight,
+            onTextLayout = {
+                if (it.didOverflowHeight && !readyToDraw) {
+                    val nextFontSizeValue = fontSizeValue - fontSizeRange.step.value
+                    if (nextFontSizeValue <= fontSizeRange.min.value) {
+                        // Reached minimum font size, enable scrolling
+                        fontSizeValue = fontSizeRange.min.value
+                        readyToDraw = true
+                        enableScrolling = true
+                    } else {
+                        // Continue decreasing font size
+                        fontSizeValue = nextFontSizeValue
+                    }
                 } else {
-                    onMaxErrChange(false)
-                    recalculateFilter()
+                    // Text fits, no need for scrolling
+                    readyToDraw = true
                 }
             },
-            isError = maxError
+            modifier = Modifier.drawWithContent { if (readyToDraw) drawContent() }
         )
+    }
+}
+
+data class FontSizeRange(
+    val min: TextUnit,
+    val max: TextUnit,
+    val step: TextUnit = DEFAULT_TEXT_STEP,
+) {
+    init {
+        require(min < max) { "min should be less than max, $this" }
+        require(step.value > 0) { "step should be greater than 0, $this" }
+    }
+
+    companion object {
+        private val DEFAULT_TEXT_STEP = 1.sp
     }
 }
 
