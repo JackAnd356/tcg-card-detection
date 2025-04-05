@@ -19,10 +19,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -61,17 +64,25 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -147,8 +158,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var selectedMaxPrice by remember { mutableStateOf("") }
     var maxPriceErr by remember { mutableStateOf(false) }
 
-    val leftOffset = LocalConfiguration.current.screenWidthDp * 0.05
+    val screenHeight = LocalConfiguration.current.screenHeightDp
     val forceRecomposeState = rememberUpdatedState(refreshFlag)
+    val backArrowSize = (screenHeight * 0.02)
 
 
     if (navWebsite != "") {
@@ -257,109 +269,135 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             .background(color = Color.White)
             .fillMaxWidth()
             .fillMaxHeight(.9f),
-        contentAlignment = Alignment.TopStart) {
+        contentAlignment = Alignment.TopCenter) {
         Column(
             verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .wrapContentWidth(Alignment.CenterHorizontally)
         ) {
-            Spacer(modifier = modifier.height(20.dp))
-            Button(
-                modifier = Modifier.padding(start = leftOffset.dp, end = 0.dp, top = 0.dp, bottom = 0.dp),
-                onClick = { navBack() },
-                colors = ButtonDefaults.buttonColors(colorResource(R.color.darkGray))
-            ) {
-                Text(stringResource(R.string.back_to_main_collections_button_label))
+            Box(modifier = Modifier
+                .clickable(
+                    onClick = navBack,
+                    onClickLabel = "Back To Collection Manager"
+                )
+                .width((backArrowSize * 2).dp)
+                .padding(top = 18.dp)) {
+                Icon(modifier = Modifier
+                    .height(backArrowSize.dp)
+                    .width(backArrowSize.dp),
+                    painter = painterResource(R.drawable.arrow_left_icon),
+                    contentDescription = "Back Arrow",
+                    tint = Color.Black
+                )
             }
-            Card(colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gray)),
+
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(.9f)
+                    .fillMaxWidth(0.9f)
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 10.dp, bottom = 20.dp)
-                    .border(1.dp, colorResource(R.color.borderGray), shape = RoundedCornerShape(10.dp))
-                    .shadow(elevation = 10.dp, shape = RoundedCornerShape(10.dp),
-                        spotColor = Color.Black, ambientColor = Color.Black)
+                    .shadow(
+                        elevation = 10.dp,
+                        shape = RoundedCornerShape(10.dp),
+                        ambientColor = Color.Black,
+                        spotColor = Color.Black
+                    )
             ) {
-                Row(modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center) {
-                    Column(modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = subcolInfo.name,
-                            fontSize = 40.sp,
-                            lineHeight = 50.sp,
-                            textAlign = TextAlign.Center
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gray)),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            1.dp,
+                            colorResource(R.color.borderGray),
+                            shape = RoundedCornerShape(10.dp)
                         )
-                        Text(
-                            text = String.format(
-                                stringResource(R.string.total_value_label),
-                                subcolInfo.totalValue,
-                                "$"
-                            ),
-                            fontSize = 15.sp,
-                            lineHeight = 20.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    if (subcolInfo.subcollectionid != "all") {
-                        Box {
-                            IconButton(
-                                onClick = {optionsExpanded = !optionsExpanded}
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = "More"
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = optionsExpanded,
-                                onDismissRequest = {
-                                    optionsExpanded = false
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = subcolInfo.name,
+                                fontSize = 40.sp,
+                                lineHeight = 50.sp,
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                text = String.format(
+                                    stringResource(R.string.total_value_label),
+                                    subcolInfo.totalValue,
+                                    "$"
+                                ),
+                                fontSize = 15.sp,
+                                lineHeight = 20.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        if (subcolInfo.subcollectionid != "all") {
+                            Box {
+                                IconButton(
+                                    onClick = { optionsExpanded = !optionsExpanded }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.MoreVert,
+                                        contentDescription = "More"
+                                    )
                                 }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.edit_option_label)) },
-                                    onClick = {
-                                        showEditPopup = !showEditPopup
+                                DropdownMenu(
+                                    expanded = optionsExpanded,
+                                    onDismissRequest = {
+                                        optionsExpanded = false
                                     }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.delete_option_label)) },
-                                    onClick = {
-                                        showDeletePopup = !showDeletePopup
-                                    }
-                                )
+                                ) {
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.edit_option_label)) },
+                                        onClick = {
+                                            showEditPopup = !showEditPopup
+                                        }
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.delete_option_label)) },
+                                        onClick = {
+                                            showDeletePopup = !showDeletePopup
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
-                    if (subcolInfo.physLoc != "") {
+                    Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)) {
+                        if (subcolInfo.physLoc != "") {
+                            Text(
+                                text = String.format(
+                                    stringResource(R.string.location_label),
+                                    subcolInfo.physLoc
+                                ),
+                                fontSize = 15.sp,
+                                lineHeight = 20.sp,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.weight(1f))
+                        }
                         Text(
                             text = String.format(
-                                stringResource(R.string.location_label),
-                                subcolInfo.physLoc
+                                stringResource(R.string.total_cards_label),
+                                subcolInfo.cardCount
                             ),
                             fontSize = 15.sp,
                             lineHeight = 20.sp,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(Modifier.weight(1f))
                     }
-                    Text(
-                        text = String.format(
-                            stringResource(R.string.total_cards_label),
-                            subcolInfo.cardCount
-                        ),
-                        fontSize = 15.sp,
-                        lineHeight = 20.sp,
-                        textAlign = TextAlign.Center
-                    )
                 }
-
             }
 
             if(!allCardsFlag) {
@@ -401,93 +439,55 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 }
             }
 
-            if (showFilters) {
-                Column(modifier = Modifier.fillMaxWidth(.9f)
-                    .clip(RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp))
-                    .background(color = colorResource(R.color.darkGray))
-                    .align(Alignment.CenterHorizontally),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp)) {
-                        MinMaxIntComponent(
-                            minVal = selectedMinQuantity,
-                            maxVal = selectedMaxQuantity,
-                            onMinValChange = { selectedMinQuantity = it },
-                            onMaxValChange = { selectedMaxQuantity = it },
-                            label = stringResource(R.string.quantity_filter_label),
-                            minError = minQuantErr,
-                            onMinErrChange = { minQuantErr = it },
-                            maxError = maxQuantErr,
-                            onMaxErrChange = { maxQuantErr = it },
-                            modifier = Modifier.clip(RoundedCornerShape(10.dp))
-                                .background(Color.White)
-                                .padding(5.dp)
-                                .weight(.48f),
-                        ) {
-                            filterList.clear()
-                            recalculateFilterList(
-                                type = selectedTypeFilter,
-                                quantityMin = selectedMinQuantity,
-                                levelMin = selectedMinLevel,
-                                priceRange = selectedPriceRange,
-                                quantityMax = selectedMaxQuantity,
-                                levelMax = selectedMaxLevel,
-                                priceMin = selectedMinPrice,
-                                priceMax = selectedMaxPrice,
-                            ).forEach {
-                                    func ->
-                                filterList.add(func)
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.weight(.04f))
-
-                        MinMaxDoubleComponent(
-                            minVal = selectedMinPrice,
-                            maxVal = selectedMaxPrice,
-                            onMinValChange = { selectedMinPrice = it },
-                            onMaxValChange = {  selectedMaxPrice = it },
-                            label = stringResource(R.string.price_filter_label),
-                            minError = minPriceErr,
-                            onMinErrChange = { minPriceErr = it },
-                            maxError = maxPriceErr,
-                            modifier = Modifier.clip(RoundedCornerShape(10.dp))
-                                .background(Color.White)
-                                .padding(5.dp)
-                                .weight(.48f),
-                            onMaxErrChange = { maxPriceErr = it }
-                        ) {
-                            filterList.clear()
-                            recalculateFilterList(
-                                type = selectedTypeFilter,
-                                quantityMin = selectedMinQuantity,
-                                levelMin = selectedMinLevel,
-                                priceRange = selectedPriceRange,
-                                quantityMax = selectedMaxQuantity,
-                                levelMax = selectedMaxLevel,
-                                priceMin = selectedMinPrice,
-                                priceMax = selectedMaxPrice,
-                            ).forEach {
-                                    func ->
-                                filterList.add(func)
-                            }
-                        }
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally),
+                contentAlignment = Alignment.TopCenter) {
+                var filteredCardData = mutableListOf<CardData>()
+                cardData.forEach { card ->
+                    if (searchTerm in card.cardname) {
+                        filteredCardData.add(card)
                     }
-                    Column(modifier = Modifier.padding(vertical = 10.dp)) {
-                        if (game == "yugioh") {
+                }
+                if (searchTerm == "") {
+                    filteredCardData = cardData.toMutableList()
+                }
+                filteredCardData = sortSubcollection(filteredCardData, game)
+                Spacer(modifier = Modifier.height(5.dp))
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxWidth(.9f),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(15.dp)
+                ) {
+                    items(filteredCardData) { cardInfo ->
+                        CardImage(
+                            cardData = cardInfo,
+                            setFocusedCard = { currentFocusedCard = it },
+                            showCardPopup = { showCardPopup = !showCardPopup },
+                            modifier = Modifier,
+                            allCardsFlag = allCardsFlag
+                        )
+                    }
+                }
+                if (showFilters) {
+                    Column(modifier = Modifier.fillMaxWidth(.9f)
+                        .clip(RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp))
+                        .background(color = colorResource(R.color.darkGray)),
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp)) {
                             MinMaxIntComponent(
-                                minVal = selectedMinLevel,
-                                maxVal = selectedMaxLevel,
-                                onMinValChange = { selectedMinLevel = it },
-                                onMaxValChange = { selectedMaxLevel = it },
-                                label = stringResource(R.string.level_filter_label),
-                                minError = minLevelErr,
-                                onMinErrChange = { minLevelErr = it },
-                                maxError = maxLevelErr,
-                                onMaxErrChange = { maxLevelErr = it },
+                                minVal = selectedMinQuantity,
+                                maxVal = selectedMaxQuantity,
+                                onMinValChange = { selectedMinQuantity = it },
+                                onMaxValChange = { selectedMaxQuantity = it },
+                                label = stringResource(R.string.quantity_filter_label),
+                                minError = minQuantErr,
+                                onMinErrChange = { minQuantErr = it },
+                                maxError = maxQuantErr,
+                                onMaxErrChange = { maxQuantErr = it },
                                 modifier = Modifier.clip(RoundedCornerShape(10.dp))
-                                    .background(Color.White)
+                                    .background(colorResource(R.color.darkGray))
                                     .padding(5.dp)
-                                    .fillMaxWidth(.9f)
+                                    .weight(.48f),
                             ) {
                                 filterList.clear()
                                 recalculateFilterList(
@@ -504,42 +504,110 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     filterList.add(func)
                                 }
                             }
-                            DropdownMenu(
-                                expanded = typeExpanded,
-                                onDismissRequest = {
-                                    typeExpanded = false
-                                }
+
+                            Spacer(modifier = Modifier.weight(.04f))
+
+                            MinMaxDoubleComponent(
+                                minVal = selectedMinPrice,
+                                maxVal = selectedMaxPrice,
+                                onMinValChange = { selectedMinPrice = it },
+                                onMaxValChange = {  selectedMaxPrice = it },
+                                label = stringResource(R.string.price_filter_label),
+                                minError = minPriceErr,
+                                onMinErrChange = { minPriceErr = it },
+                                maxError = maxPriceErr,
+                                modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                                    .background(Color.White)
+                                    .padding(5.dp)
+                                    .weight(.48f),
+                                onMaxErrChange = { maxPriceErr = it }
                             ) {
-                                listOfTypes.forEach { type ->
-                                    DropdownMenuItem(
-                                        text = { Text(type) },
-                                        onClick = {
-                                            selectedTypeFilter = type
-                                            filterList.clear()
-                                            recalculateFilterList(
-                                                type = selectedTypeFilter,
-                                                quantityMin = selectedMinQuantity,
-                                                levelMin = selectedMinLevel,
-                                                priceRange = selectedPriceRange,
-                                                quantityMax = selectedMaxQuantity,
-                                                levelMax = selectedMaxLevel,
-                                                priceMin = selectedMinPrice,
-                                                priceMax = selectedMaxPrice,
-                                            ).forEach { func ->
-                                                filterList.add { func(it) }
-                                            }
-                                        }
-                                    )
+                                filterList.clear()
+                                recalculateFilterList(
+                                    type = selectedTypeFilter,
+                                    quantityMin = selectedMinQuantity,
+                                    levelMin = selectedMinLevel,
+                                    priceRange = selectedPriceRange,
+                                    quantityMax = selectedMaxQuantity,
+                                    levelMax = selectedMaxLevel,
+                                    priceMin = selectedMinPrice,
+                                    priceMax = selectedMaxPrice,
+                                ).forEach {
+                                        func ->
+                                    filterList.add(func)
                                 }
                             }
                         }
-                        else if (game == "mtg") {
+                        Column(modifier = Modifier.padding(vertical = 10.dp)) {
+                            if (game == "yugioh") {
+                                MinMaxIntComponent(
+                                    minVal = selectedMinLevel,
+                                    maxVal = selectedMaxLevel,
+                                    onMinValChange = { selectedMinLevel = it },
+                                    onMaxValChange = { selectedMaxLevel = it },
+                                    label = stringResource(R.string.level_filter_label),
+                                    minError = minLevelErr,
+                                    onMinErrChange = { minLevelErr = it },
+                                    maxError = maxLevelErr,
+                                    onMaxErrChange = { maxLevelErr = it },
+                                    modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                                        .background(Color.White)
+                                        .padding(5.dp)
+                                        .fillMaxWidth(.9f)
+                                ) {
+                                    filterList.clear()
+                                    recalculateFilterList(
+                                        type = selectedTypeFilter,
+                                        quantityMin = selectedMinQuantity,
+                                        levelMin = selectedMinLevel,
+                                        priceRange = selectedPriceRange,
+                                        quantityMax = selectedMaxQuantity,
+                                        levelMax = selectedMaxLevel,
+                                        priceMin = selectedMinPrice,
+                                        priceMax = selectedMaxPrice,
+                                    ).forEach {
+                                            func ->
+                                        filterList.add(func)
+                                    }
+                                }
+                                DropdownMenu(
+                                    expanded = typeExpanded,
+                                    onDismissRequest = {
+                                        typeExpanded = false
+                                    }
+                                ) {
+                                    listOfTypes.forEach { type ->
+                                        DropdownMenuItem(
+                                            text = { Text(type) },
+                                            onClick = {
+                                                selectedTypeFilter = type
+                                                filterList.clear()
+                                                recalculateFilterList(
+                                                    type = selectedTypeFilter,
+                                                    quantityMin = selectedMinQuantity,
+                                                    levelMin = selectedMinLevel,
+                                                    priceRange = selectedPriceRange,
+                                                    quantityMax = selectedMaxQuantity,
+                                                    levelMax = selectedMaxLevel,
+                                                    priceMin = selectedMinPrice,
+                                                    priceMax = selectedMaxPrice,
+                                                ).forEach { func ->
+                                                    filterList.add { func(it) }
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            else if (game == "mtg") {
 
-                        }
-                        else if (game == "pokemon") {
+                            }
+                            else if (game == "pokemon") {
 
+                            }
                         }
                     }
+
                 }
             }
 
@@ -606,34 +674,6 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     )
                 }
             }
-
-            var filteredCardData = mutableListOf<CardData>()
-            cardData.forEach { card ->
-                if (searchTerm in card.cardname) {
-                    filteredCardData.add(card)
-                }
-            }
-            if (searchTerm == "") {
-                filteredCardData = cardData.toMutableList()
-            }
-            filteredCardData = sortSubcollection(filteredCardData, game)
-            Spacer(modifier = Modifier.height(5.dp))
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(filteredCardData) { cardInfo ->
-                    CardImage(
-                        cardData = cardInfo,
-                        setFocusedCard = { currentFocusedCard = it },
-                        showCardPopup = { showCardPopup = !showCardPopup },
-                        modifier = Modifier
-                            .padding(vertical = 10.dp, horizontal = 10.dp),
-                        allCardsFlag = allCardsFlag
-                    )
-                }
-            }
         }
 
     }
@@ -676,6 +716,7 @@ fun CardImage(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
+                    .offset(y = (-5).dp)
                     .background(Color.Black.copy(alpha = 0.7f), shape = RoundedCornerShape(4.dp))
                     .padding(4.dp)
             )
@@ -836,8 +877,8 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
                 colors = CardDefaults.cardColors(containerColor = Color.Gray)
             ) {
                 AutoResizeText(text = cardData.description!!.replace("\\n", "\n"),
-                    fontSizeRange = FontSizeRange(10.sp, 30.sp, 3.sp),
-                    modifier = Modifier,
+                    fontSizeRange = FontSizeRange(10.sp, 30.sp, 1.sp),
+                    modifier = Modifier.fillMaxSize(),
                     color = Color.Black,
                 )
             }
@@ -1537,46 +1578,93 @@ fun AutoResizeText(
     text: String,
     fontSizeRange: FontSizeRange,
     modifier: Modifier = Modifier,
+    style: TextStyle = TextStyle.Default,
     color: Color = Color.Unspecified,
-    fontStyle: FontStyle? = null,
-    fontWeight: FontWeight? = null,
-    lineHeight: TextUnit = TextUnit.Unspecified,
 ) {
-    var fontSizeValue by remember { mutableStateOf(fontSizeRange.max.value) }
-    var readyToDraw by remember { mutableStateOf(false) }
-    var enableScrolling by remember { mutableStateOf(false) }
+    var textSize by remember { mutableStateOf<TextUnit?>(null) }
+    var parentSize by remember { mutableStateOf(IntSize.Zero) }
 
     Box(
-        modifier = modifier.then(
-            if (enableScrolling) Modifier.verticalScroll(rememberScrollState()) else Modifier
-        )
+        modifier = modifier
+            .onSizeChanged { parentSize = it }
+            .background(Color.LightGray) // optional: for debugging
     ) {
-        Text(
-            text = text,
-            color = color,
-            fontStyle = fontStyle,
-            fontWeight = fontWeight,
-            fontSize = fontSizeValue.sp,
-            lineHeight = lineHeight,
-            onTextLayout = {
-                if (it.didOverflowHeight && !readyToDraw) {
-                    val nextFontSizeValue = fontSizeValue - fontSizeRange.step.value
-                    if (nextFontSizeValue <= fontSizeRange.min.value) {
-                        // Reached minimum font size, enable scrolling
-                        fontSizeValue = fontSizeRange.min.value
-                        readyToDraw = true
-                        enableScrolling = true
-                    } else {
-                        // Continue decreasing font size
-                        fontSizeValue = nextFontSizeValue
-                    }
-                } else {
-                    // Text fits, no need for scrolling
-                    readyToDraw = true
-                }
-            },
-            modifier = Modifier.drawWithContent { if (readyToDraw) drawContent() }
-        )
+        if (parentSize.width > 0 && parentSize.height > 0) {
+            val constraints = Constraints.fixed(parentSize.width - 10, parentSize.height - 10)
+            val fontSize = rememberAutoResizedFontSize(
+                text = AnnotatedString(text),
+                fontSizeRange = fontSizeRange,
+                constraints = constraints,
+                textStyle = style
+            )
+            textSize = fontSize
+        }
+
+        if (textSize != null) {
+            Text(
+                text = text,
+                style = style.copy(fontSize = textSize!!),
+                color = color,
+                modifier = Modifier.fillMaxSize().padding(5.dp),
+                softWrap = true,
+            )
+        }
+    }
+}
+
+@Composable
+fun rememberAutoResizedFontSize(
+    text: AnnotatedString,
+    fontSizeRange: FontSizeRange,
+    constraints: Constraints,
+    textStyle: TextStyle = TextStyle.Default,
+    density: Density = LocalDensity.current,
+): TextUnit {
+    val textMeasurer = rememberTextMeasurer()
+    val stepSizePx = with(density) { fontSizeRange.step.toPx() }
+    val minFontSizePx = with(density) { fontSizeRange.min.toPx() }
+    val maxFontSizePx = with(density) { fontSizeRange.max.toPx() }
+
+    return remember(text, constraints) {
+        var low = minFontSizePx
+        var high = maxFontSizePx
+        var bestSize = low
+
+        while ((high - low) >= stepSizePx) {
+            val mid = (low + high) / 2
+            val fontSizeSp = with(density) { mid.toSp() }
+
+            val result = textMeasurer.measure(
+                text = text,
+                style = textStyle.copy(fontSize = fontSizeSp),
+                constraints = constraints,
+                softWrap = true
+            )
+
+            val fits = !result.hasVisualOverflow
+
+            if (fits) {
+                bestSize = mid
+                low = mid + stepSizePx
+            } else {
+                high = mid - stepSizePx
+            }
+        }
+
+        // Try stepping up once more to see if it still fits
+        val stepUp = bestSize + stepSizePx
+        val finalSize = if (stepUp <= maxFontSizePx) {
+            val fontSizeSp = with(density) { stepUp.toSp() }
+            val result = textMeasurer.measure(
+                text = text,
+                style = textStyle.copy(fontSize = fontSizeSp),
+                constraints = constraints,
+                softWrap = true
+            )
+            if (!result.hasVisualOverflow) stepUp else bestSize
+        } else bestSize
+
+        with(density) { finalSize.toSp() }
     }
 }
 
