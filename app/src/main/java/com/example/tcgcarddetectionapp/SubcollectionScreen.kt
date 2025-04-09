@@ -7,6 +7,7 @@ import android.net.Uri
 import android.util.Log
 import android.view.RoundedCorner
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -87,6 +88,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.isDigitsOnly
 import com.example.tcgcarddetectionapp.models.AddRemoveCardModel
 import com.example.tcgcarddetectionapp.models.CardData
@@ -456,7 +458,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     columns = GridCells.Fixed(3),
                     modifier = Modifier.fillMaxWidth(.9f),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(15.dp)
+                    horizontalArrangement = Arrangement.spacedBy(15.dp),
+                    contentPadding = PaddingValues(bottom = 20.dp)
                 ) {
                     items(filteredCardData) { cardInfo ->
                         CardImage(
@@ -464,7 +467,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             setFocusedCard = { currentFocusedCard = it },
                             showCardPopup = { showCardPopup = !showCardPopup },
                             modifier = Modifier,
-                            allCardsFlag = allCardsFlag
+                            allCardsFlag = allCardsFlag,
+                            game = game
                         )
                     }
                 }
@@ -686,7 +690,8 @@ fun CardImage(
     setFocusedCard: (CardData) -> Unit,
     showCardPopup: () -> Unit,
     modifier: Modifier,
-    allCardsFlag: Boolean
+    allCardsFlag: Boolean,
+    game: String
 ) {
     Box(modifier = modifier.clickable {
         setFocusedCard(cardData)
@@ -695,11 +700,26 @@ fun CardImage(
         if (cardData.image != "nocardimage" && cardData.image != null) {
             val decodedString = Base64.decode(cardData.image!!, 0)
             val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-            Image(
-                bitmap = img.asImageBitmap(),
-                contentDescription = "Card",
-                modifier = Modifier.size(120.dp, 200.dp)
-            )
+            val ribbon = painterResource(mapRarityToRibbon(cardData.rarity))
+            Box {
+                Image(
+                    bitmap = img.asImageBitmap(),
+                    contentDescription = "Card",
+                    modifier = Modifier
+                        .size(120.dp, 200.dp)
+                        .align(Alignment.Center)
+                )
+                if (game == "yugioh") {
+                    Image(
+                        painter = ribbon,
+                        contentDescription = "Rarity Ribbon",
+                        modifier = Modifier
+                            .size(120.dp, 200.dp)
+                            .align(Alignment.TopCenter)
+                            .offset(y = (-12).dp)
+                    )
+                }
+            }
         } else {
             Image(
                 painter = painterResource(R.drawable.nocardimage),
@@ -771,7 +791,7 @@ fun CardPopup(cardData: CardData,
         } else {
             Row {
                 Text(stringResource(R.string.subcollection_quantity_label) + ": ")
-                Button(
+                IconButton(
                     onClick = {
                         if (subColQuant.toInt() > 1) {
                             removeFromSubcollectionPost(
@@ -790,9 +810,12 @@ fun CardPopup(cardData: CardData,
                         }
 
                     }
-                ) { Text("-")}
+                ) {
+                    Icon(painter = painterResource(R.drawable.minus_icon),
+                        contentDescription = "Minus")
+                }
                 Text(subColQuant)
-                Button(
+                IconButton(
                     onClick = {
                         saveToSubcollectionPost(
                             card = cardData,
@@ -801,11 +824,14 @@ fun CardPopup(cardData: CardData,
                             subcolInfo = subcolInfo,
                             refreshUI = {
                                 refreshUI()
-                                        },
+                            },
                         )
                         subColQuant = (subColQuant.toInt() + 1).toString()
                     }
-                ) { Text("+")}
+                ) {
+                    Icon(painter = painterResource(R.drawable.plus_icon),
+                        contentDescription = "Plus")
+                }
             }
             /*Column {
                 Button(onClick = {
@@ -911,6 +937,14 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
                 CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
                     infoType = stringResource(R.string.def_label),
                     infoData = cardData.def)
+            }
+
+            if (cardData.rarity != null) {
+                CardInfoBox(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                    infoType = stringResource(R.string.rarity_label),
+                    infoData = cardData.rarity!!,
+                )
             }
         }
     }
@@ -1168,7 +1202,6 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
     val optionInfo = subcollections.filter( predicate = {
         it.game == game
     })
-    val context = LocalContext.current
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     val optionList = optionInfo.map { it.name }
     var selectedOption by remember { mutableStateOf("") }

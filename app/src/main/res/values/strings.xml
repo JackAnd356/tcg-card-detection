@@ -53,6 +53,7 @@
     <string name="type_label">Type:</string>
     <string name="atk_label">ATK:</string>
     <string name="def_label">DEF:</string>
+    <string name="rarity_label">Rarity:</string>
     <string name="cost_label">Cost: %1$s</string>
     <string name="color_label">Color: %1$s</string>
     <string name="power_label">Power: %1$s</string>
@@ -88,7 +89,8 @@
     <string name="remove_card_title">Remove Card?</string>
     <string name="remove_card_all_cards_text">Are you sure you want to remove this card from your collection (This Cannot Be Undone)?</string>
     <string name="remove_card_subcollection_text">Are you sure you want to remove this card from %1$s?</string>
-    <string name="user_photo_instructions">Some Tips for Taking a Good Photo\n\n 1. Make sure to include all of the card you are trying to scan.\n\n 2. Try not to overlap cards.\n\n 3. Take the photo in a room with good lighting.</string>
+    <string name="user_photo_instructions">1. Make sure to include all of the card you are trying to scan.\n\n2. Try not to overlap cards.\n\n3. Take the photo in a room with good lighting.</string>
+    <string name="user_photo_instructions_header">Some Tips for Taking a Good Photo:</string>
     <string name="labeled_data_entry_ghost_text">Enter %1$s Here&#8230;</string>
     <string name="scan_screen_heading">Scan</string>
     <string name="rarity_choice_text">Our scanner could not find the rarity for this card. Please select the image/description which best fits the card.</string>

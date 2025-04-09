@@ -1,5 +1,7 @@
 package com.example.tcgcarddetectionapp
 
+import android.graphics.drawable.Drawable
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
@@ -59,6 +61,12 @@ fun mapRarityToPlaceholder(rarity: String): Pair<Int, Int> {
     }
 }
 
-
+fun mapRarityToRibbon(rarity: String?): Int {
+    return when (rarity) {
+        "Secret Rare" -> R.drawable.secret_rare_ribbon
+        "Ultra Rare" -> R.drawable.ultra_rare_ribbon
+        else -> R.drawable.common_ribbon
+    }
+}
 
 
