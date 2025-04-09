@@ -7,6 +7,9 @@ import imagehash
 import difflib
 from PIL import Image
 import json
+import imutils
+import easyocr
+from fuzzywuzzy import fuzz
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
@@ -19,7 +22,7 @@ CARD_MIN_AREA = 10000
 
 # Hashing Variables
 hash_size = 16 #Bytes
-min_similarity = 14*6.8
+min_similarity = 117
 check_flipped = True
 
 pokemon_hash_path = os.path.join(os.path.dirname(__file__), 'cardHashes/pokemon_dphash_16byte.json')
@@ -48,21 +51,24 @@ def process_image(image, thresh_low=THRESH_LOW, thresh_high=THRESH_HIGH):
     cards = []
 
     # Define the new dimensions
-    new_width = 600
-    new_height = int(new_width * height / width)
+    #new_width = 600
+    #new_height = int(new_width * height / width)
 
     # Resize the image
-    image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+    #image = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
-    thresh = preprocess_image(image, thresh_low, thresh_high)
-    ccs, isCard = find_cards(thresh)
+    #thresh = preprocess_image(image, thresh_low, thresh_high)
+    #ccs, isCard = find_cards(thresh)
 
-    if len(ccs) == 0: return None
+    #if len(ccs) == 0: return None
 
-    for i in range(len(ccs)):
-        if isCard[i]:
-            card = preprocess_card(ccs[i], image)
-            if card is not None: cards.append(card)
+    #for i in range(len(ccs)):
+    #    if isCard[i]:
+    #        card = preprocess_card(ccs[i], image)
+    #        if card is not None: cards.append(card)
+
+    contour, w, h = get_one_card_contour(image)
+    cards.append(new_process_card(image, contour, w, h))
 
     frameCards = dict()
     frameCards["cards"] = cards
@@ -229,17 +235,28 @@ def get_yugioh_card_details(image):
     isNotGreenTop = np.all(avgColorTopLeft < green_hsv_range[0]) or np.all(avgColorTopLeft > green_hsv_range[1]) or np.all(avgColorTopRight < green_hsv_range[0]) or np.all(avgColorTopRight > green_hsv_range[1])
     print(isGreenBottom)
     print(isNotGreenTop)
-
+    
     # Extract card name
-    """nameImg = image[12:60, 17:330]
+    reader = easyocr.Reader(['en'])
+    
+    result = reader.readtext(image)
+    
+    cardName = ""
+    
+    if  len(result) > 0 and len(result[0]) > 1 and not result[0][1] is None:
+        cardName = result[0][1]
+    print(cardName)
+    
+    """
+    nameImg = image[0:100, 0:400]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cardName = pytesseract.image_to_string(nameImg)
-
+    print(cardName)
     # Extract card ID
     cardIDImg = image[585:598, 5:70]
     cardIDImg = cv2.resize(cardIDImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cardID = pytesseract.image_to_string(cardIDImg, config='--psm 13 -c tessedit_char_whitelist=0123456789')"""
-    match = get_match_pool(image, yugioh_hash_dict)
+    match = get_match_pool(image, yugioh_hash_dict, cardName)
     if match is None: return None
 
     # Extract card set code
@@ -261,6 +278,14 @@ def get_mtg_card_details(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Extract card name
+    reader = easyocr.Reader(['en'])
+    
+    result = reader.readtext(image)
+    cardName = ""
+    
+    if  len(result) > 0 and len(result[0]) > 1 and  not result[0][1] is None:
+        cardName = result[0][1]
+    print(cardName)
     """nameImg = image[20:60, 30:330]
     nameImg = cv2.resize(nameImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cardName = pytesseract.image_to_string(nameImg, config='-c preserve_interword_spaces=1 tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ')
@@ -268,7 +293,7 @@ def get_mtg_card_details(image):
     cardSetCodeImg = image[572:590, 0:70]
     cardSetCodeImg = cv2.resize(cardSetCodeImg, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     cardSetCode = pytesseract.image_to_string(cardSetCodeImg, config='--psm 13 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-/')"""
-    match = get_match_pool(image, mtg_hash_dict)
+    match = get_match_pool(image, mtg_hash_dict, cardName)
     if match is None: return None
 
     # Extract card ID
@@ -281,7 +306,16 @@ def get_mtg_card_details(image):
     return match
 
 def get_pokemon_card_details(image):
-    return get_match_pool(image, pokemon_hash_dict)
+    reader = easyocr.Reader(['en'])
+    
+    result = reader.readtext(image)
+    
+    cardName = ""
+    
+    if  len(result) > 1 and len(result[1]) > 1 and not result[1][1] is None:
+        cardName = result[1][1]
+    print(cardName)
+    return get_match_pool(image, pokemon_hash_dict, cardName)
 
 
 def flattener(image, pts, w, h):
@@ -343,13 +377,13 @@ def flattener(image, pts, w, h):
 
     return (warp_rgb, warp)
 
-def get_match_pool(card_image, hash_dict):
+def get_match_pool(card_image, hash_dict, name):
     if card_image is None:
         return None
     image_hash = hash_image(card_image)
-    match = find_match(image_hash, hash_dict)
+    match = find_match(image_hash, hash_dict, name)
     if match is None and check_flipped is True:
-        match = find_flipped_match(card_image, hash_dict)
+        match = find_flipped_match(card_image, hash_dict, name)
     if match is not None:
         return match
     return None
@@ -371,28 +405,35 @@ def hamming_distance(hash1, hash2):
     assert len(hash1) == len(hash2), "Hash lengths are not equal"
     return sum(ch1 != ch2 for ch1, ch2 in zip(hash1, hash2))
 
-def find_match(hash_a, hash_dict):
+def find_match(hash_a, hash_dict, name):
     """Finds the closest match for a card by hamming distance to hashed dictionary"""
     best_match = None
     min_sim = min_similarity
+    better_matches = 0
 
     for card_id, data in hash_dict.items():
         hash_b = data['hash']
         similarity = hamming_distance(hash_a, hash_b)
+        if data['name'] == 'The One Ring':
+            print("The One Ring simiarity: " + str(similarity))
+            print('The One Ring fuzzy: ' + str(fuzz.ratio(name.upper(), data['name'].upper())))
         if similarity < min_sim:
-            min_sim = similarity
-            best_match = card_id
+            if fuzz.ratio(name.upper(), data['name'].upper()) > 90 or similarity < 80:
+                min_sim = similarity
+                best_match = card_id
+            
+    print("Cards we'd look through: " + str(better_matches))
 
     if best_match is None:
         return None
 
     return hash_dict[best_match]
 
-def find_flipped_match(card_image, hash_dict):
+def find_flipped_match(card_image, hash_dict, name):
     """Rotates the card 180 degrees and tries to find closest match"""
     card_image = cv2.rotate(card_image, cv2.ROTATE_180)
     image_hash = hash_image(card_image)
-    match = find_match(image_hash, hash_dict)
+    match = find_match(image_hash, hash_dict, name)
     return match
 
 def ygoprodeck_to_card_data(ygoCard, setcode):
@@ -430,3 +471,97 @@ def scryfall_to_card_data(scryfallCard):
     cardData["game"] = "mtg"
     cardData["cardname"] = scryfallCard["name"]
     return cardData
+
+def get_one_card_contour(imgIn):
+    img = imutils.resize(imgIn, height=640)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # For low contrast (lighter colored) cards
+    if needs_clahe(gray):
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+        gray = clahe.apply(gray)
+
+    # Adaptive Contrast Enhancement for Darker Cards
+    mean_intensity = np.mean(gray)
+    if mean_intensity < 100:
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        gray = clahe.apply(gray)
+
+    # Pre-Processing: Blur and Morphological Operations
+    blurred = cv2.edgePreservingFilter(gray, flags=1, sigma_s=25, sigma_r=0.375)
+    
+    # Adaptive Canny Edge Detection
+    high_thresh, _ = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    low_thresh = max(30, int(high_thresh * 0.5))  # Adjust dynamically
+
+    edges = cv2.Canny(blurred, low_thresh, high_thresh)
+
+    # Morphological Closing to Connect Broken Edges
+    kernel = np.ones((25, 25), np.uint8)
+    edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+
+    # Find Contours
+    cnts = cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = imutils.grab_contours(cnts)
+    cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:2]  # Get the largest few contours
+
+    screenCnt = None
+    card_aspect_ratio = 1.38  # Yu-Gi-Oh! card aspect ratio
+    img_display = img.copy()
+    best_ratio = 0
+    for c in cnts:
+        peri = cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, 0.05 * peri, True)
+        x, y, w, h = cv2.boundingRect(approx)
+        aspect_ratio = float(h) / float(w)
+
+        if abs(best_ratio - 1.434) > abs(aspect_ratio - 1.434):  # Ensuring it is close to a card shape
+            screenCnt = approx
+            best_ratio = aspect_ratio
+
+    # Draw a Rectangle Around the Detected Card
+    testFlattenImage_BGR = ""
+    testFlattenImage_RGB = ""
+    if screenCnt is not None:
+        x, y, w, h = cv2.boundingRect(screenCnt)
+        cv2.rectangle(img_display, (x, y), (x + w, y + h), (0, 255, 0), 3)
+        contour = np.array([[x, y], [x + w, y], [x + w, y + h], [x, y + h]])
+        contour = contour.reshape((-1, 1, 2))  # Reshape for OpenCV compatibility
+        (testFlattenImage_RGB, testFlattenImage_BGR) = flattener(img.copy(), contour, w, h)
+        return contour, w, h
+    return None
+    
+def needs_clahe(image):
+    # Compute contrast using standard deviation
+    contrast = np.std(image)
+    return contrast < 30  # Adjust this threshold if needed
+
+def new_process_card(frame, contour, w, h):
+    qCard = dict()
+    qCard["contour"] = contour
+    # Warp card into 400x600 flattened image using perspective transform
+    (warp_rgb, warp_bgr) = flattener(frame, contour, w, h)
+    qCard["warp_rgb"] = warp_rgb
+    qCard["warp_bgr"] = warp_bgr
+
+    """cv2.imshow("Warp", warp_bgr)"""
+
+    classifyImage = cv2.resize(warp_bgr, (128, 128), interpolation=cv2.INTER_AREA)
+    img_array = tf.expand_dims(classifyImage, 0) # Create a batch of size 1
+    cardType, confidence = predict_card(model, img_array)
+    qCard["game"] = cardType
+
+    print(cardType)
+
+    if cardType == 'yugioh': match = get_yugioh_card_details(qCard["warp_rgb"])
+    elif cardType == 'mtg': match = get_mtg_card_details(qCard["warp_rgb"])
+    elif cardType == 'pokemon': match = get_pokemon_card_details(qCard["warp_rgb"])
+    else: return None
+
+    if match is None: return None
+    qCard["name"] = match["name"]
+    qCard["cardid"] = match["id"]
+    if "setcode" in match: qCard["setcode"] = match["setcode"]
+    else: qCard["setcode"] = None
+    if "scryfallid" in match: qCard["scryfallid"] = match["scryfallid"]
+    return qCard
