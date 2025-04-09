@@ -62,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
@@ -954,7 +955,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
 @Composable
 fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Row(modifier = modifier) {
-        Column {
+        Column(modifier = Modifier.weight(.4f)) {
             if (cardData.image != "nocardimage" && cardData.image != null) {
                 val decodedString = Base64.decode(cardData.image!!, 0)
                 val img =
@@ -974,63 +975,51 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                 )
             }
             Text(cardData.cardname)
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_setcode_label),
-                    cardData.setcode
-                ),
-                fontSize = 10.sp,
-                lineHeight = 15.sp,
-            )
+
+            CardPriceComponent(cardData, navWebsite)
         }
-        Column {
-            Text(stringResource(R.string.price_header))
-            Text(
-                String.format(
-                    stringResource(R.string.card_price_label),
-                    cardData.price,
-                    "$"
-                )
-            )
-            Button(
-                onClick = {
-                    if (cardData.purchaseurl != null) {
-                        navWebsite(cardData.purchaseurl!!)
-                    }
-                }
-            ) {
-                Text(stringResource(R.string.tcgplayer_label))
-            }
-            Row {
-                Text(String.format(stringResource(R.string.cost_label), cardData.cost))
-                Text(
-                    String.format(
-                        stringResource(R.string.color_label),
-                        cardData.attribute
-                    )
-                )
-            }
-            Text(String.format(stringResource(R.string.type_label), cardData.type))
-            Card(
+        Column(modifier = Modifier.weight(.6f)) {
+            Card(modifier = Modifier.height(220.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Gray)
             ) {
-                Text(cardData.description!!.replace("\\n", "\n"))
+                AutoResizeText(text = cardData.description!!.replace("\\n", "\n"),
+                    fontSizeRange = FontSizeRange(10.sp, 30.sp, 1.sp),
+                    modifier = Modifier.fillMaxSize(),
+                    color = Color.Black,
+                )
             }
+
+            if (cardData.cost != null) {
+                CardInfoBox(
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    infoType = stringResource(R.string.cost_label),
+                    infoData = "",
+                    icons = stripMTGColorString(cardData.cost)
+                )
+            }
+
+            if (cardData.type != null) {
+                CardInfoBox(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    infoType = stringResource(R.string.type_label),
+                    infoData = cardData.type
+                )
+            }
+
             if (cardData.atk != null) {
-                Row {
-                    Text(
-                        String.format(
-                            stringResource(R.string.power_label),
-                            cardData.atk
-                        )
-                    )
-                    Text(
-                        String.format(
-                            stringResource(R.string.toughness_label),
-                            cardData.def
-                        )
-                    )
-                }
+                CardInfoBox(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    infoType = stringResource(R.string.power_label),
+                    infoData = cardData.atk
+                )
+            }
+
+            if (cardData.def != null) {
+                CardInfoBox(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    infoType = stringResource(R.string.toughness_label),
+                    infoData = cardData.def
+                )
             }
         }
     }
@@ -1167,7 +1156,7 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
 
 @Composable
 fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: String,
-                icons: Array<String>? = null, split: Float = 0.4f) {
+                icons: CharArray? = null, split: Float = 0.4f) {
     Card(
         modifier = modifier
     ) {
@@ -1182,8 +1171,13 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
             }
             Box(modifier = Modifier.weight(1-split).background(colorResource(R.color.gray))) {
                 if (icons != null) {
-                    Text(modifier = Modifier.padding(start = 5.dp),
-                        text = icons[0])
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        for (icon in icons) {
+                            Image(painter = painterResource(mapMTGColorToIcon(icon)),
+                                contentDescription = icon.toString(),
+                                modifier = Modifier.size(24.dp))
+                        }
+                    }
                 } else {
                     Text(modifier = Modifier.padding(start = 5.dp),
                         text = infoData)

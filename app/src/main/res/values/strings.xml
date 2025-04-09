@@ -54,10 +54,10 @@
     <string name="atk_label">ATK:</string>
     <string name="def_label">DEF:</string>
     <string name="rarity_label">Rarity:</string>
-    <string name="cost_label">Cost: %1$s</string>
-    <string name="color_label">Color: %1$s</string>
-    <string name="power_label">Power: %1$s</string>
-    <string name="toughness_label">Toughness: %1$s</string>
+    <string name="cost_label">Cost:</string>
+    <string name="color_label">Color:</string>
+    <string name="power_label">Power:</string>
+    <string name="toughness_label">Toughness:</string>
     <string name="damage_label">Damage: %1$s</string>
     <string name="effect_label">Effect: %1$s</string>
     <string name="weakness_label">Weakness: %1$s %2$s</string>

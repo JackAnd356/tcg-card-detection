@@ -69,4 +69,23 @@ fun mapRarityToRibbon(rarity: String?): Int {
     }
 }
 
+fun mapMTGColorToIcon(color: Char): Int {
+    return when (color) {
+        'W' -> R.drawable.white_icon
+        'U' -> R.drawable.blue_icon
+        'B' -> R.drawable.black_icon
+        'R' -> R.drawable.red_icon
+        'G' -> R.drawable.green_icon
+        else -> R.drawable.colorless_icon
+    }
+}
+
+fun stripMTGColorString(colors: String): CharArray {
+    val filtered = colors.filterNot {
+        it.isWhitespace() || it == '{' || it == '}'
+    }
+
+    return filtered.toCharArray()
+}
+
 
