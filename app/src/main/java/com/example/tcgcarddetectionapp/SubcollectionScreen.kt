@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -32,10 +33,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -47,6 +51,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -63,9 +68,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalConfiguration
@@ -88,6 +95,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.Dialog
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.isDigitsOnly
@@ -144,8 +152,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var showDeletePopup by remember { mutableStateOf(false) }
     var showFilters by remember { mutableStateOf(false) }
     var filterList = remember { mutableStateListOf<(CardData) -> Boolean>()}
-    var listOfTypes = mutableListOf<String>()
+    var listOfTypes = remember {  mutableStateListOf<String>()}
+    var listOfAttributes = remember {  mutableStateListOf<String>()}
     var selectedTypeFilter by remember { mutableStateOf("") }
+    var selectedAttributeFilter by remember { mutableStateOf("") }
     var selectedMinQuantity by remember { mutableStateOf("") }
     var minQuantErr by remember { mutableStateOf(false) }
     var selectedMaxQuantity by remember { mutableStateOf("") }
@@ -164,6 +174,14 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     val screenHeight = LocalConfiguration.current.screenHeightDp
     val forceRecomposeState = rememberUpdatedState(refreshFlag)
     val backArrowSize = (screenHeight * 0.02)
+
+    if (!listOfTypes.contains("")) {
+        listOfTypes.add("")
+    }
+
+    if (!listOfAttributes.contains("")) {
+        listOfAttributes.add("")
+    }
 
 
     if (navWebsite != "") {
@@ -184,6 +202,12 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             }
             if (!cardData.contains(card) && card.game == game && filterFlag) {
                 cardData.add(card)
+                if (game == "yugioh" && !listOfTypes.contains(card.type!!)) {
+                    listOfTypes.add(card.type)
+                }
+                if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
+                    listOfAttributes.add(card.attribute)
+                }
             }
             else if (cardData.contains(card) && !filterFlag) {
                 cardData.removeAll(Collections.singleton(card))
@@ -225,10 +249,12 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 else if ((card.subcollections == null || !card.subcollections!!.contains(subcolInfo.subcollectionid)) && cardData.contains(card)) {
                     cardData.removeAll(Collections.singleton(card))
                 }
-
                 if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
-                    if (card.game == "yugioh") {
-                        listOfTypes.add(card.type!!)
+                    if (card.game == "yugioh" && !listOfTypes.contains(card.type!!)) {
+                        listOfTypes.add(card.type)
+                    }
+                    if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
+                        listOfAttributes.add(card.attribute)
                     }
                 }
             }
@@ -259,8 +285,11 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 }
 
                 if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
-                    if (card.game == "yugioh") {
-                        listOfTypes.add(card.type!!)
+                    if (card.game == "yugioh" && !listOfTypes.contains(card.type!!)) {
+                        listOfTypes.add(card.type)
+                    }
+                    if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
+                        listOfAttributes.add(card.attribute)
                     }
                 }
             }
@@ -499,11 +528,11 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     type = selectedTypeFilter,
                                     quantityMin = selectedMinQuantity,
                                     levelMin = selectedMinLevel,
-                                    priceRange = selectedPriceRange,
                                     quantityMax = selectedMaxQuantity,
                                     levelMax = selectedMaxLevel,
                                     priceMin = selectedMinPrice,
                                     priceMax = selectedMaxPrice,
+                                    attribute = selectedAttributeFilter,
                                 ).forEach {
                                         func ->
                                     filterList.add(func)
@@ -532,11 +561,11 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     type = selectedTypeFilter,
                                     quantityMin = selectedMinQuantity,
                                     levelMin = selectedMinLevel,
-                                    priceRange = selectedPriceRange,
                                     quantityMax = selectedMaxQuantity,
                                     levelMax = selectedMaxLevel,
                                     priceMin = selectedMinPrice,
                                     priceMax = selectedMaxPrice,
+                                    attribute = selectedAttributeFilter,
                                 ).forEach {
                                         func ->
                                     filterList.add(func)
@@ -565,50 +594,112 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                         type = selectedTypeFilter,
                                         quantityMin = selectedMinQuantity,
                                         levelMin = selectedMinLevel,
-                                        priceRange = selectedPriceRange,
                                         quantityMax = selectedMaxQuantity,
                                         levelMax = selectedMaxLevel,
                                         priceMin = selectedMinPrice,
                                         priceMax = selectedMaxPrice,
+                                        attribute = selectedAttributeFilter,
                                     ).forEach {
                                             func ->
                                         filterList.add(func)
                                     }
                                 }
-                                DropdownMenu(
-                                    expanded = typeExpanded,
-                                    onDismissRequest = {
-                                        typeExpanded = false
-                                    }
+                                DropdownSelectorFilter(
+                                    label = "Type",
+                                    data = 1,
+                                    options = listOfTypes.toList(),
+                                    onSelectedValChange = {
+                                        selectedTypeFilter = it
+                                    },
                                 ) {
-                                    listOfTypes.forEach { type ->
-                                        DropdownMenuItem(
-                                            text = { Text(type) },
-                                            onClick = {
-                                                selectedTypeFilter = type
-                                                filterList.clear()
-                                                recalculateFilterList(
-                                                    type = selectedTypeFilter,
-                                                    quantityMin = selectedMinQuantity,
-                                                    levelMin = selectedMinLevel,
-                                                    priceRange = selectedPriceRange,
-                                                    quantityMax = selectedMaxQuantity,
-                                                    levelMax = selectedMaxLevel,
-                                                    priceMin = selectedMinPrice,
-                                                    priceMax = selectedMaxPrice,
-                                                ).forEach { func ->
-                                                    filterList.add { func(it) }
-                                                }
-                                            }
-                                        )
+                                    filterList.clear()
+                                    recalculateFilterList(
+                                        type = selectedTypeFilter,
+                                        quantityMin = selectedMinQuantity,
+                                        levelMin = selectedMinLevel,
+                                        quantityMax = selectedMaxQuantity,
+                                        levelMax = selectedMaxLevel,
+                                        priceMin = selectedMinPrice,
+                                        priceMax = selectedMaxPrice,
+                                        attribute = selectedAttributeFilter,
+                                    ).forEach {
+                                            func ->
+                                        filterList.add(func)
+                                    }
+                                }
+                                DropdownSelectorFilter(
+                                    label = "Attribute",
+                                    data = 1,
+                                    options = listOfAttributes.toList(),
+                                    onSelectedValChange = {
+                                        selectedAttributeFilter = it
+                                    },
+                                ) {
+                                    filterList.clear()
+                                    recalculateFilterList(
+                                        type = selectedTypeFilter,
+                                        quantityMin = selectedMinQuantity,
+                                        levelMin = selectedMinLevel,
+                                        quantityMax = selectedMaxQuantity,
+                                        levelMax = selectedMaxLevel,
+                                        priceMin = selectedMinPrice,
+                                        priceMax = selectedMaxPrice,
+                                        attribute = selectedAttributeFilter,
+                                    ).forEach {
+                                            func ->
+                                        filterList.add(func)
                                     }
                                 }
                             }
                             else if (game == "mtg") {
-
+                                DropdownSelectorFilter(
+                                    label = "Color",
+                                    data = 1,
+                                    options = listOfAttributes.toList(),
+                                    onSelectedValChange = {
+                                        selectedAttributeFilter = it
+                                    },
+                                ) {
+                                    filterList.clear()
+                                    recalculateFilterList(
+                                        type = selectedTypeFilter,
+                                        quantityMin = selectedMinQuantity,
+                                        levelMin = selectedMinLevel,
+                                        quantityMax = selectedMaxQuantity,
+                                        levelMax = selectedMaxLevel,
+                                        priceMin = selectedMinPrice,
+                                        priceMax = selectedMaxPrice,
+                                        attribute = selectedAttributeFilter,
+                                    ).forEach {
+                                            func ->
+                                        filterList.add(func)
+                                    }
+                                }
                             }
                             else if (game == "pokemon") {
-
+                                DropdownSelectorFilter(
+                                    label = "Type",
+                                    data = 1,
+                                    options = listOfAttributes.toList(),
+                                    onSelectedValChange = {
+                                        selectedAttributeFilter = it
+                                    },
+                                ) {
+                                    filterList.clear()
+                                    recalculateFilterList(
+                                        type = selectedTypeFilter,
+                                        quantityMin = selectedMinQuantity,
+                                        levelMin = selectedMinLevel,
+                                        quantityMax = selectedMaxQuantity,
+                                        levelMax = selectedMaxLevel,
+                                        priceMin = selectedMinPrice,
+                                        priceMax = selectedMaxPrice,
+                                        attribute = selectedAttributeFilter,
+                                    ).forEach {
+                                            func ->
+                                        filterList.add(func)
+                                    }
+                                }
                             }
                         }
                     }
@@ -1445,7 +1536,7 @@ fun CardPriceComponent(cardData: CardData, navWebsite: (String) -> Unit) {
                 )
             )
             Image(modifier = Modifier.size(25.dp, 25.dp),
-                painter = painterResource(R.drawable.tcg_player_icon),
+                painter = painterResource(R.drawable.templogo),
                 contentDescription = stringResource(R.string.tcgplayer_label),
             )
         }
@@ -1595,6 +1686,72 @@ fun MinMaxDoubleComponent(minVal: String,
                 },
                 isError = maxError
             )
+        }
+    }
+}
+
+@Composable
+fun DropdownSelectorFilter(label: String, data: Int,
+                           options: List<String>,
+                           onSelectedValChange: (String) -> Unit,
+                           modifier: Modifier = Modifier,
+                           recalculateFilter: () -> Unit) {
+    var mExpanded by remember { mutableStateOf(false) }
+    var mSelectedText by remember { mutableStateOf(options[data - 1]) }
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    val icon = if (mExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+    Card(
+        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+        border = BorderStroke(1.dp, Color.Black),
+        shape = RoundedCornerShape(corner = CornerSize(0.dp)),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(70.dp)
+            .requiredHeight(70.dp)) {
+        Row {
+            Text(
+                text = label,
+                fontSize = 20.sp,
+                lineHeight = 50.sp,
+                textAlign = TextAlign.Left
+            )
+            Spacer(Modifier.weight(1f))
+            Column {
+                OutlinedTextField(
+                    value = mSelectedText,
+                    onValueChange = { mSelectedText = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            // This value is used to assign to
+                            // the DropDown the same width
+                            mTextFieldSize = coordinates.size.toSize()
+                        },
+                    trailingIcon = {
+                        Icon(icon,"contentDescription",
+                            Modifier.clickable { mExpanded = !mExpanded })
+                    }
+                )
+                DropdownMenu(
+                    expanded = mExpanded,
+                    onDismissRequest = {mExpanded = false}
+                ) {
+                    options.forEachIndexed{ index, optionLabel ->
+                        DropdownMenuItem(
+                            onClick = {
+                                mSelectedText = optionLabel
+                                onSelectedValChange(optionLabel)
+                                recalculateFilter()
+                                mExpanded = false
+                            },
+                            text = {Text(optionLabel)}
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -1858,10 +2015,20 @@ fun saveToSubcollectionPost(card: CardData, userid: String, subcollection: Strin
     })
 }
 
-fun recalculateFilterList(type: String, quantityMin: String, levelMin: String, priceRange: Int, quantityMax: String, levelMax: String, priceMin: String, priceMax: String): MutableList<(CardData) -> Boolean> {
+fun recalculateFilterList(type: String,
+                          quantityMin: String,
+                          levelMin: String,
+                          quantityMax: String,
+                          levelMax: String,
+                          priceMin: String,
+                          priceMax: String,
+                          attribute: String): MutableList<(CardData) -> Boolean> {
     var ret = mutableListOf<(CardData) -> Boolean>()
     if (type != "") {
         ret.add({it.type == type})
+    }
+    if (attribute != "") {
+        ret.add({it.attribute != null && it.attribute == attribute})
     }
     if (quantityMin != "" && (quantityMax == "" || quantityMin.toInt() < quantityMax.toInt())) {
         ret.add({it.quantity >= quantityMin.toInt()})

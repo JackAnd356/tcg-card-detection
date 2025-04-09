@@ -1,14 +1,20 @@
 ﻿import cv2 as cv
 import numpy as np
 import imutils
+import easyocr
+from fuzzywuzzy import fuzz
+import os
 
-from Cards import flattener
+from Cards import flattener, process_image as pi
 
-img_list = ['Call_Of_The_Haunted', 'Deskbot_007', 'Dragon_Capture_Jar', 'Fighting_Spirit', 'Gouki_Suprex', 'Gouki_Thunder_Ogre', 'Red_Dragon_Archfiend', 'The_One_Ring', 'Tynamo']
+# Get all image file names in the 'images' folder
+supported_extensions = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp')
+img_list = [f for f in os.listdir('./images') if f.lower().endswith(supported_extensions)]
+img_list.sort()  # Optional: sort files alphabetically
 img_index = 0  # Start with the first image
 
 def process_image():
-    img = cv.imread(f'./images/{img_list[img_index]}.jpg')
+    img = cv.imread(f'./images/{img_list[img_index]}')
     if img is None:
         print(f"Error: File {img_list[img_index]} not found!")
         return
@@ -73,8 +79,15 @@ def process_image():
     # Convert Edges to BGR for Display
     edges_colored = cv.cvtColor(edges, cv.COLOR_GRAY2BGR)
     display = np.hstack((img_display, edges_colored))
+
+    freshImg = cv.imread(f'./images/{img_list[img_index]}')
     
+    freshImg = imutils.resize(freshImg, height=640)
+
     
+    cardInfo = pi(freshImg, 1, 1)
+    
+    print(cardInfo)
 
     cv.imshow('Image and Edge Detection', testFlattenImage_RGB)
 
