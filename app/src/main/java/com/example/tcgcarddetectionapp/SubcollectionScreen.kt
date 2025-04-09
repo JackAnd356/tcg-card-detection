@@ -1536,7 +1536,7 @@ fun CardPriceComponent(cardData: CardData, navWebsite: (String) -> Unit) {
                 )
             )
             Image(modifier = Modifier.size(25.dp, 25.dp),
-                painter = painterResource(R.drawable.templogo),
+                painter = painterResource(R.drawable.tcg_player_icon),
                 contentDescription = stringResource(R.string.tcgplayer_label),
             )
         }
