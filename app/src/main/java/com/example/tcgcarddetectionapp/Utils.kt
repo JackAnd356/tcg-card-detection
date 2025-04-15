@@ -80,12 +80,28 @@ fun mapMTGColorToIcon(color: Char): Int {
     }
 }
 
-fun stripMTGColorString(colors: String): CharArray {
+fun stripColorString(colors: String): CharArray {
     val filtered = colors.filterNot {
-        it.isWhitespace() || it == '{' || it == '}'
+        it.isWhitespace() || it == '{' || it == '}' || it == ','
     }
 
     return filtered.toCharArray()
+}
+
+fun mapPokemonTypeToIcon(type: String): Int {
+    return when (type) {
+        "Normal" -> R.drawable.normal_energy_icon
+        "Dark" -> R.drawable.dark_energy_icon
+        "Electric" -> R.drawable.electric_energy_icon
+        "Fairy" -> R.drawable.fairy_energy_icon
+        "Fighting" -> R.drawable.fighting_energy_icon
+        "Fire" -> R.drawable.fire_energy_icon
+        "Grass" -> R.drawable.grass_energy_icon
+        "Psychic" -> R.drawable.psychic_energy_icon
+        "Metal" -> R.drawable.steel_energy_icon
+        "Water" -> R.drawable.water_energy_icon
+        else -> R.drawable.normal_energy_icon
+    }
 }
 
 

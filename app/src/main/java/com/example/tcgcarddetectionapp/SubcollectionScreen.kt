@@ -13,6 +13,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,6 +92,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -310,7 +312,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             Box(modifier = Modifier
                 .clickable(
                     onClick = navBack,
-                    onClickLabel = "Back To Collection Manager"
+                    onClickLabel = "Back To Collection Manager",
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    enabled = true
                 )
                 .width((backArrowSize * 2).dp)
                 .padding(top = 18.dp)) {
@@ -1085,7 +1090,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                     modifier = Modifier.padding(vertical = 10.dp),
                     infoType = stringResource(R.string.cost_label),
                     infoData = "",
-                    icons = stripMTGColorString(cardData.cost)
+                    icons = stripColorString(cardData.cost)
                 )
             }
 
@@ -1120,7 +1125,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
 @Composable
 fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Row(modifier = modifier) {
-        Column {
+        Column(modifier = Modifier.weight(.4f)) {
             if (cardData.image != "nocardimage" && cardData.image != null) {
                 val decodedString = Base64.decode(cardData.image!!, 0)
                 val img =
@@ -1140,27 +1145,21 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                 )
             }
             Text(cardData.cardname)
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_id_label),
-                    cardData.cardid
-                ),
-                fontSize = 10.sp,
-                lineHeight = 15.sp,
+            CardInfoBox(
+                modifier = Modifier.padding(vertical = 10.dp),
+                infoType = stringResource(R.string.card_id_label),
+                infoData = cardData.cardid
             )
-            Text(
-                text = String.format(
-                    stringResource(R.string.card_setcode_label),
-                    cardData.setcode
-                ),
-                fontSize = 10.sp,
-                lineHeight = 15.sp,
+            CardInfoBox(
+                modifier = Modifier.padding(bottom = 10.dp),
+                infoType = stringResource(R.string.card_setcode_label),
+                infoData = cardData.setcode
             )
-            Text(
-                text = String.format(stringResource(R.string.hp), cardData.hp),
-                fontSize = 10.sp,
-                lineHeight = 15.sp,
-            )
+            if (cardData.hp != null) {
+                CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
+                    infoType = stringResource(R.string.hp),
+                    infoData = cardData.hp)
+            }
             cardData.weaknesses!!.forEach { weakness ->
                 Text(
                     text = String.format(
@@ -1172,17 +1171,17 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                     lineHeight = 15.sp,
                 )
             }
-            Text(
-                text = String.format(
-                    stringResource(R.string.retreat),
-                    arrToPrintableString(cardData.retreat!!)
-                ),
-                fontSize = 10.sp,
-                lineHeight = 15.sp,
-            )
+            if (cardData.retreat != null) {
+                CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
+                    infoType = stringResource(R.string.retreat),
+                    icons = cardData.retreat,
+                    split = .4f,
+                    iconSize = 18.dp)
+            }
+
 
         }
-        Column {
+        Column(modifier = Modifier.weight(.6f)) {
             Text(stringResource(R.string.price_header))
             Text(
                 String.format(
@@ -1275,6 +1274,42 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
                 }
             }
         }
+    }
+}
+
+@Composable
+fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
+                split: Float = .4f, iconSize: Dp = 24.dp
+) {
+    Card(
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+        ) {
+            Box(modifier = Modifier.weight(split).background(colorResource(R.color.textLightGrey))) {
+                Text(
+                    modifier = Modifier.padding(start = 5.dp),
+                    text = infoType,
+                )
+            }
+            Box(modifier = Modifier.weight(1-split).background(colorResource(R.color.gray))) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    for (icon in icons) {
+                        Image(painter = painterResource(mapPokemonTypeToIcon(icon)),
+                            contentDescription = icon,
+                            modifier = Modifier.size(iconSize))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
+    Column(modifier = modifier) {
+
     }
 }
 
