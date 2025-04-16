@@ -447,6 +447,7 @@ def ygoprodeck_to_card_data(ygoCard, setcode):
     cardData["description"] = ygoCard["description"]
     cardData["atk"] = ygoCard["atk"]
     cardData["def"] = ygoCard["def"]
+    cardData["frameType"] = ygoCard["frameType"]
     setname = ''
     rarities = []
     for set in ygoCard["card_sets"]:
