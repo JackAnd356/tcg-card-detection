@@ -33,7 +33,7 @@ data class CardData(
 ) {
     override fun equals(other: Any?): Boolean {
         if (other !is CardData) return false
-        return this.cardname == other.cardname && this.cardid == other.cardid && this.setcode == other.setcode
+        return this.cardname == other.cardname && this.cardid == other.cardid && this.setcode == other.setcode && this.rarity == other.rarity
     }
 
     override fun hashCode(): Int {
