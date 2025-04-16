@@ -624,6 +624,8 @@ def create_app():
                     payload['atk'] = clientUserInfo['atk']
                 if "def" in clientUserInfo:    
                     payload['def'] = clientUserInfo['def']
+                if "frameType" in clientUserInfo:
+                    payload["frameType"] = clientUserInfo["frameType"]
             elif payload['game'] == 'mtg':
                 if "cost" in clientUserInfo:
                     payload['cost'] = clientUserInfo['cost']
