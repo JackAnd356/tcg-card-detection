@@ -46,6 +46,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
@@ -107,6 +108,7 @@ import com.example.tcgcarddetectionapp.models.GenericSuccessErrorResponseModel
 import com.example.tcgcarddetectionapp.models.SaveToSubcollectionRequestModel
 import com.example.tcgcarddetectionapp.models.SaveToSubcollectionResponseModel
 import com.example.tcgcarddetectionapp.models.SubcollectionInfo
+import com.example.tcgcarddetectionapp.models.Weakness
 import com.example.tcgcarddetectionapp.ui.theme.TCGCardDetectionAppTheme
 import retrofit2.Call
 import retrofit2.Callback
@@ -438,7 +440,9 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             }
 
             if(!allCardsFlag) {
-                Row(modifier = Modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth(.9f)
+                    .align(Alignment.CenterHorizontally)) {
                     Button(
                         shape = RoundedCornerShape(10),
                         modifier = Modifier,
@@ -454,17 +458,24 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 }
             }
 
-            Row(modifier = Modifier.fillMaxWidth(.9f).align(Alignment.CenterHorizontally),
+            Row(modifier = Modifier
+                .fillMaxWidth(.9f)
+                .align(Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically) {
                 TextField(
-                    modifier = Modifier.weight(.75f).padding(end = 5.dp).height(26.dp),
+                    modifier = Modifier
+                        .weight(.75f)
+                        .padding(end = 5.dp)
+                        .height(26.dp),
                     value = searchTerm,
                     onValueChange = { searchTerm = it },
                     singleLine = true,
                     label = { Text(stringResource(R.string.search_label)) }
                 )
                 Button(
-                    modifier = Modifier.weight(.25f).height(50.dp),
+                    modifier = Modifier
+                        .weight(.25f)
+                        .height(50.dp),
                     shape = if (!showFilters) RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
                             else RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp),
                     onClick = {
@@ -508,7 +519,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     }
                 }
                 if (showFilters) {
-                    Column(modifier = Modifier.fillMaxWidth(.9f)
+                    Column(modifier = Modifier
+                        .fillMaxWidth(.9f)
                         .clip(RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp))
                         .background(color = colorResource(R.color.darkGray)),
                         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -523,7 +535,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 onMinErrChange = { minQuantErr = it },
                                 maxError = maxQuantErr,
                                 onMaxErrChange = { maxQuantErr = it },
-                                modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
                                     .background(colorResource(R.color.darkGray))
                                     .padding(5.dp)
                                     .weight(.48f),
@@ -555,7 +568,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 minError = minPriceErr,
                                 onMinErrChange = { minPriceErr = it },
                                 maxError = maxPriceErr,
-                                modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
                                     .background(Color.White)
                                     .padding(5.dp)
                                     .weight(.48f),
@@ -589,7 +603,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     onMinErrChange = { minLevelErr = it },
                                     maxError = maxLevelErr,
                                     onMaxErrChange = { maxLevelErr = it },
-                                    modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(10.dp))
                                         .background(Color.White)
                                         .padding(5.dp)
                                         .fillMaxWidth(.9f)
@@ -984,13 +999,17 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
             }
             Text(cardData.cardname)
             CardPriceComponent(cardData, navWebsite)
-            CardInfoBox(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+            CardInfoBox(modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp),
                 infoType = stringResource(R.string.card_id_label),
                 infoData = cardData.cardid,
                 split = .3f
             )
 
-            CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+            CardInfoBox(modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 5.dp),
                 infoType = stringResource(R.string.card_setcode_label),
                 infoData = cardData.setcode,
                 split = .3f)
@@ -1007,38 +1026,50 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
             }
 
             if (cardData.level != null) {
-                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                CardInfoBox(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
                     infoType = stringResource(R.string.level_label),
                     infoData = cardData.level)
             }
 
             if (cardData.attribute != null) {
-                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                CardInfoBox(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
                     infoType = stringResource(R.string.attribute_label),
                     infoData = cardData.attribute)
             }
 
             if (cardData.type != null) {
-                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                CardInfoBox(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
                     infoType = stringResource(R.string.type_label),
                     infoData = cardData.type)
             }
 
             if (cardData.atk != null) {
-                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                CardInfoBox(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
                     infoType = stringResource(R.string.atk_label),
                     infoData = cardData.atk)
             }
 
             if (cardData.def != null) {
-                CardInfoBox(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                CardInfoBox(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 5.dp),
                     infoType = stringResource(R.string.def_label),
                     infoData = cardData.def)
             }
 
             if (cardData.rarity != null) {
                 CardInfoBox(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 5.dp),
                     infoType = stringResource(R.string.rarity_label),
                     infoData = cardData.rarity!!,
                 )
@@ -1050,7 +1081,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
-    Row(modifier = modifier) {
+    Row(modifier = modifier.padding(5.dp)) {
         Column(modifier = Modifier.weight(.4f)) {
             if (cardData.image != "nocardimage" && cardData.image != null) {
                 val decodedString = Base64.decode(cardData.image!!, 0)
@@ -1124,7 +1155,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
 @OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
-    Row(modifier = modifier) {
+    Row(modifier = modifier.padding(5.dp)) {
         Column(modifier = Modifier.weight(.4f)) {
             if (cardData.image != "nocardimage" && cardData.image != null) {
                 val decodedString = Base64.decode(cardData.image!!, 0)
@@ -1144,104 +1175,52 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                         .size(120.dp, 200.dp)
                 )
             }
-            Text(cardData.cardname)
+            Row {
+                Text(cardData.cardname)
+                if (cardData.attribute != null) {
+                    Image(painter = painterResource(mapPokemonTypeToIcon(cardData.attribute)),
+                        contentDescription = cardData.attribute,
+                        modifier = Modifier.size(24.dp))
+                }
+            }
+            Text(String.format(stringResource(R.string.pokemon_type_label), cardData.type))
+
+            CardPriceComponent(cardData, navWebsite)
+        }
+        Column(modifier = Modifier.weight(.6f)) {
             CardInfoBox(
                 modifier = Modifier.padding(vertical = 10.dp),
                 infoType = stringResource(R.string.card_id_label),
-                infoData = cardData.cardid
+                infoData = cardData.cardid,
+                split = .5f
             )
             CardInfoBox(
                 modifier = Modifier.padding(bottom = 10.dp),
                 infoType = stringResource(R.string.card_setcode_label),
-                infoData = cardData.setcode
+                infoData = cardData.setcode,
+                split = .5f
             )
             if (cardData.hp != null) {
                 CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
                     infoType = stringResource(R.string.hp),
-                    infoData = cardData.hp)
+                    infoData = cardData.hp,
+                    split = .5f)
             }
-            cardData.weaknesses!!.forEach { weakness ->
-                Text(
-                    text = String.format(
-                        stringResource(R.string.weakness_label),
-                        weakness.type,
-                        weakness.value
-                    ),
-                    fontSize = 10.sp,
-                    lineHeight = 15.sp,
-                )
+            if (cardData.weaknesses != null) {
+                CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
+                    weaknesses = cardData.weaknesses,
+                    split = .5f)
             }
             if (cardData.retreat != null) {
                 CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
                     infoType = stringResource(R.string.retreat),
                     icons = cardData.retreat,
-                    split = .4f,
-                    iconSize = 18.dp)
+                    split = .5f)
             }
 
-
-        }
-        Column(modifier = Modifier.weight(.6f)) {
-            Text(stringResource(R.string.price_header))
-            Text(
-                String.format(
-                    stringResource(R.string.card_price_label),
-                    cardData.price,
-                    "$"
-                )
-            )
-            Button(
-                onClick = {
-                    if (cardData.purchaseurl != null) {
-                        navWebsite(cardData.purchaseurl!!)
-                    }
-                }
-            ) {
-                Text(stringResource(R.string.tcgplayer_label))
-            }
-
-            Text(
-                String.format(
-                    stringResource(R.string.attribute_label),
-                    cardData.attribute
-                )
-            )
-
-            Text(String.format(stringResource(R.string.type_label), cardData.type))
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.Gray)
-            ) {
-                cardData.attacks!!.forEach { attack ->
-                    Text(
-                        String.format(
-                            stringResource(R.string.cost_label),
-                            arrToPrintableString(attack.cost)
-                        )
-                    )
-                    Text(
-                        String.format(
-                            stringResource(R.string.card_name_label),
-                            attack.name
-                        )
-                    )
-                    Text(
-                        String.format(
-                            stringResource(R.string.damage_label),
-                            attack.damage
-                        )
-                    )
-                    if (attack.text != null) {
-                        Text(
-                            String.format(
-                                stringResource(R.string.effect_label),
-                                attack.text
-                            )
-                        )
-                    }
-                }
-            }
         }
     }
+    PokemonAttackBox(cardData = cardData)
 }
 
 @Composable
@@ -1253,13 +1232,17 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
         Row(
             modifier = Modifier
         ) {
-            Box(modifier = Modifier.weight(split).background(colorResource(R.color.textLightGrey))) {
+            Box(modifier = Modifier
+                .weight(split)
+                .background(colorResource(R.color.textLightGrey))) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
                     text = infoType,
                 )
             }
-            Box(modifier = Modifier.weight(1-split).background(colorResource(R.color.gray))) {
+            Box(modifier = Modifier
+                .weight(1 - split)
+                .background(colorResource(R.color.gray))) {
                 if (icons != null) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         for (icon in icons) {
@@ -1279,7 +1262,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
 
 @Composable
 fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
-                split: Float = .4f, iconSize: Dp = 24.dp
+                text: String? = null, split: Float = .4f, iconSize: Dp = 24.dp
 ) {
     Card(
         modifier = modifier
@@ -1287,13 +1270,17 @@ fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
         Row(
             modifier = Modifier
         ) {
-            Box(modifier = Modifier.weight(split).background(colorResource(R.color.textLightGrey))) {
+            Box(modifier = Modifier
+                .weight(split)
+                .background(colorResource(R.color.textLightGrey))) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
                     text = infoType,
                 )
             }
-            Box(modifier = Modifier.weight(1-split).background(colorResource(R.color.gray))) {
+            Box(modifier = Modifier
+                .weight(1 - split)
+                .background(colorResource(R.color.gray))) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     for (icon in icons) {
                         Image(painter = painterResource(mapPokemonTypeToIcon(icon)),
@@ -1307,9 +1294,75 @@ fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
 }
 
 @Composable
-fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
-    Column(modifier = modifier) {
+fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
+                split: Float = .4f, iconSize: Dp = 24.dp) {
+    Card(
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+        ) {
+            Box(modifier = Modifier
+                .weight(split)
+                .background(colorResource(R.color.textLightGrey))) {
+                Text(
+                    modifier = Modifier.padding(start = 5.dp),
+                    text = "Weakness:",
+                )
+            }
+            Box(modifier = Modifier
+                .weight(1 - split)
+                .background(colorResource(R.color.gray))) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    for (weakness in weaknesses) {
+                        Image(painter = painterResource(mapPokemonTypeToIcon(weakness.type)),
+                            contentDescription = weakness.type,
+                            modifier = Modifier.size(iconSize))
+                        Text(
+                            text = weakness.value
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
 
+@Composable
+fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
+    Card(modifier = modifier
+        .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+        .padding(5.dp),
+        colors = CardColors(containerColor = Color.White, contentColor = Color.Black,
+            disabledContainerColor = Color.White, disabledContentColor = Color.Black)
+    ) {
+        cardData.attacks!!.forEach { attack ->
+            Row(modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                Row {
+                    for (icon in attack.cost) {
+                        Image(painter = painterResource(mapPokemonTypeToIcon(icon)),
+                            contentDescription = icon,
+                            modifier = Modifier.size(24.dp))
+                    }
+                    Text(modifier = Modifier,
+                        text = attack.name,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+
+                Text(
+                    text = attack.damage,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            if (attack.text != null) {
+                Text(
+                    text = attack.text
+                )
+            }
+        }
     }
 }
 
@@ -1598,7 +1651,9 @@ fun MinMaxIntComponent(minVal: String,
             modifier = Modifier.fillMaxWidth()
         ) {
             FilterTextfield(
-                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                modifier = Modifier
+                    .weight(.3f)
+                    .padding(horizontal = 5.dp),
                 label = stringResource(R.string.min),
                 value = minVal,
                 onValueChange = {
@@ -1620,7 +1675,9 @@ fun MinMaxIntComponent(minVal: String,
 
             Spacer(modifier = Modifier.weight(.09f))
             Column(
-                modifier = Modifier.weight(.11f).height(30.dp),
+                modifier = Modifier
+                    .weight(.11f)
+                    .height(30.dp),
                 verticalArrangement = Arrangement.Center
             ) {
                 Spacer(modifier = Modifier.weight(.5f))
@@ -1631,7 +1688,9 @@ fun MinMaxIntComponent(minVal: String,
             }
 
             FilterTextfield(
-                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                modifier = Modifier
+                    .weight(.3f)
+                    .padding(horizontal = 5.dp),
                 label = stringResource(R.string.max),
                 value = maxVal,
                 onValueChange = {
@@ -1673,7 +1732,9 @@ fun MinMaxDoubleComponent(minVal: String,
             verticalAlignment = Alignment.CenterVertically
         ) {
             FilterTextfield(
-                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                modifier = Modifier
+                    .weight(.3f)
+                    .padding(horizontal = 5.dp),
                 label = stringResource(R.string.min),
                 value = minVal,
                 onValueChange = {
@@ -1693,7 +1754,9 @@ fun MinMaxDoubleComponent(minVal: String,
 
             Spacer(modifier = Modifier.weight(.09f))
             Column(
-                modifier = Modifier.weight(.11f).height(30.dp),
+                modifier = Modifier
+                    .weight(.11f)
+                    .height(30.dp),
                 verticalArrangement = Arrangement.Center
             ) {
                 Spacer(modifier = Modifier.weight(.5f))
@@ -1704,7 +1767,9 @@ fun MinMaxDoubleComponent(minVal: String,
             }
 
             FilterTextfield(
-                modifier = Modifier.weight(.3f).padding(horizontal = 5.dp),
+                modifier = Modifier
+                    .weight(.3f)
+                    .padding(horizontal = 5.dp),
                 label = stringResource(R.string.max),
                 value = maxVal,
                 onValueChange = {
@@ -1824,7 +1889,9 @@ fun AutoResizeText(
                 text = text,
                 style = style.copy(fontSize = textSize!!),
                 color = color,
-                modifier = Modifier.fillMaxSize().padding(5.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp),
                 softWrap = true,
             )
         }
