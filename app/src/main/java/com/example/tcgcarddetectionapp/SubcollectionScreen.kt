@@ -2060,7 +2060,7 @@ fun recalculateFilterList(type: String,
 fun sortSubcollection(subCol: MutableList<CardData> , game: String): MutableList<CardData> {
     if (game == "yugioh") {
         return subCol.sortedWith( compareBy<CardData> {
-            yugiohSort(it.type!!)
+            yugiohSort(it.frameType!!)
         }.thenBy { it.cardname }).toMutableList()
     }
     return subCol.sortedWith( compareBy<CardData> {
@@ -2068,11 +2068,11 @@ fun sortSubcollection(subCol: MutableList<CardData> , game: String): MutableList
     }.thenBy { it.cardname }).toMutableList()
 }
 
-fun yugiohSort(type: String): Int {
-    if (type.contains(" Spell")) {
+fun yugiohSort(frameType: String): Int {
+    if (frameType == "spell") {
         return 2
     }
-    else if (type.contains(" Trap")) {
+    else if (frameType == "trap") {
         return 3
     }
     else {

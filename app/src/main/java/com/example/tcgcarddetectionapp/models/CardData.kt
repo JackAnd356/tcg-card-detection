@@ -29,6 +29,7 @@ data class CardData(
     val attacks: Array<Attack>? = null,
     var added: MutableState<Boolean> = mutableStateOf(true),
     var purchaseurl: String? = null,
+    val frameType: String? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (other !is CardData) return false
