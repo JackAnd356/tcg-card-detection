@@ -495,50 +495,100 @@ fun EditSubcollectionPopup(
     var name by remember { mutableStateOf(subcollection.name)}
     var physloc by remember { mutableStateOf(subcollection.physLoc) }
     var isDeck by remember { mutableStateOf(subcollection.isDeck) }
+    val context = LocalContext.current
+    val error = stringResource(R.string.edit_subcollection_info_warning)
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = modifier
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
     ) {
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text(stringResource(R.string.collection_name_placeholder))}
-        )
-        TextField(
-            value = physloc,
-            onValueChange = { physloc = it },
-            label = { Text(stringResource(R.string.subcol_physloc_label))}
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Checkbox(
-                checked = isDeck,
-                onCheckedChange = { isDeck = it }
-            )
             Text(
-                stringResource(R.string.subcol_isdeck_label)
+                text = stringResource(R.string.edit_subcollection_info_title),
+                fontSize = 28.sp,
+                lineHeight = 40.sp,
+                textAlign = TextAlign.Center
             )
-        }
-        Row {
-            Button(
-                onClick = {
-                    subcollection.name = name
-                    subcollection.physLoc = physloc
-                    subcollection.isDeck = isDeck
-                    updateSubcollectionPost(subcollection)
-                    onCancel()
-                }
+
+            FilterTextfield(
+                modifier = Modifier.fillMaxWidth(.9f),
+                value = name,
+                onValueChange = { name = it },
+                label = stringResource(R.string.collection_name_placeholder),
+                isError = false
+            )
+
+            FilterTextfield(
+                modifier = Modifier.fillMaxWidth(.9f),
+                value = physloc,
+                onValueChange = { physloc = it },
+                label = stringResource(R.string.subcol_physloc_label),
+                isError = false
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(.9f),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(stringResource(R.string.save_button_label))
+                Checkbox(
+                    checked = isDeck,
+                    onCheckedChange = { isDeck = it }
+                )
+                Text(
+                    stringResource(R.string.subcol_isdeck_label)
+                )
             }
-            Button(
-                onClick = {
-                    onCancel()
-                }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(.9f),
             ) {
-                Text(stringResource(R.string.cancel_button_label))
+                Button(
+                    modifier = Modifier.weight(.45f),
+                    onClick = {
+                        onCancel()
+                    },
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonColors(
+                        containerColor = colorResource(R.color.gray),
+                        contentColor = Color.Black,
+                        disabledContainerColor = colorResource(R.color.gray),
+                        disabledContentColor = Color.Black
+                    )
+                ) {
+                    Text(stringResource(R.string.dismiss))
+                }
+
+                Spacer(modifier = Modifier.weight(.1f))
+
+                Button(
+                    modifier = Modifier.weight(.45f),
+                    onClick = {
+                        if (name != "") {
+                            subcollection.name = name
+                            subcollection.physLoc = physloc
+                            subcollection.isDeck = isDeck
+                            updateSubcollectionPost(subcollection)
+                            onCancel()
+                        } else {
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonColors(
+                        containerColor = colorResource(R.color.lightGreen),
+                        contentColor = Color.Black,
+                        disabledContainerColor = colorResource(R.color.lightGreen),
+                        disabledContentColor = Color.Black
+                    )
+                ) {
+                    Text(stringResource(R.string.save_button_label))
+                }
+
             }
         }
     }

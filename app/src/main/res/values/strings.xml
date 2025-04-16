@@ -111,4 +111,6 @@
     <string name="more_options">More Options</string>
     <string name="min">Min:</string>
     <string name="max">Max:</string>
+    <string name="edit_subcollection_info_title">Edit Collection Info</string>
+    <string name="edit_subcollection_info_warning">Name is required</string>
 </resources>
