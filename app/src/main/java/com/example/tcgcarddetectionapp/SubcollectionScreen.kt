@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
@@ -90,6 +91,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -116,6 +118,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Collections
+import java.util.Locale
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -466,7 +469,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     modifier = Modifier
                         .weight(.75f)
                         .padding(end = 5.dp)
-                        .height(26.dp),
+                        .height(60.dp)
+                        .heightIn(35.dp),
                     value = searchTerm,
                     onValueChange = { searchTerm = it },
                     singleLine = true,
@@ -491,7 +495,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 contentAlignment = Alignment.TopCenter) {
                 var filteredCardData = mutableListOf<CardData>()
                 cardData.forEach { card ->
-                    if (searchTerm in card.cardname) {
+                    if (searchTerm.uppercase() in card.cardname.uppercase()) {
                         filteredCardData.add(card)
                     }
                 }
