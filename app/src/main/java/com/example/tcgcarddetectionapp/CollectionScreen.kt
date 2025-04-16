@@ -249,7 +249,7 @@ fun CollectionScreen(gameName: String,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(subcollections) { subcollection ->
-                    if (subcollection.game == gameFilter && searchTerm in subcollection.name) {
+                    if (subcollection.game == gameFilter && searchTerm.uppercase() in subcollection.name.uppercase()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()

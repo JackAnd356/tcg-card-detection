@@ -23,17 +23,18 @@ fun <E> List<E>.remove(elem: E): List<E> {
 }
 
 fun updateSubcollectionInfo(subcolInfo: SubcollectionInfo, card: CardData, quantity: Int, adding: Boolean) {
+    val amt = card.subcollections!!.count { it == subcolInfo.subcollectionid}
     if (adding) {
-        if (subcolInfo.totalValue != null) subcolInfo.totalValue = subcolInfo.totalValue!! + (card.price * quantity)
-        else subcolInfo.totalValue = (card.price * quantity)
+        if (subcolInfo.totalValue != null) subcolInfo.totalValue = subcolInfo.totalValue!! + (card.price * amt)
+        else subcolInfo.totalValue = (card.price * amt)
 
-        if (subcolInfo.cardCount != null) subcolInfo.cardCount = subcolInfo.cardCount!! + quantity
-        else subcolInfo.cardCount = quantity
+        if (subcolInfo.cardCount != null) subcolInfo.cardCount = subcolInfo.cardCount!! + amt
+        else subcolInfo.cardCount = amt
     } else {
-        if (subcolInfo.totalValue != null) subcolInfo.totalValue = subcolInfo.totalValue!! - (card.price * quantity)
+        if (subcolInfo.totalValue != null) subcolInfo.totalValue = subcolInfo.totalValue!! - (card.price * amt)
         else println("Removing Card From Subcollection with no Price??")
 
-        if (subcolInfo.cardCount != null) subcolInfo.cardCount = subcolInfo.cardCount!! - quantity
+        if (subcolInfo.cardCount != null) subcolInfo.cardCount = subcolInfo.cardCount!! - amt
         else println("Removing Card from Empty Subcollection??")
     }
 }

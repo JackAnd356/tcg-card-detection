@@ -388,17 +388,18 @@ fun onUserSubColInfoChange(subColInfo: Array<SubcollectionInfo>, cardDataCollect
             subColInfo.forEach {
                     subCol ->
                 if (subCol.subcollectionid in card.subcollections!!) {
+                    val amt = card.subcollections!!.count { it == subCol.subcollectionid}
                     if (subCol.cardCount == null) {
-                        subCol.cardCount = card.quantity
+                        subCol.cardCount = amt
                     }
                     else {
-                        subCol.cardCount = subCol.cardCount!! + card.quantity
+                        subCol.cardCount = subCol.cardCount!! + amt
                     }
                     if (subCol.totalValue == null) {
-                        subCol.totalValue = (card.price * card.quantity)
+                        subCol.totalValue = (card.price * amt)
                     }
                     else {
-                        subCol.totalValue = subCol.totalValue!! + (card.price * card.quantity)
+                        subCol.totalValue = subCol.totalValue!! + (card.price * amt)
                     }
                 }
             }

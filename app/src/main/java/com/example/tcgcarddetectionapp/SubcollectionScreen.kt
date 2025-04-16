@@ -373,7 +373,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             Text(
                                 text = String.format(
                                     stringResource(R.string.total_value_label),
-                                    subcolInfo.totalValue,
+                                    subcolInfo.totalValue ?: 0.00,
                                     "$"
                                 ),
                                 fontSize = 15.sp,
@@ -432,7 +432,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         Text(
                             text = String.format(
                                 stringResource(R.string.total_cards_label),
-                                subcolInfo.cardCount
+                                subcolInfo.cardCount ?: 0
                             ),
                             fontSize = 15.sp,
                             lineHeight = 20.sp,
