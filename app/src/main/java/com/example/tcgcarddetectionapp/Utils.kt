@@ -105,4 +105,13 @@ fun mapPokemonTypeToIcon(type: String): Int {
     }
 }
 
+fun arrToPrintableString(arr: Array<String>): String {
+    var str = ""
+    arr.forEach {
+            itm ->
+        str += "$itm,"
+    }
+    return str
+}
+
 

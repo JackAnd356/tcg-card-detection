@@ -234,10 +234,13 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                 }
 
                 Button(onClick = {
-                    cards.forEach { card ->
-                        if (card.added.value) {
-                            addToCollectionPost(userid = userid, card = card, addToOverallCards = addToOverallCards)
-                            cardImagePost(card.cardid, card.game, {card.image = it})
+                    cards.forEach { cardData ->
+                        if (cardData.added.value) {
+                            addToCollectionPost(userid = userid, card = cardData, addToOverallCards = addToOverallCards)
+                            cardImagePost(cardData.cardid, cardData.game, {image, bitmap ->
+                                cardData.image = image
+                                cardData.imageBitmap = bitmap
+                            })
                         }
                     }
                     stage.value = Stages.PostConfirmation

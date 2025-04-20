@@ -26,6 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.Image
 import android.os.Bundle
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,7 +43,9 @@ import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -79,6 +84,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
 fun LoginScreen(onLoginNavigate: () -> Unit,
@@ -459,7 +466,10 @@ fun collectionPost(userid: String,
                 onUserCollectionChange(respData)
                 respData.forEach {
                     cardData ->
-                    cardImagePost(cardData.cardid, cardData.game, {cardData.image = it})
+                    cardImagePost(cardData.cardid, cardData.game, {image, bitmap ->
+                        cardData.image = image
+                        cardData.imageBitmap = bitmap
+                    })
                 }
                 subcollectionPost(userid, onUserSubColInfoChange, onLoginNavigate)
             }
@@ -500,7 +510,8 @@ fun subcollectionPost(userid: String,
     })
 }
 
-fun cardImagePost(cardid: String, game: String, setCardImage: (String) -> Unit) {
+@OptIn(ExperimentalEncodingApi::class)
+fun cardImagePost(cardid: String, game: String, setCardImage: (String, ImageBitmap?) -> Unit) {
     val retrofit = Retrofit.Builder()
         .baseUrl(api_url)
         .addConverterFactory(GsonConverterFactory.create())
@@ -514,14 +525,17 @@ fun cardImagePost(cardid: String, game: String, setCardImage: (String) -> Unit) 
         ) {
             val respData = response.body()
             if (respData != null && respData.image != null) {
-                setCardImage(respData.image)
+                val decodedString = Base64.decode(respData.image, 0)
+                val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                val resized = Bitmap.createScaledBitmap(img, 413, 602, true);
+                setCardImage(respData.image, img.asImageBitmap())
             }
         }
 
         override fun onFailure(call: Call<GetCardImageResponseModel>, t: Throwable) {
             t.printStackTrace()
             Log.d("ERROR", "Card " + cardid + " not loaded in")
-            setCardImage("nocardimage")
+            setCardImage("nocardimage", null)
         }
 
     } )

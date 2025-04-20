@@ -1,13 +1,8 @@
 package com.example.tcgcarddetectionapp
 
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.graphics.Paint.Align
 import android.net.Uri
 import android.util.Log
-import android.view.RoundedCorner
-import android.widget.Toast
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -61,6 +56,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,16 +65,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -87,12 +78,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -103,8 +93,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.Dialog
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.isDigitsOnly
+import coil3.compose.AsyncImage
 import com.example.tcgcarddetectionapp.models.AddRemoveCardModel
 import com.example.tcgcarddetectionapp.models.CardData
 import com.example.tcgcarddetectionapp.models.GenericSuccessErrorResponseModel
@@ -119,9 +109,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Collections
-import java.util.Locale
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
@@ -137,7 +124,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var searchTerm by remember { mutableStateOf("") }
     var showCardPopup by remember { mutableStateOf(false) }
     var showAllCardAddToSubcollection by remember { mutableStateOf(false) }
-    var currentFocusedCard by remember { mutableStateOf<CardData>(
+    var currentFocusedCard by remember { mutableStateOf(
         value = CardData(
             userid = "",
             cardid = "",
@@ -151,8 +138,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             cardname = ""
         ),
     ) }
-    val scrollstate = rememberScrollState()
-    var refreshFlag by remember { mutableStateOf(0) }
+    val scrollState = rememberScrollState()
+    var refreshFlag by remember { mutableIntStateOf(0) }
     var cardData = remember { mutableStateListOf<CardData>() }
     var navWebsite by remember { mutableStateOf("") }
     var optionsExpanded by remember { mutableStateOf(false) }
@@ -168,12 +155,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var minQuantErr by remember { mutableStateOf(false) }
     var selectedMaxQuantity by remember { mutableStateOf("") }
     var maxQuantErr by remember { mutableStateOf(false) }
-    var selectedPriceRange by remember { mutableStateOf(0) }
     var selectedMinLevel by remember { mutableStateOf("") }
     var minLevelErr by remember { mutableStateOf(false) }
     var selectedMaxLevel by remember { mutableStateOf("") }
     var maxLevelErr by remember { mutableStateOf(false) }
-    var typeExpanded by remember { mutableStateOf(false) }
     var selectedMinPrice by remember { mutableStateOf("") }
     var minPriceErr by remember { mutableStateOf(false) }
     var selectedMaxPrice by remember { mutableStateOf("") }
@@ -510,7 +495,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     modifier = Modifier.fillMaxWidth(.9f),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
-                    contentPadding = PaddingValues(bottom = 20.dp)
+                    contentPadding = PaddingValues(vertical = 20.dp)
                 ) {
                     items(filteredCardData) { cardInfo ->
                         CardImage(
@@ -597,23 +582,76 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             }
                         }
                         Column(modifier = Modifier.padding(vertical = 10.dp)) {
-                            if (game == "yugioh") {
-                                Row(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp)) {
-                                    MinMaxIntComponent(
-                                        minVal = selectedMinLevel,
-                                        maxVal = selectedMaxLevel,
-                                        onMinValChange = { selectedMinLevel = it },
-                                        onMaxValChange = { selectedMaxLevel = it },
-                                        label = stringResource(R.string.level_filter_label),
-                                        minError = minLevelErr,
-                                        onMinErrChange = { minLevelErr = it },
-                                        maxError = maxLevelErr,
-                                        onMaxErrChange = { maxLevelErr = it },
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .background(Color.White)
-                                            .padding(5.dp)
-                                            .weight(.48f)
+                            when (game) {
+                                "yugioh" -> {
+                                    Row(
+                                        modifier = Modifier.padding(
+                                            vertical = 10.dp,
+                                            horizontal = 5.dp
+                                        )
+                                    ) {
+                                        MinMaxIntComponent(
+                                            minVal = selectedMinLevel,
+                                            maxVal = selectedMaxLevel,
+                                            onMinValChange = { selectedMinLevel = it },
+                                            onMaxValChange = { selectedMaxLevel = it },
+                                            label = stringResource(R.string.level_filter_label),
+                                            minError = minLevelErr,
+                                            onMinErrChange = { minLevelErr = it },
+                                            maxError = maxLevelErr,
+                                            onMaxErrChange = { maxLevelErr = it },
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .background(Color.White)
+                                                .padding(5.dp)
+                                                .weight(.48f)
+                                        ) {
+                                            filterList.clear()
+                                            recalculateFilterList(
+                                                type = selectedTypeFilter,
+                                                quantityMin = selectedMinQuantity,
+                                                levelMin = selectedMinLevel,
+                                                quantityMax = selectedMaxQuantity,
+                                                levelMax = selectedMaxLevel,
+                                                priceMin = selectedMinPrice,
+                                                priceMax = selectedMaxPrice,
+                                                attribute = selectedAttributeFilter,
+                                            ).forEach { func ->
+                                                filterList.add(func)
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.weight(.04f))
+                                        DropdownSelectorFilter(
+                                            label = "Type",
+                                            data = 1,
+                                            options = listOfTypes.toList(),
+                                            onSelectedValChange = {
+                                                selectedTypeFilter = it
+                                            },
+                                            modifier = Modifier.weight(.48f)
+                                        ) {
+                                            filterList.clear()
+                                            recalculateFilterList(
+                                                type = selectedTypeFilter,
+                                                quantityMin = selectedMinQuantity,
+                                                levelMin = selectedMinLevel,
+                                                quantityMax = selectedMaxQuantity,
+                                                levelMax = selectedMaxLevel,
+                                                priceMin = selectedMinPrice,
+                                                priceMax = selectedMaxPrice,
+                                                attribute = selectedAttributeFilter,
+                                            ).forEach { func ->
+                                                filterList.add(func)
+                                            }
+                                        }
+                                    }
+                                    DropdownSelectorFilter(
+                                        label = "Attribute",
+                                        data = 1,
+                                        options = listOfAttributes.toList(),
+                                        onSelectedValChange = {
+                                            selectedAttributeFilter = it
+                                        },
                                     ) {
                                         filterList.clear()
                                         recalculateFilterList(
@@ -629,15 +667,41 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                             filterList.add(func)
                                         }
                                     }
-                                    Spacer(modifier = Modifier.weight(.04f))
+                                }
+
+                                "mtg" -> {
+                                    DropdownSelectorFilter(
+                                        label = "Color",
+                                        data = 1,
+                                        options = listOfAttributes.toList(),
+                                        onSelectedValChange = {
+                                            selectedAttributeFilter = it
+                                        },
+                                    ) {
+                                        filterList.clear()
+                                        recalculateFilterList(
+                                            type = selectedTypeFilter,
+                                            quantityMin = selectedMinQuantity,
+                                            levelMin = selectedMinLevel,
+                                            quantityMax = selectedMaxQuantity,
+                                            levelMax = selectedMaxLevel,
+                                            priceMin = selectedMinPrice,
+                                            priceMax = selectedMaxPrice,
+                                            attribute = selectedAttributeFilter,
+                                        ).forEach { func ->
+                                            filterList.add(func)
+                                        }
+                                    }
+                                }
+
+                                "pokemon" -> {
                                     DropdownSelectorFilter(
                                         label = "Type",
                                         data = 1,
-                                        options = listOfTypes.toList(),
+                                        options = listOfAttributes.toList(),
                                         onSelectedValChange = {
-                                            selectedTypeFilter = it
+                                            selectedAttributeFilter = it
                                         },
-                                        modifier = Modifier.weight(.48f)
                                     ) {
                                         filterList.clear()
                                         recalculateFilterList(
@@ -652,79 +716,6 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                         ).forEach { func ->
                                             filterList.add(func)
                                         }
-                                    }
-                                }
-                                DropdownSelectorFilter(
-                                    label = "Attribute",
-                                    data = 1,
-                                    options = listOfAttributes.toList(),
-                                    onSelectedValChange = {
-                                        selectedAttributeFilter = it
-                                    },
-                                ) {
-                                    filterList.clear()
-                                    recalculateFilterList(
-                                        type = selectedTypeFilter,
-                                        quantityMin = selectedMinQuantity,
-                                        levelMin = selectedMinLevel,
-                                        quantityMax = selectedMaxQuantity,
-                                        levelMax = selectedMaxLevel,
-                                        priceMin = selectedMinPrice,
-                                        priceMax = selectedMaxPrice,
-                                        attribute = selectedAttributeFilter,
-                                    ).forEach {
-                                            func ->
-                                        filterList.add(func)
-                                    }
-                                }
-                            }
-                            else if (game == "mtg") {
-                                DropdownSelectorFilter(
-                                    label = "Color",
-                                    data = 1,
-                                    options = listOfAttributes.toList(),
-                                    onSelectedValChange = {
-                                        selectedAttributeFilter = it
-                                    },
-                                ) {
-                                    filterList.clear()
-                                    recalculateFilterList(
-                                        type = selectedTypeFilter,
-                                        quantityMin = selectedMinQuantity,
-                                        levelMin = selectedMinLevel,
-                                        quantityMax = selectedMaxQuantity,
-                                        levelMax = selectedMaxLevel,
-                                        priceMin = selectedMinPrice,
-                                        priceMax = selectedMaxPrice,
-                                        attribute = selectedAttributeFilter,
-                                    ).forEach {
-                                            func ->
-                                        filterList.add(func)
-                                    }
-                                }
-                            }
-                            else if (game == "pokemon") {
-                                DropdownSelectorFilter(
-                                    label = "Type",
-                                    data = 1,
-                                    options = listOfAttributes.toList(),
-                                    onSelectedValChange = {
-                                        selectedAttributeFilter = it
-                                    },
-                                ) {
-                                    filterList.clear()
-                                    recalculateFilterList(
-                                        type = selectedTypeFilter,
-                                        quantityMin = selectedMinQuantity,
-                                        levelMin = selectedMinLevel,
-                                        quantityMax = selectedMaxQuantity,
-                                        levelMax = selectedMaxLevel,
-                                        priceMin = selectedMinPrice,
-                                        priceMax = selectedMaxPrice,
-                                        attribute = selectedAttributeFilter,
-                                    ).forEach {
-                                            func ->
-                                        filterList.add(func)
                                     }
                                 }
                             }
@@ -802,7 +793,6 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     }
 }
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun CardImage(
     cardData: CardData,
@@ -812,37 +802,35 @@ fun CardImage(
     allCardsFlag: Boolean,
     game: String
 ) {
+    val ribbon = mapRarityToRibbon(cardData.rarity)
+    val noCardImage = R.drawable.nocardimage
+    val cardImageNotLoadedText = stringResource(R.string.card_image_not_loaded_context)
+
     Box(modifier = modifier.clickable {
         setFocusedCard(cardData)
         showCardPopup()
     }) {
-        if (cardData.image != "nocardimage" && cardData.image != null) {
-            val decodedString = Base64.decode(cardData.image!!, 0)
-            val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-            val ribbon = painterResource(mapRarityToRibbon(cardData.rarity))
+        if (cardData.imageBitmap != null) {
             Box {
                 Image(
-                    bitmap = img.asImageBitmap(),
-                    contentDescription = "Card",
+                    bitmap = cardData.imageBitmap!!,
+                    contentDescription = cardData.cardname,
                     modifier = Modifier
-                        .size(120.dp, 200.dp)
                         .align(Alignment.Center)
                 )
                 if (game == "yugioh") {
-                    Image(
-                        painter = ribbon,
-                        contentDescription = "Rarity Ribbon",
+                    AsyncImage(
+                        model = ribbon,
+                        contentDescription = cardData.rarity,
                         modifier = Modifier
-                            .size(120.dp, 200.dp)
-                            .align(Alignment.TopCenter)
-                            .offset(y = (-12).dp)
+                            .align(Alignment.Center)
                     )
                 }
             }
         } else {
-            Image(
-                painter = painterResource(R.drawable.nocardimage),
-                contentDescription = stringResource(R.string.card_image_not_loaded_context),
+            AsyncImage(
+                model = noCardImage,
+                contentDescription = cardImageNotLoadedText,
                 modifier = Modifier.size(120.dp, 200.dp)
             )
         }
@@ -855,7 +843,7 @@ fun CardImage(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(y = (-5).dp)
+                    .offset(y = 5.dp)
                     .background(Color.Black.copy(alpha = 0.7f), shape = RoundedCornerShape(4.dp))
                     .padding(4.dp)
             )
@@ -970,121 +958,129 @@ fun CardPopup(cardData: CardData,
     }
 }
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
-    Row(modifier = modifier.padding(3.dp)) {
-        Column(modifier = Modifier.weight(.4f)) {
-            if (cardData.image != "nocardimage" && cardData.image != null) {
-                val decodedString = Base64.decode(cardData.image!!, 0)
-                val img =
-                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                Image(
-                    bitmap = img.asImageBitmap(),
-                    contentDescription = "Card",
-                    Modifier
-                        .size(120.dp, 200.dp)
+    Column(modifier = modifier.padding(3.dp)) {
+        Text(cardData.cardname)
+        Row(modifier = Modifier) {
+            Column(modifier = Modifier.weight(.4f)) {
+                if (cardData.imageBitmap != null) {
+                    Image(
+                        bitmap = cardData.imageBitmap!!,
+                        contentDescription = "Card",
+                        modifier = Modifier
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.nocardimage),
+                        contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                        modifier = Modifier
+                    )
+                }
+                CardPriceComponent(modifier = Modifier.padding(top = 10.dp, bottom = 5.dp),
+                    cardData = cardData, navWebsite = navWebsite)
+            }
+            Column(modifier = Modifier.weight(.6f)) {
+                CardInfoBox(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 5.dp),
+                    infoType = stringResource(R.string.card_id_label),
+                    infoData = cardData.cardid
                 )
-            } else {
-                Image(
-                    painter = painterResource(R.drawable.nocardimage),
-                    contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                    Modifier
-                        .size(120.dp, 200.dp)
-                )
-            }
-            Text(cardData.cardname)
-            CardPriceComponent(cardData, navWebsite)
-        }
-        Column(modifier = Modifier.weight(.6f)) {
-            CardInfoBox(modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp),
-                infoType = stringResource(R.string.card_id_label),
-                infoData = cardData.cardid)
 
-            CardInfoBox(modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 5.dp),
-                infoType = stringResource(R.string.card_setcode_label),
-                infoData = cardData.setcode)
-
-            if (cardData.level != null) {
-                CardInfoBox(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-                    infoType = stringResource(R.string.level_label),
-                    infoData = cardData.level)
-            }
-
-            if (cardData.attribute != null) {
-                CardInfoBox(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-                    infoType = stringResource(R.string.attribute_label),
-                    infoData = cardData.attribute)
-            }
-
-            if (cardData.type != null) {
-                CardInfoBox(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-                    infoType = stringResource(R.string.type_label),
-                    infoData = cardData.type)
-            }
-
-            if (cardData.atk != null) {
-                CardInfoBox(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-                    infoType = stringResource(R.string.atk_label),
-                    infoData = cardData.atk)
-            }
-
-            if (cardData.def != null) {
-                CardInfoBox(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 5.dp),
-                    infoType = stringResource(R.string.def_label),
-                    infoData = cardData.def)
-            }
-
-            if (cardData.rarity != null) {
                 CardInfoBox(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 5.dp),
-                    infoType = stringResource(R.string.rarity_label),
-                    infoData = cardData.rarity!!,
+                    infoType = stringResource(R.string.card_setcode_label),
+                    infoData = cardData.setcode
                 )
+
+                if (cardData.level != null) {
+                    CardInfoBox(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
+                        infoType = stringResource(R.string.level_label),
+                        infoData = cardData.level
+                    )
+                }
+
+                if (cardData.attribute != null) {
+                    CardInfoBox(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
+                        infoType = stringResource(R.string.attribute_label),
+                        infoData = cardData.attribute
+                    )
+                }
+
+                if (cardData.type != null) {
+                    CardInfoBox(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
+                        infoType = stringResource(R.string.type_label),
+                        infoData = cardData.type
+                    )
+                }
+
+                if (cardData.atk != null) {
+                    CardInfoBox(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
+                        infoType = stringResource(R.string.atk_label),
+                        infoData = cardData.atk
+                    )
+                }
+
+                if (cardData.def != null) {
+                    CardInfoBox(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
+                        infoType = stringResource(R.string.def_label),
+                        infoData = cardData.def
+                    )
+                }
+
+                if (cardData.rarity != null) {
+                    CardInfoBox(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 5.dp),
+                        infoType = stringResource(R.string.rarity_label),
+                        infoData = cardData.rarity!!,
+                    )
+                }
             }
         }
-    }
-    Card(modifier = Modifier.height(120.dp).padding(5.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Gray)
-    ) {
-        AutoResizeText(text = cardData.description!!.replace("\\n", "\n"),
-            fontSizeRange = FontSizeRange(10.sp, 30.sp, 1.sp),
-            modifier = Modifier.fillMaxSize(),
-            color = Color.Black,
-        )
+        Card(
+            modifier = Modifier.height(120.dp).padding(5.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.Gray)
+        ) {
+            AutoResizeText(
+                text = cardData.description!!.replace("\\n", "\n"),
+                fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
+                modifier = Modifier.fillMaxSize(),
+                color = Color.Black,
+            )
+        }
     }
 }
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Row(modifier = modifier.padding(5.dp)) {
         Column(modifier = Modifier.weight(.4f)) {
-            if (cardData.image != "nocardimage" && cardData.image != null) {
-                val decodedString = Base64.decode(cardData.image!!, 0)
-                val img =
-                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+            if (cardData.imageBitmap != null) {
                 Image(
-                    bitmap = img.asImageBitmap(),
+                    bitmap = cardData.imageBitmap!!,
                     contentDescription = "Card",
-                    Modifier
-                        .size(120.dp, 200.dp)
+                    modifier = Modifier
                 )
             } else {
                 Image(
@@ -1096,7 +1092,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
             }
             Text(cardData.cardname)
 
-            CardPriceComponent(cardData, navWebsite)
+            CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
         }
         Column(modifier = Modifier.weight(.6f)) {
             Card(modifier = Modifier.height(220.dp),
@@ -1145,17 +1141,13 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
     }
 }
 
-@OptIn(ExperimentalEncodingApi::class)
 @Composable
 fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Row(modifier = modifier.padding(5.dp)) {
         Column(modifier = Modifier.weight(.4f)) {
-            if (cardData.image != "nocardimage" && cardData.image != null) {
-                val decodedString = Base64.decode(cardData.image!!, 0)
-                val img =
-                    BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+            if (cardData.imageBitmap != null) {
                 Image(
-                    bitmap = img.asImageBitmap(),
+                    bitmap = cardData.imageBitmap!!,
                     contentDescription = "Card",
                     modifier = Modifier
                 )
@@ -1176,7 +1168,7 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
             }
             Text(String.format(stringResource(R.string.pokemon_type_label), cardData.type))
 
-            CardPriceComponent(cardData, navWebsite)
+            CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
         }
         Column(modifier = Modifier.weight(.6f)) {
             CardInfoBox(
@@ -1253,7 +1245,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
 
 @Composable
 fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
-                text: String? = null, split: Float = .4f, iconSize: Dp = 24.dp
+                split: Float = .4f, iconSize: Dp = 24.dp
 ) {
     Card(
         modifier = modifier
@@ -1369,7 +1361,7 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     val optionList = optionInfo.map { it.name }
     var selectedOption by remember { mutableStateOf("") }
-    var selectedIndex by remember { mutableStateOf(1) }
+    var selectedIndex by remember { mutableIntStateOf(1) }
     var responseText by remember { mutableStateOf("")}
     var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
     var cardQuantErr by remember { mutableStateOf(false) }
@@ -1378,7 +1370,7 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
         label = stringResource(R.string.subcollection_page),
         data = 1,
         onUserStorefrontChange = {
-            selectedOption = optionInfo.get(it - 1).subcollectionid
+            selectedOption = optionInfo[it - 1].subcollectionid
             selectedIndex = it - 1
         },
         options = optionList,
@@ -1389,7 +1381,7 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
                 card = cardData,
                 userid = userid,
                 subcollection = selectedOption,
-                subcolInfo = optionInfo.get(selectedIndex),
+                subcolInfo = optionInfo[selectedIndex],
                 refreshUI = { }
             )
             responseText = staticResponseText
@@ -1496,7 +1488,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                          subcolInfo: SubcollectionInfo,
                          refreshUI: () -> Unit,
                          modifier: Modifier = Modifier) {
-    val scrollstate = rememberScrollState()
+    val scrollState = rememberScrollState()
     val cardList = allCards.filter {
         it.game == game
     }
@@ -1509,7 +1501,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
         modifier = modifier
     ) {
         Column(
-             modifier = modifier.verticalScroll(scrollstate)
+             modifier = modifier.verticalScroll(scrollState)
         ) {
             cardList.forEachIndexed { index, card ->
                 Row {
@@ -1543,7 +1535,7 @@ fun RemoveFromCollectionPopup(modifier: Modifier, cardData: CardData, onDismissR
                               subcolInfo: SubcollectionInfo, userid: String, fullCardPool: Array<CardData>,
                               onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit, refreshUI: () -> Unit,
                               showCardPopup: () -> Unit) {
-    AlertDialog(
+    AlertDialog(modifier = modifier,
         onDismissRequest = onDismissRequest,
         title = { Text(stringResource(R.string.remove_card_title)) },
         text = {
@@ -1595,16 +1587,13 @@ fun RemoveFromCollectionPopup(modifier: Modifier, cardData: CardData, onDismissR
 }
 
 @Composable
-fun CardPriceComponent(cardData: CardData, navWebsite: (String) -> Unit) {
-    Card(modifier = Modifier,
-        onClick = {
-            if (cardData.purchaseurl != null) {
-                navWebsite(cardData.purchaseurl!!)
-            }
-        },
-        shape = RectangleShape,
-        border = BorderStroke(1.dp, Color.Black),
-        colors = CardDefaults.cardColors(Color.White)
+fun CardPriceComponent(modifier: Modifier = Modifier,
+                       cardData: CardData, navWebsite: (String) -> Unit) {
+    Box(modifier = modifier.clickable(onClick = {
+        if (cardData.purchaseurl != null) {
+            navWebsite(cardData.purchaseurl!!)
+        }
+    }).border(width = 1.dp, color = Color.Black),
     ) {
         Row(modifier = Modifier.padding(vertical = 1.dp, horizontal = 3.dp)) {
             Text(
@@ -1635,7 +1624,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .padding(5.dp)
                 .clip(CircleShape)
                 .background(Color.White)
-                .border(2.dp, Color.Black, CircleShape)
+                .border(1.dp, Color.Black, CircleShape)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.minus_icon),
@@ -1649,7 +1638,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .padding(5.dp)
                 .clip(CircleShape)
                 .background(Color.White)
-                .border(2.dp, Color.Black, CircleShape)
+                .border(1.dp, Color.Black, CircleShape)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.plus_icon),
@@ -1866,7 +1855,7 @@ fun DropdownSelectorFilter(label: String, data: Int,
                     expanded = mExpanded,
                     onDismissRequest = {mExpanded = false}
                 ) {
-                    options.forEachIndexed{ index, optionLabel ->
+                    options.forEach{ optionLabel ->
                         DropdownMenuItem(
                             onClick = {
                                 mSelectedText = optionLabel
@@ -1894,11 +1883,13 @@ fun AutoResizeText(
 ) {
     var textSize by remember { mutableStateOf<TextUnit?>(null) }
     var parentSize by remember { mutableStateOf(IntSize.Zero) }
+    val scrollState = rememberScrollState()
 
     Box(
         modifier = modifier
             .onSizeChanged { parentSize = it }
-            .background(Color.LightGray) // optional: for debugging
+            .background(Color.LightGray)
+            .verticalScroll(scrollState)// optional: for debugging
     ) {
         if (parentSize.width > 0 && parentSize.height > 0) {
             val constraints = Constraints.fixed(parentSize.width - 10, parentSize.height - 10)
@@ -1996,15 +1987,6 @@ data class FontSizeRange(
     }
 }
 
-fun arrToPrintableString(arr: Array<String>): String {
-    var str = ""
-    arr.forEach {
-            itm ->
-        str += "$itm,"
-    }
-    return str
-}
-
 fun removeFromCollectionPost(card: CardData, userid: String, game: String, quantity: Int, fullCardPool: Array<CardData>,
                              onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit,
                              subcolInfo: SubcollectionInfo, refreshUI: () -> Unit): Boolean {
@@ -2030,7 +2012,7 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
                 removeCard(card)
                 onCollectionChange(cardsWithoutRemoved.toTypedArray())
             } else {
-                card.quantity = card.quantity - quantity
+                card.quantity -= quantity
             }
 
             updateSubcollectionInfo(subcolInfo = subcolInfo, card = card, quantity = 1, adding = false)
@@ -2067,7 +2049,7 @@ fun increaseQuantityPost(userid: String, card: CardData, quantityChange: Int) {
         ) {
             val respData = response.body()
             if (respData != null) {
-                //Do Nothing
+                Log.i("IncreaseQuantityPost", "Do Nothing")
             }
         }
 
@@ -2152,30 +2134,30 @@ fun recalculateFilterList(type: String,
                           priceMin: String,
                           priceMax: String,
                           attribute: String): MutableList<(CardData) -> Boolean> {
-    var ret = mutableListOf<(CardData) -> Boolean>()
+    val ret = mutableListOf<(CardData) -> Boolean>()
     if (type != "") {
-        ret.add({it.type == type})
+        ret.add { it.type == type }
     }
     if (attribute != "") {
-        ret.add({it.attribute != null && it.attribute == attribute})
+        ret.add { it.attribute != null && it.attribute == attribute }
     }
     if (quantityMin != "" && (quantityMax == "" || quantityMin.toInt() < quantityMax.toInt())) {
-        ret.add({it.quantity >= quantityMin.toInt()})
+        ret.add { it.quantity >= quantityMin.toInt() }
     }
     if (quantityMax != "" && (quantityMin == "" || quantityMax.toInt() > quantityMin.toInt())) {
-        ret.add({it.quantity <= quantityMax.toInt()})
+        ret.add { it.quantity <= quantityMax.toInt() }
     }
     if (levelMin != "" && (levelMax == "" || levelMin.toInt() < levelMax.toInt())) {
-        ret.add({ (it.level?.toInt() ?: -1) >= levelMin.toInt()})
+        ret.add { (it.level?.toInt() ?: -1) >= levelMin.toInt() }
     }
     if (levelMax != "" && (levelMin == "" || levelMin.toInt() < levelMax.toInt())) {
-        ret.add({ (it.level?.toInt() ?: Int.MAX_VALUE) <= levelMax.toInt()})
+        ret.add { (it.level?.toInt() ?: Int.MAX_VALUE) <= levelMax.toInt() }
     }
     if (priceMin != "" && (priceMax == "" || priceMin.toDouble() < priceMax.toDouble())) {
-        ret.add({ (it.price) >= priceMin.toDouble()})
+        ret.add { (it.price) >= priceMin.toDouble() }
     }
     if (priceMax != "" && (priceMin == "" || priceMin.toDouble() < priceMax.toDouble())) {
-        ret.add({ (it.price) <= priceMax.toDouble()})
+        ret.add { (it.price) <= priceMax.toDouble() }
     }
     return ret
 }
@@ -2192,14 +2174,10 @@ fun sortSubcollection(subCol: MutableList<CardData> , game: String): MutableList
 }
 
 fun yugiohSort(frameType: String): Int {
-    if (frameType == "spell") {
-        return 2
-    }
-    else if (frameType == "trap") {
-        return 3
-    }
-    else {
-        return 1
+    return when (frameType) {
+        "spell" -> 2
+        "trap" -> 3
+        else -> 1
     }
 }
 

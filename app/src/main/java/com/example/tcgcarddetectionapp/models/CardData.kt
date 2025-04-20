@@ -2,6 +2,7 @@ package com.example.tcgcarddetectionapp.models
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.ImageBitmap
 
 
 data class CardData(
@@ -15,6 +16,7 @@ data class CardData(
     val game: String,
     val price: Double,
     var image: String?,
+    var imageBitmap: ImageBitmap? = null,
     val cardname: String,
     val attribute: String? = null,
     val level: String? = null,
