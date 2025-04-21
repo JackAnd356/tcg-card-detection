@@ -93,9 +93,7 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
             .wrapContentWidth(Alignment.CenterHorizontally)) {
         Text(
             text = stringResource(R.string.scan_screen_heading),
-            fontSize = 50.sp,
-            lineHeight = 46.sp,
-            textAlign = TextAlign.Center,
+            style = appTypography.headlineLarge,
             modifier = Modifier.padding(16.dp)
         )
 
@@ -108,12 +106,12 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(modifier = Modifier.padding(5.dp),
                     text = stringResource(R.string.user_photo_instructions_header),
-                    fontSize = 30.sp, fontWeight = FontWeight.Bold,
+                    style = appTypography.headlineLarge,
                     textAlign = TextAlign.Center
                 )
                 Text(modifier = Modifier.padding(10.dp),
                     text = stringResource(R.string.user_photo_instructions),
-                    fontSize = 30.sp
+                    style = appTypography.bodyLarge
                 )
             }
         }
@@ -131,9 +129,15 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
                     shape = RoundedCornerShape(16.dp),
                 ) {
                     if (error.intValue == 1) {
-                        Text(text = stringResource(R.string.no_card_error))
+                        Text(
+                            text = stringResource(R.string.no_card_error),
+                            style = appTypography.headlineMedium
+                        )
                     } else {
-                        Text(text = stringResource(R.string.scan_network_error))
+                        Text(
+                            text = stringResource(R.string.scan_network_error),
+                            style = appTypography.headlineMedium
+                        )
                     }
                 }
             }
@@ -166,7 +170,10 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
             val map = cards.groupBy { it.game }
             map.forEach { entry ->
                 val game = entry.key
-                Text(text = mapGameToFullName(game), fontSize = 32.sp)
+                Text(
+                    text = mapGameToFullName(game),
+                    style = appTypography.displaySmall
+                )
                 for (cardData in entry.value) {
                     if (cardData.possRarities != null) cardData.added.value = false
                     val isChecked = remember { cardData.added }
@@ -203,6 +210,7 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                         ) {
                             Text(
                                 text = "x${cardData.quantity} ${cardData.cardname}",
+                                style = appTypography.labelMedium,
                                 modifier = Modifier.weight(1f)
                             )
                             Checkbox(
@@ -230,7 +238,10 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                 Button(onClick = {
                     stage.value = Stages.Home
                 }) {
-                    Text(text = "Cancel")
+                    Text(
+                        text = "Cancel",
+                        style = appTypography.labelLarge
+                    )
                 }
 
                 Button(onClick = {
@@ -245,7 +256,10 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                     }
                     stage.value = Stages.PostConfirmation
                 }) {
-                    Text(text = "Submit")
+                    Text(
+                        text = "Submit",
+                        style = appTypography.labelLarge
+                    )
                 }
             }
         }
@@ -264,6 +278,7 @@ fun ScanSetCodeChoicePopup(modifier: Modifier, card: CardData, dismissPopup: () 
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = stringResource(R.string.rarity_choice_text),
+                style = appTypography.bodyMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             LazyVerticalGrid(
@@ -280,7 +295,8 @@ fun ScanSetCodeChoicePopup(modifier: Modifier, card: CardData, dismissPopup: () 
                             .clickable { selectedRarity.value = rarity }
                     ) {
                         Text(
-                            text = rarity
+                            text = rarity,
+                            style = appTypography.headlineSmall
                         )
                         Image(
                             painter = painterResource(placeholderPair.first),
@@ -296,6 +312,7 @@ fun ScanSetCodeChoicePopup(modifier: Modifier, card: CardData, dismissPopup: () 
                         Text(
                             text = stringResource(placeholderPair.second),
                             color = if (selectedRarity.value == rarity) Color.Blue else Color.Black,
+                            style = appTypography.bodySmall,
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
@@ -311,12 +328,18 @@ fun ScanSetCodeChoicePopup(modifier: Modifier, card: CardData, dismissPopup: () 
                         Toast.makeText(context, "Please select a rarity first", Toast.LENGTH_SHORT).show()
                     }
                 }) {
-                    Text(text = stringResource(R.string.submit))
+                    Text(
+                        text = stringResource(R.string.submit),
+                        style = appTypography.labelLarge,
+                        )
                 }
                 Button(onClick = {
                     dismissPopup()
                 }) {
-                    Text(text = stringResource(R.string.ignore_card))
+                    Text(
+                        text = stringResource(R.string.ignore_card),
+                        style = appTypography.labelLarge
+                    )
                 }
             }
         }
@@ -329,22 +352,33 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
         .fillMaxSize()
         .wrapContentWidth(Alignment.CenterHorizontally)) {
 
-        Text(text = "Added Cards: ", fontSize = 36.sp)
+        Text(text = "Added Cards: ",
+            style = appTypography.displaySmall
+        )
 
         val map = cards.groupBy { it.game }
         map.forEach({ entry ->
             val game = entry.key
-            Text(text = game, fontSize = 32.sp)
+            Text(
+                text = game,
+                style = appTypography.headlineLarge
+            )
             var cardsFromGame = false
             for (cardData in entry.value) {
                 if (cardData.added.value) {
                     cardsFromGame = true
                     Text(
-                        text = "x${cardData.quantity} ${cardData.cardname}"
+                        text = "x${cardData.quantity} ${cardData.cardname}",
+                        style = appTypography.labelMedium
                     )
                 }
             }
-            if (!cardsFromGame) Text(text = "None")
+            if (!cardsFromGame) {
+                Text(
+                    text = "None",
+                    style = appTypography.labelMedium
+                )
+            }
         })
 
         Row(
@@ -353,11 +387,17 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
             Button(
                 onClick = { stage.value = Stages.Home }
             ) {
-                Text(text = "Take Another Photo")
+                Text(
+                    text = "Take Another Photo",
+                    style = appTypography.labelLarge
+                )
             }
 
             Button(onClick = collectionNavigate) {
-                Text(text = "Go To Yu-Gi-Oh Collection")
+                Text(
+                    text = "Go To Yu-Gi-Oh Collection",
+                    style = appTypography.labelLarge
+                )
             }
         }
     }

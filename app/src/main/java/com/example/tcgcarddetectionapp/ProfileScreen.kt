@@ -79,9 +79,7 @@ fun ProfileScreen(username: String,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.profile_screen_heading),
-            fontSize = 50.sp,
-            lineHeight = 100.sp,
-            textAlign = TextAlign.Center
+            style = appTypography.displayLarge,
         )
         if(showDeletePopup) {
             DeleteUserWarningPopup(
@@ -143,7 +141,10 @@ fun ProfileScreen(username: String,
             ),
             modifier = modifier.fillMaxWidth(.9f).padding(top = 30.dp),
         ) {
-            Text(stringResource(R.string.delete_account_button_label))
+            Text(
+                text = stringResource(R.string.delete_account_button_label),
+                style = appTypography.labelLarge
+            )
         }
         Button(
             onClick = { onLogout() },
@@ -155,7 +156,10 @@ fun ProfileScreen(username: String,
             ),
             modifier = modifier.fillMaxWidth(.9f).padding(top = 30.dp),
         ) {
-            Text(stringResource(R.string.logout_button_label))
+            Text(
+                text = stringResource(R.string.logout_button_label),
+                style = appTypography.bodyLarge
+            )
         }
 
     }
@@ -184,14 +188,16 @@ fun UserDataComponent(label: String,
                 TextField(
                     value = data,
                     onValueChange = onChange,
-                    label = { Text(label) }
+                    label = { Text(
+                        text = label,
+                        style = appTypography.labelMedium
+                    ) }
                 )
             }
             else {
                 Text(
                     text = "$label: $data",
-                    fontSize = 20.sp,
-                    lineHeight = 50.sp,
+                    style = appTypography.labelMedium,
                     textAlign = TextAlign.Left
                 )
             }
@@ -218,22 +224,19 @@ fun UserDataComponent(label: String,
                     if (flag && data != oldData) {
                         Text(
                             text = stringResource(R.string.save_button_label),
-                            fontSize = 15.sp,
-                            lineHeight = 10.sp,
+                            style = appTypography.labelLarge,
                             textAlign = TextAlign.Center
                         )
                     } else if (flag) {
                         Text(
                             text = stringResource(R.string.cancel_button_label),
-                            fontSize = 15.sp,
-                            lineHeight = 10.sp,
+                            style = appTypography.labelLarge,
                             textAlign = TextAlign.Center
                         )
                     } else {
                         Text(
                             text = stringResource(R.string.change_button_label),
-                            fontSize = 15.sp,
-                            lineHeight = 10.sp,
+                            style = appTypography.labelLarge,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -314,7 +317,10 @@ fun DeleteUserWarningPopup(
         onDismissRequest = onDismiss
     ) {
         Card {
-            Text(stringResource(R.string.delete_account_confirmation_message))
+            Text(
+                text = stringResource(R.string.delete_account_confirmation_message),
+                style = appTypography.headlineMedium
+            )
             Row {
                 Button(
                     onClick = {
@@ -327,7 +333,10 @@ fun DeleteUserWarningPopup(
                         disabledContentColor = Color.White
                     )
                 ) {
-                    Text(stringResource(R.string.yes_label))
+                    Text(
+                        text = stringResource(R.string.yes_label),
+                        style = appTypography.labelLarge
+                    )
                 }
                 Button(
                     onClick = { onDismiss() },
@@ -338,7 +347,10 @@ fun DeleteUserWarningPopup(
                         disabledContentColor = Color.White
                     )
                 ) {
-                    Text(stringResource(R.string.no_label))
+                    Text(
+                        text = stringResource(R.string.no_label),
+                        style = appTypography.labelLarge
+                    )
                 }
             }
         }

@@ -2,11 +2,19 @@ package com.example.tcgcarddetectionapp
 
 import android.graphics.drawable.Drawable
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.compose.material3.Typography
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.sp
 import com.example.tcgcarddetectionapp.models.CardData
 import com.example.tcgcarddetectionapp.models.SubcollectionInfo
 
@@ -114,4 +122,71 @@ fun arrToPrintableString(arr: Array<String>): String {
     return str
 }
 
+val appTypography = Typography(
+    displayLarge = TextStyle(
+        color = Color.Black,
+        fontSize = 50.sp,
+        lineHeight = 60.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        textDirection = TextDirection.Ltr,
+        lineBreak = LineBreak.Heading
+    ),
+    displayMedium = TextStyle(
+        color = Color.DarkGray,
+        fontSize = 40.sp,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center
+    ),
+    displaySmall = TextStyle(
+        color = Color.DarkGray,
+        fontSize = 34.sp,
+        fontWeight = FontWeight.Medium
+    ),
+    headlineLarge = TextStyle(
+        color = Color.Black,
+        fontSize = 28.sp,
+        fontWeight = FontWeight.Bold
+    ),
+    headlineMedium = TextStyle(
+        color = Color.DarkGray,
+        fontSize = 26.sp,
+        fontWeight = FontWeight.Medium
+    ),
+    headlineSmall = TextStyle(
+        color = Color.DarkGray,
+        fontSize = 22.sp,
+        fontWeight = FontWeight.Normal
+    ),
+    bodyLarge = TextStyle(
+        color = Color.Black,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Normal
+    ),
+    bodyMedium = TextStyle(
+        color = Color.Gray,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal
+    ),
+    bodySmall = TextStyle(
+        color = Color.LightGray,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Light
+    ),
+    labelLarge = TextStyle(
+        color = Color.Black,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Medium
+    ),
+    labelMedium = TextStyle(
+        color = Color.DarkGray,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Normal
+    ),
+    labelSmall = TextStyle(
+        color = Color.Gray,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Normal
+    )
+)
 

@@ -352,8 +352,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         ) {
                             Text(
                                 text = subcolInfo.name,
-                                fontSize = 40.sp,
-                                lineHeight = 50.sp,
+                                style = appTypography.displayMedium,
                                 textAlign = TextAlign.Center
                             )
                             Text(
@@ -362,8 +361,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     subcolInfo.totalValue ?: 0.00,
                                     "$"
                                 ),
-                                fontSize = 15.sp,
-                                lineHeight = 20.sp,
+                                style = appTypography.headlineMedium,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -384,13 +382,19 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     }
                                 ) {
                                     DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.edit_option_label)) },
+                                        text = { Text(
+                                            text = stringResource(R.string.edit_option_label),
+                                            style = appTypography.labelSmall
+                                        ) },
                                         onClick = {
                                             showEditPopup = !showEditPopup
                                         }
                                     )
                                     DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.delete_option_label)) },
+                                        text = { Text(
+                                            text = stringResource(R.string.delete_option_label),
+                                            style = appTypography.labelSmall
+                                        ) },
                                         onClick = {
                                             showDeletePopup = !showDeletePopup
                                         }
@@ -409,8 +413,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     stringResource(R.string.location_label),
                                     subcolInfo.physLoc
                                 ),
-                                fontSize = 15.sp,
-                                lineHeight = 20.sp,
+                                style = appTypography.bodyLarge,
                                 textAlign = TextAlign.Center
                             )
                             Spacer(Modifier.weight(1f))
@@ -420,8 +423,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 stringResource(R.string.total_cards_label),
                                 subcolInfo.cardCount ?: 0
                             ),
-                            fontSize = 15.sp,
-                            lineHeight = 20.sp,
+                            style = appTypography.bodyLarge,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -442,7 +444,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     ) {
                         Text(
                             text = stringResource(R.string.add_from_all_cards_button_label),
-                            color = Color.Black)
+                            style = appTypography.labelLarge
+                        )
                     }
                 }
             }
@@ -460,12 +463,15 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     value = searchTerm,
                     onValueChange = { searchTerm = it },
                     singleLine = true,
-                    label = { Text(stringResource(R.string.search_label)) }
+                    label = { Text(
+                        text = stringResource(R.string.search_label),
+                        style = appTypography.labelMedium
+                    ) }
                 )
                 Button(
                     modifier = Modifier
                         .weight(.25f)
-                        .height(50.dp),
+                        .height(60.dp),
                     shape = if (!showFilters) RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp)
                             else RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp),
                     onClick = {
@@ -473,7 +479,10 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     },
                     colors = ButtonDefaults.buttonColors(colorResource(R.color.darkGray))
                 ) {
-                    Text(stringResource(R.string.filter_button_label))
+                    Text(
+                        text = stringResource(R.string.filter_button_label),
+                        style = appTypography.labelLarge
+                    )
                 }
             }
 
@@ -839,7 +848,7 @@ fun CardImage(
             Text(
                 text = "${cardData.quantity}x",
                 color = Color.White,
-                fontSize = 14.sp,
+                fontSize = appTypography.labelMedium.fontSize,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -961,14 +970,18 @@ fun CardPopup(cardData: CardData,
 @Composable
 fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Column(modifier = modifier.padding(3.dp)) {
-        Text(cardData.cardname)
+        Text(text = cardData.cardname,
+            style = appTypography.headlineSmall,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
         Row(modifier = Modifier) {
             Column(modifier = Modifier.weight(.4f)) {
                 if (cardData.imageBitmap != null) {
                     Image(
                         bitmap = cardData.imageBitmap!!,
                         contentDescription = "Card",
-                        modifier = Modifier
+                        modifier = Modifier.padding(end = 5.dp)
                     )
                 } else {
                     Image(
@@ -1074,136 +1087,163 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
 
 @Composable
 fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
-    Row(modifier = modifier.padding(5.dp)) {
-        Column(modifier = Modifier.weight(.4f)) {
-            if (cardData.imageBitmap != null) {
-                Image(
-                    bitmap = cardData.imageBitmap!!,
-                    contentDescription = "Card",
-                    modifier = Modifier
-                )
-            } else {
-                Image(
-                    painter = painterResource(R.drawable.nocardimage),
-                    contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                    Modifier
-                        .size(120.dp, 200.dp)
-                )
-            }
-            Text(cardData.cardname)
+    Column(modifier = modifier.padding(3.dp)) {
+        Text(
+            text = cardData.cardname,
+            style = appTypography.headlineSmall,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+        )
+        Row(modifier = Modifier) {
+            Column(modifier = Modifier.weight(.4f)) {
+                if (cardData.imageBitmap != null) {
+                    Image(
+                        bitmap = cardData.imageBitmap!!,
+                        contentDescription = "Card",
+                        modifier = Modifier
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.nocardimage),
+                        contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                        Modifier
+                            .size(120.dp, 200.dp)
+                    )
+                }
 
-            CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
+                CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
+            }
+            Column(modifier = Modifier.weight(.6f)) {
+                if (cardData.cost != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        infoType = stringResource(R.string.cost_label),
+                        infoData = "",
+                        icons = stripColorString(cardData.cost)
+                    )
+                }
+
+                if (cardData.type != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        infoType = stringResource(R.string.type_label),
+                        infoData = cardData.type
+                    )
+                }
+
+                if (cardData.atk != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        infoType = stringResource(R.string.power_label),
+                        infoData = cardData.atk
+                    )
+                }
+
+                if (cardData.def != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        infoType = stringResource(R.string.toughness_label),
+                        infoData = cardData.def
+                    )
+                }
+            }
         }
-        Column(modifier = Modifier.weight(.6f)) {
-            Card(modifier = Modifier.height(220.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Gray)
-            ) {
-                AutoResizeText(text = cardData.description!!.replace("\\n", "\n"),
-                    fontSizeRange = FontSizeRange(10.sp, 30.sp, 1.sp),
-                    modifier = Modifier.fillMaxSize(),
-                    color = Color.Black,
-                )
-            }
-
-            if (cardData.cost != null) {
-                CardInfoBox(
-                    modifier = Modifier.padding(vertical = 10.dp),
-                    infoType = stringResource(R.string.cost_label),
-                    infoData = "",
-                    icons = stripColorString(cardData.cost)
-                )
-            }
-
-            if (cardData.type != null) {
-                CardInfoBox(
-                    modifier = Modifier.padding(bottom = 10.dp),
-                    infoType = stringResource(R.string.type_label),
-                    infoData = cardData.type
-                )
-            }
-
-            if (cardData.atk != null) {
-                CardInfoBox(
-                    modifier = Modifier.padding(bottom = 10.dp),
-                    infoType = stringResource(R.string.power_label),
-                    infoData = cardData.atk
-                )
-            }
-
-            if (cardData.def != null) {
-                CardInfoBox(
-                    modifier = Modifier.padding(bottom = 10.dp),
-                    infoType = stringResource(R.string.toughness_label),
-                    infoData = cardData.def
-                )
-            }
+        Card(
+            modifier = Modifier.height(120.dp).padding(5.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.Gray)
+        ) {
+            AutoResizeText(
+                text = cardData.description!!.replace("\\n", "\n"),
+                fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
+                modifier = Modifier.fillMaxSize(),
+                color = Color.Black,
+            )
         }
     }
 }
 
 @Composable
 fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
-    Row(modifier = modifier.padding(5.dp)) {
-        Column(modifier = Modifier.weight(.4f)) {
-            if (cardData.imageBitmap != null) {
+    Column(modifier = modifier.padding(3.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center) {
+            Text(
+                text = cardData.cardname,
+                style = appTypography.headlineSmall,
+                textAlign = TextAlign.Center,
+            )
+            if (cardData.attribute != null) {
                 Image(
-                    bitmap = cardData.imageBitmap!!,
-                    contentDescription = "Card",
-                    modifier = Modifier
-                )
-            } else {
-                Image(
-                    painter = painterResource(R.drawable.nocardimage),
-                    contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                    modifier = Modifier
+                    painter = painterResource(mapPokemonTypeToIcon(cardData.attribute)),
+                    contentDescription = cardData.attribute,
+                    modifier = Modifier.size(24.dp)
                 )
             }
-            Row {
-                Text(cardData.cardname)
-                if (cardData.attribute != null) {
-                    Image(painter = painterResource(mapPokemonTypeToIcon(cardData.attribute)),
-                        contentDescription = cardData.attribute,
-                        modifier = Modifier.size(24.dp))
+        }
+
+        Row(modifier = Modifier) {
+            Column(modifier = Modifier.weight(.4f)) {
+                if (cardData.imageBitmap != null) {
+                    Image(
+                        bitmap = cardData.imageBitmap!!,
+                        contentDescription = "Card",
+                        modifier = Modifier
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.nocardimage),
+                        contentDescription = stringResource(R.string.card_image_not_loaded_context),
+                        modifier = Modifier
+                    )
                 }
-            }
-            Text(String.format(stringResource(R.string.pokemon_type_label), cardData.type))
+                Text(
+                    text = String.format(stringResource(R.string.pokemon_type_label), cardData.type),
+                    style = appTypography.labelSmall
+                )
 
-            CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
-        }
-        Column(modifier = Modifier.weight(.6f)) {
-            CardInfoBox(
-                modifier = Modifier.padding(vertical = 10.dp),
-                infoType = stringResource(R.string.card_id_label),
-                infoData = cardData.cardid,
-                split = .5f
-            )
-            CardInfoBox(
-                modifier = Modifier.padding(bottom = 10.dp),
-                infoType = stringResource(R.string.card_setcode_label),
-                infoData = cardData.setcode,
-                split = .5f
-            )
-            if (cardData.hp != null) {
-                CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
-                    infoType = stringResource(R.string.hp),
-                    infoData = cardData.hp,
-                    split = .5f)
+                CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
             }
-            if (cardData.weaknesses != null) {
-                CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
-                    weaknesses = cardData.weaknesses,
-                    split = .5f)
-            }
-            if (cardData.retreat != null) {
-                CardInfoBox(modifier = Modifier.padding(bottom = 10.dp),
-                    infoType = stringResource(R.string.retreat),
-                    icons = cardData.retreat,
-                    split = .5f)
-            }
+            Column(modifier = Modifier.weight(.6f)) {
+                CardInfoBox(
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    infoType = stringResource(R.string.card_id_label),
+                    infoData = cardData.cardid,
+                    split = .5f
+                )
+                CardInfoBox(
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    infoType = stringResource(R.string.card_setcode_label),
+                    infoData = cardData.setcode,
+                    split = .5f
+                )
+                if (cardData.hp != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        infoType = stringResource(R.string.hp),
+                        infoData = cardData.hp,
+                        split = .5f
+                    )
+                }
+                if (cardData.weaknesses != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        weaknesses = cardData.weaknesses,
+                        split = .5f
+                    )
+                }
+                if (cardData.retreat != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        infoType = stringResource(R.string.retreat),
+                        icons = cardData.retreat,
+                        split = .5f
+                    )
+                }
 
+            }
         }
+        PokemonAttackBox(cardData = cardData)
     }
-    PokemonAttackBox(cardData = cardData)
 }
 
 @Composable
@@ -1220,6 +1260,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
                 .background(colorResource(R.color.textLightGrey))) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
+                    style = appTypography.labelMedium,
                     text = infoType,
                 )
             }
@@ -1236,7 +1277,9 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
                     }
                 } else {
                     Text(modifier = Modifier.padding(start = 5.dp),
-                        text = infoData)
+                        text = infoData,
+                        style = appTypography.labelMedium,
+                    )
                 }
             }
         }
@@ -1258,6 +1301,7 @@ fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
                 .background(colorResource(R.color.textLightGrey))) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
+                    style = appTypography.labelMedium,
                     text = infoType,
                 )
             }
@@ -1290,6 +1334,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
                 .background(colorResource(R.color.textLightGrey))) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
+                    style = appTypography.labelMedium,
                     text = "Weakness:",
                 )
             }
@@ -1302,7 +1347,8 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
                             contentDescription = weakness.type,
                             modifier = Modifier.size(iconSize))
                         Text(
-                            text = weakness.value
+                            text = weakness.value,
+                            style = appTypography.labelMedium,
                         )
                     }
                 }
@@ -1330,6 +1376,7 @@ fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
                     }
                     Text(modifier = Modifier,
                         text = attack.name,
+                        style = appTypography.labelLarge,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -1337,12 +1384,14 @@ fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
 
                 Text(
                     text = attack.damage,
+                    style = appTypography.labelLarge,
                     fontWeight = FontWeight.Bold
                 )
             }
             if (attack.text != null) {
                 Text(
-                    text = attack.text
+                    text = attack.text,
+                    style = appTypography.labelSmall,
                 )
             }
         }
@@ -1388,10 +1437,16 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
         },
         enabled = selectedOption != ""
     ) {
-        Text(stringResource(R.string.add_to_subcollection_button_label))
+        Text(
+            text = stringResource(R.string.add_to_subcollection_button_label),
+            style = appTypography.labelLarge
+        )
     }
     Row {
-        Text(stringResource(R.string.quantity_filter_label) + ": ")
+        Text(
+            text = stringResource(R.string.quantity_filter_label) + ": ",
+            style = appTypography.labelMedium
+        )
         Button(
             onClick = {
                 if (cardData.quantity > 1) {
@@ -1412,7 +1467,12 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
                     showCardDeletePopup()
                 }
             }
-        ) { Text("-")}
+        ) {
+            Text(
+                text = "-",
+                style = appTypography.labelLarge
+            )
+        }
         TextField(
             value = cardQuantity,
             onValueChange = {
@@ -1452,6 +1512,7 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
                 if (cardQuantErr) {
                     Text(
                         text = stringResource(R.string.invalid_value_error),
+                        style = appTypography.labelSmall,
                         color = Color.Red
                     )
                 }
@@ -1466,7 +1527,12 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
                 )
                 cardQuantity = (cardQuantity.toInt() + 1).toString()
             }
-        ) { Text("+")}
+        ) {
+            Text(
+                text = "+",
+                style = appTypography.labelLarge
+            )
+        }
     }
     /*Column {
         Button(onClick = {
@@ -1505,7 +1571,10 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
         ) {
             cardList.forEachIndexed { index, card ->
                 Row {
-                    Text(card.cardname)
+                    Text(
+                        text = card.cardname,
+                        style = appTypography.labelSmall
+                    )
                     Checkbox(
                         checked = checkedStates[index],
                         onCheckedChange = {
@@ -1525,7 +1594,10 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                 }
             }
         ) {
-            Text(stringResource(R.string.add_to_subcollection_button_label))
+            Text(
+                text = stringResource(R.string.add_to_subcollection_button_label),
+                style = appTypography.labelLarge
+            )
         }
     }
 }
@@ -1537,13 +1609,24 @@ fun RemoveFromCollectionPopup(modifier: Modifier, cardData: CardData, onDismissR
                               showCardPopup: () -> Unit) {
     AlertDialog(modifier = modifier,
         onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.remove_card_title)) },
+        title = {
+            Text(
+                text = stringResource(R.string.remove_card_title),
+                style = appTypography.headlineLarge,
+                textAlign = TextAlign.Center
+            )
+        },
         text = {
             if (allCardsFlag) {
-                Text(stringResource(R.string.remove_card_all_cards_text))
+                Text(
+                    text = stringResource(R.string.remove_card_all_cards_text),
+                    style = appTypography.labelMedium
+                )
             }
             else {
-                Text(String.format(stringResource(R.string.remove_card_subcollection_text), subcolInfo.name))
+                Text(
+                    text = String.format(stringResource(R.string.remove_card_subcollection_text), subcolInfo.name),
+                    style = appTypography.labelMedium)
             }
         },
         confirmButton = {
@@ -1575,12 +1658,18 @@ fun RemoveFromCollectionPopup(modifier: Modifier, cardData: CardData, onDismissR
                 }
                 showCardPopup()
             }) {
-                Text(stringResource(R.string.yes_label))
+                Text(
+                    text = stringResource(R.string.yes_label),
+                    style = appTypography.labelLarge
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text(stringResource(R.string.no_label))
+                Text(
+                    text = stringResource(R.string.no_label),
+                    style = appTypography.labelLarge
+                )
             }
         }
     )
@@ -1589,21 +1678,28 @@ fun RemoveFromCollectionPopup(modifier: Modifier, cardData: CardData, onDismissR
 @Composable
 fun CardPriceComponent(modifier: Modifier = Modifier,
                        cardData: CardData, navWebsite: (String) -> Unit) {
-    Box(modifier = modifier.clickable(onClick = {
-        if (cardData.purchaseurl != null) {
-            navWebsite(cardData.purchaseurl!!)
-        }
-    }).border(width = 1.dp, color = Color.Black),
+    Box(modifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 5.dp)
+        .clickable(onClick = {
+            if (cardData.purchaseurl != null) {
+                navWebsite(cardData.purchaseurl!!)
+            }
+        }).border(width = 1.dp, color = Color.Black),
     ) {
-        Row(modifier = Modifier.padding(vertical = 1.dp, horizontal = 3.dp)) {
+        Row(modifier = Modifier.fillMaxWidth()
+            .padding(vertical = 1.dp, horizontal = 3.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
-                String.format(
+                text = String.format(
                     stringResource(R.string.card_price_label),
                     cardData.price,
                     "$"
-                )
+                ),
+                style = appTypography.labelMedium
             )
-            Image(modifier = Modifier.size(25.dp, 25.dp),
+            Image(modifier = Modifier.size(24.dp, 24.dp),
                 painter = painterResource(R.drawable.tcg_player_icon),
                 contentDescription = stringResource(R.string.tcgplayer_label),
             )
@@ -1616,7 +1712,10 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                                 plusOnClick: () -> Unit, subColQuant: String) {
     Row(modifier = modifier.padding(horizontal = 5.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.subcollection_quantity_label) + ": ")
+        Text(
+            text = stringResource(R.string.subcollection_quantity_label) + ": ",
+            style = appTypography.labelSmall
+        )
         IconButton(
             onClick = minusOnClick,
             modifier = Modifier
@@ -1630,7 +1729,10 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
             Icon(painter = painterResource(R.drawable.minus_icon),
                 contentDescription = "Minus")
         }
-        Text(subColQuant)
+        Text(
+            text = subColQuant,
+            style = appTypography.labelSmall
+        )
         IconButton(
             onClick = plusOnClick,
             modifier = Modifier
@@ -1661,7 +1763,10 @@ fun MinMaxIntComponent(minVal: String,
                        recalculateFilter: () -> Unit) {
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label)
+        Text(
+            text = label,
+            style = appTypography.labelSmall
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
@@ -1699,7 +1804,8 @@ fun MinMaxIntComponent(minVal: String,
                 Spacer(modifier = Modifier.weight(.5f))
                 Text(
                     modifier = Modifier.weight(.5f),
-                    text = "-"
+                    text = "-",
+                    style = appTypography.labelSmall
                 )
             }
 
@@ -1742,7 +1848,10 @@ fun MinMaxDoubleComponent(minVal: String,
                        recalculateFilter: () -> Unit) {
     Column(modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label)
+        Text(
+            text = label,
+            style = appTypography.labelSmall
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -1778,7 +1887,8 @@ fun MinMaxDoubleComponent(minVal: String,
                 Spacer(modifier = Modifier.weight(.5f))
                 Text(
                     modifier = Modifier.weight(.5f),
-                    text = "-"
+                    text = "-",
+                    style = appTypography.labelSmall
                 )
             }
 
@@ -1830,8 +1940,7 @@ fun DropdownSelectorFilter(label: String, data: Int,
         Row {
             Text(
                 text = label,
-                fontSize = 20.sp,
-                lineHeight = 50.sp,
+                style = appTypography.labelSmall,
                 textAlign = TextAlign.Left
             )
             Spacer(Modifier.weight(1f))
@@ -1863,7 +1972,11 @@ fun DropdownSelectorFilter(label: String, data: Int,
                                 recalculateFilter()
                                 mExpanded = false
                             },
-                            text = {Text(optionLabel)}
+                            text = {
+                                Text(text = optionLabel,
+                                    style = appTypography.labelSmall
+                                )
+                            }
                         )
                     }
                 }
@@ -1878,7 +1991,7 @@ fun AutoResizeText(
     text: String,
     fontSizeRange: FontSizeRange,
     modifier: Modifier = Modifier,
-    style: TextStyle = TextStyle.Default,
+    style: TextStyle = appTypography.bodyMedium,
     color: Color = Color.Unspecified,
 ) {
     var textSize by remember { mutableStateOf<TextUnit?>(null) }
@@ -1889,7 +2002,7 @@ fun AutoResizeText(
         modifier = modifier
             .onSizeChanged { parentSize = it }
             .background(Color.LightGray)
-            .verticalScroll(scrollState)// optional: for debugging
+            .verticalScroll(scrollState)
     ) {
         if (parentSize.width > 0 && parentSize.height > 0) {
             val constraints = Constraints.fixed(parentSize.width - 10, parentSize.height - 10)

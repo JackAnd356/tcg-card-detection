@@ -71,8 +71,7 @@ fun NewUserRegistrationScreen(username: String,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.new_user_registration_screen_heading),
-            fontSize = 30.sp,
-            lineHeight = 100.sp,
+            style = appTypography.displayLarge,
             textAlign = TextAlign.Center
         )
         NewUserDataComponent(label = stringResource(R.string.username_label),
@@ -112,16 +111,23 @@ fun NewUserRegistrationScreen(username: String,
                 disabledContentColor = Color.White
             ),
         ) {
-            Text(stringResource(R.string.register_button_label))
+            Text(
+                text = stringResource(R.string.register_button_label),
+                style = appTypography.labelLarge
+            )
         }
         Button(
             onClick = {onBackNavigate()},
             modifier = modifier.fillMaxWidth(.9f).padding(top = 20.dp),
         ) {
-            Text(stringResource(R.string.back_to_login_button_label))
+            Text(
+                text = stringResource(R.string.back_to_login_button_label),
+                style = appTypography.labelLarge)
         }
         if (errorText != "") {
-            Text(errorText,
+            Text(
+                text = errorText,
+                style = appTypography.labelSmall,
                 color = Color.Red)
         }
     }
@@ -143,6 +149,7 @@ fun NewUserDataComponent(label: String,
         Row {
             Text(
                 text = label + ":",
+                style = appTypography.labelMedium,
                 modifier = modifier.align(Alignment.CenterVertically)
             )
             Spacer(Modifier.weight(1f))
@@ -150,7 +157,10 @@ fun NewUserDataComponent(label: String,
                 value = data,
                 onValueChange = onChange,
                 modifier = modifier.fillMaxWidth(.8f).align(Alignment.CenterVertically),
-                label = { Text(String.format(stringResource(R.string.labeled_data_entry_ghost_text), label)) },
+                label = { Text(
+                    text = String.format(stringResource(R.string.labeled_data_entry_ghost_text), label),
+                    style = appTypography.labelSmall
+                ) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
                 singleLine = true,
             )

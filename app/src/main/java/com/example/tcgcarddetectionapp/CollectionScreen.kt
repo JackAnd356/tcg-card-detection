@@ -127,9 +127,7 @@ fun CollectionScreen(gameName: String,
                         stringResource(R.string.collection_screen_heading),
                         gameName
                     ),
-                    fontSize = 50.sp,
-                    lineHeight = 60.sp,
-                    textAlign = TextAlign.Center
+                    style = appTypography.displayLarge
                 )
             }
             Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
@@ -149,8 +147,7 @@ fun CollectionScreen(gameName: String,
                             totalCardCount
                         ),
                         modifier = Modifier.fillMaxWidth(1f),
-                        fontSize = 20.sp,
-                        lineHeight = 25.sp,
+                        style = appTypography.headlineMedium,
                         textAlign = TextAlign.Center
                     )
                     Text(
@@ -160,8 +157,7 @@ fun CollectionScreen(gameName: String,
                             "$"
                         ),
                         modifier = Modifier.fillMaxWidth(1f),
-                        fontSize = 20.sp,
-                        lineHeight = 25.sp,
+                        style = appTypography.headlineMedium,
                         textAlign = TextAlign.Center
                     )
                     Text(
@@ -171,8 +167,7 @@ fun CollectionScreen(gameName: String,
                             "$"
                         ),
                         modifier = Modifier.fillMaxWidth(1f),
-                        fontSize = 20.sp,
-                        lineHeight = 25.sp,
+                        style = appTypography.headlineMedium,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -203,7 +198,10 @@ fun CollectionScreen(gameName: String,
                         disabledContentColor = Color.Black
                     )
                 ) {
-                    Text(stringResource(R.string.create_new_collection_label))
+                    Text(
+                        text = stringResource(R.string.create_new_collection_label),
+                        style = appTypography.labelMedium
+                    )
                 }
             }
 
@@ -312,22 +310,19 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                     text = name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 30.sp,
-                    lineHeight = 35.sp,
+                    style = appTypography.headlineLarge,
                     textAlign = TextAlign.Left
                 )
                 Text(
                     text = String.format(stringResource(R.string.cards_label), cardCount),
-                    fontSize = 20.sp,
-                    lineHeight = 25.sp,
+                    style = appTypography.headlineSmall,
                     textAlign = TextAlign.Left
                 )
                 Text(
                     text = String.format(stringResource(R.string.location_label), location),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 20.sp,
-                    lineHeight = 25.sp,
+                    style = appTypography.headlineSmall,
                     textAlign = TextAlign.Left
                 )
                 Text(
@@ -336,8 +331,7 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                         totalValue,
                         "$"
                     ),
-                    fontSize = 20.sp,
-                    lineHeight = 25.sp,
+                    style = appTypography.headlineSmall,
                     textAlign = TextAlign.Left
                 )
             }
@@ -362,13 +356,22 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                     }
                 ) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.edit_option_label)) },
+                        text = {
+                            Text(
+                                text = stringResource(R.string.edit_option_label),
+                                style = appTypography.labelSmall
+                            )
+                        },
                         onClick = {
                             onEditSubcollectionInfo(subcollection)
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.delete_option_label)) },
+                        text = {
+                            Text(
+                                text = stringResource(R.string.delete_option_label),
+                                style = appTypography.labelSmall)
+                        },
                         onClick = {
                             onDeleteSubcollection(subcollection)
                         }
@@ -403,8 +406,7 @@ fun CreateNewCollectionPopup(
             ) {
                 Text(
                     text = stringResource(R.string.create_new_collection_label),
-                    fontSize = 28.sp,
-                    lineHeight = 40.sp,
+                    style = appTypography.headlineLarge,
                     textAlign = TextAlign.Center
                 )
 
@@ -433,7 +435,8 @@ fun CreateNewCollectionPopup(
                         onCheckedChange = { isDeck = it }
                     )
                     Text(
-                        stringResource(R.string.subcol_isdeck_label)
+                        text = stringResource(R.string.subcol_isdeck_label),
+                        style = appTypography.labelMedium
                     )
                 }
 
@@ -454,7 +457,9 @@ fun CreateNewCollectionPopup(
                             disabledContentColor = Color.Black
                         )
                     ) {
-                        Text(stringResource(R.string.dismiss))
+                        Text(
+                            text = stringResource(R.string.dismiss),
+                            style = appTypography.labelLarge)
                     }
 
                     Spacer(modifier = Modifier.weight(.1f))
@@ -477,7 +482,9 @@ fun CreateNewCollectionPopup(
                             disabledContentColor = Color.Black
                         )
                     ) {
-                        Text(stringResource(R.string.create))
+                        Text(
+                            text = stringResource(R.string.create),
+                            style = appTypography.labelLarge)
                     }
 
                 }
@@ -509,8 +516,7 @@ fun EditSubcollectionPopup(
         ) {
             Text(
                 text = stringResource(R.string.edit_subcollection_info_title),
-                fontSize = 28.sp,
-                lineHeight = 40.sp,
+                style = appTypography.headlineLarge,
                 textAlign = TextAlign.Center
             )
 
@@ -539,7 +545,8 @@ fun EditSubcollectionPopup(
                     onCheckedChange = { isDeck = it }
                 )
                 Text(
-                    stringResource(R.string.subcol_isdeck_label)
+                    text = stringResource(R.string.subcol_isdeck_label),
+                    style = appTypography.labelMedium
                 )
             }
 
@@ -560,7 +567,10 @@ fun EditSubcollectionPopup(
                         disabledContentColor = Color.Black
                     )
                 ) {
-                    Text(stringResource(R.string.dismiss))
+                    Text(
+                        text = stringResource(R.string.dismiss),
+                        style = appTypography.labelLarge
+                    )
                 }
 
                 Spacer(modifier = Modifier.weight(.1f))
@@ -586,7 +596,10 @@ fun EditSubcollectionPopup(
                         disabledContentColor = Color.Black
                     )
                 ) {
-                    Text(stringResource(R.string.save_button_label))
+                    Text(
+                        text = stringResource(R.string.save_button_label),
+                        style = appTypography.labelLarge
+                    )
                 }
 
             }
@@ -607,7 +620,10 @@ fun DeleteSubcollectionPopup(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
     ) {
-        Text(stringResource(R.string.subcol_delete_warning))
+        Text(
+            text = stringResource(R.string.subcol_delete_warning),
+            style = appTypography.headlineSmall
+        )
         Row {
             Button(
                 onClick = {
@@ -617,14 +633,20 @@ fun DeleteSubcollectionPopup(
                     onCancel()
                 }
             ) {
-                Text(stringResource(R.string.delete_option_label))
+                Text(
+                    text = stringResource(R.string.delete_option_label),
+                    style = appTypography.labelLarge
+                )
             }
             Button(
                 onClick = {
                     onCancel()
                 }
             ) {
-                Text(stringResource(R.string.cancel_button_label))
+                Text(
+                    text = stringResource(R.string.cancel_button_label),
+                    style = appTypography.labelLarge
+                )
             }
         }
     }
@@ -711,14 +733,15 @@ fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
 }
 
 @Composable
-fun FilterTextfield(modifier: Modifier, label: String, value: String, onValueChange: (String) -> Unit,
-                    isError: Boolean) {
+fun FilterTextfield(modifier: Modifier, label: String, value: String,
+                    onValueChange: (String) -> Unit, isError: Boolean,
+                    textStyle: TextStyle = appTypography.labelMedium) {
     Column(modifier = modifier) {
         Text(
             text = label,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Start,
-            color = Color.Black
+            style = textStyle,
         )
 
         BasicTextField(

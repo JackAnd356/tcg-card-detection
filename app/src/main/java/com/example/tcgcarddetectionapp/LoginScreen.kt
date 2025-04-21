@@ -158,8 +158,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
         if (loginError != "") {
             Text(
                 text = loginError,
-                fontSize = 20.sp,
-                lineHeight = 30.sp,
+                style = appTypography.bodyLarge,
                 textAlign = TextAlign.Left
             )
         }
@@ -212,7 +211,10 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 painter = painterResource(id = R.drawable.facebook_icon_white_logo),
                 contentDescription = "Login With Facebook",
             )
-            Text(stringResource( R.string.facebook_login_placeholder), fontSize = 12.sp)
+            Text(
+                text = stringResource( R.string.facebook_login_placeholder),
+                style = appTypography.labelMedium
+            )
         }
         Button(
             onClick = {
@@ -227,7 +229,8 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
             modifier = modifier.padding(top = 40.dp)
         ) {
             Text(
-                stringResource(R.string.new_user_button_label)
+                text = stringResource(R.string.new_user_button_label),
+                style = appTypography.labelMedium
             )
         }
     }
@@ -247,7 +250,10 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
     TextField(
         value = username,
         onValueChange = onChange,
-        label = { Text(stringResource(R.string.username_label)) },
+        label = { Text(
+            text = stringResource(R.string.username_label),
+            style = appTypography.labelMedium
+            ) },
         modifier = modifier.fillMaxWidth(.9f),
         colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
         singleLine = true,
@@ -259,7 +265,9 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
     TextField(
         value = password,
         onValueChange = onChange,
-        label = { Text(stringResource(R.string.password_label)) },
+        label = { Text(
+            text = stringResource(R.string.password_label),
+            style = appTypography.labelMedium) },
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         modifier = modifier.fillMaxWidth(.9f).padding(bottom = 8.dp),
@@ -281,7 +289,10 @@ fun LoginButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
             disabledContentColor = Color.White
         )
     ) {
-        Text(stringResource(R.string.login_label), fontSize = 30.sp)
+        Text(
+            text = stringResource(R.string.login_label),
+            style = appTypography.labelLarge
+        )
     }
 }
 
