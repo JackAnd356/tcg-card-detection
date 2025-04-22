@@ -51,9 +51,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -149,8 +152,16 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var filterList = remember { mutableStateListOf<(CardData) -> Boolean>()}
     var listOfTypes = remember {  mutableStateListOf<String>()}
     var listOfAttributes = remember {  mutableStateListOf<String>()}
+    var listOfRarities = remember { mutableStateListOf<String>() }
+    var listOfFrames = remember { mutableStateListOf<String>()}
     var selectedTypeFilter by remember { mutableStateOf("") }
+    var selectedTypeFilterIndex by remember { mutableIntStateOf(1) }
     var selectedAttributeFilter by remember { mutableStateOf("") }
+    var selectedAttributeFilterIndex by remember { mutableIntStateOf(1) }
+    var selectedRarityFilter by remember { mutableStateOf("") }
+    var selectedRarityFilterIndex by remember { mutableIntStateOf(1) }
+    var selectedFrameFilter by remember { mutableStateOf("") }
+    var selectedFrameFilterIndex by remember { mutableIntStateOf(1) }
     var selectedMinQuantity by remember { mutableStateOf("") }
     var minQuantErr by remember { mutableStateOf(false) }
     var selectedMaxQuantity by remember { mutableStateOf("") }
@@ -165,15 +176,20 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
     var maxPriceErr by remember { mutableStateOf(false) }
 
     val screenHeight = LocalConfiguration.current.screenHeightDp
-    val forceRecomposeState = rememberUpdatedState(refreshFlag)
+    val forceRecomposeState = rememberUpdatedState(refreshFlag) //Says unused. However it is very much so required
     val backArrowSize = (screenHeight * 0.02)
 
     if (!listOfTypes.contains("")) {
         listOfTypes.add("")
     }
-
     if (!listOfAttributes.contains("")) {
         listOfAttributes.add("")
+    }
+    if (!listOfRarities.contains("")) {
+        listOfRarities.add("")
+    }
+    if(!listOfFrames.contains("")) {
+        listOfFrames.add("")
     }
 
 
@@ -195,11 +211,17 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             }
             if (!cardData.contains(card) && card.game == game && filterFlag) {
                 cardData.add(card)
-                if (game == "yugioh" && !listOfTypes.contains(card.type!!)) {
+                if ((game == "yugioh" || game == "mtg") && !listOfTypes.contains(card.type!!)) {
                     listOfTypes.add(card.type)
                 }
                 if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
                     listOfAttributes.add(card.attribute)
+                }
+                if (card.rarity != null && !listOfRarities.contains(card.rarity)) {
+                    listOfRarities.add(card.rarity!!)
+                }
+                if (game == "yugioh" && !listOfFrames.contains(card.frameType!!)) {
+                    listOfFrames.add(card.frameType)
                 }
             }
             else if (cardData.contains(card) && !filterFlag) {
@@ -243,11 +265,17 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     cardData.removeAll(Collections.singleton(card))
                 }
                 if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
-                    if (card.game == "yugioh" && !listOfTypes.contains(card.type!!)) {
+                    if (!listOfTypes.contains(card.type!!)) {
                         listOfTypes.add(card.type)
                     }
                     if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
                         listOfAttributes.add(card.attribute)
+                    }
+                    if (card.rarity != null && !listOfRarities.contains(card.rarity)) {
+                        listOfRarities.add(card.rarity!!)
+                    }
+                    if (!listOfFrames.contains(card.frameType!!)) {
+                        listOfFrames.add(card.frameType)
                     }
                 }
             }
@@ -278,11 +306,14 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 }
 
                 if (card.subcollections?.contains(subcolInfo.subcollectionid) == true) {
-                    if (card.game == "yugioh" && !listOfTypes.contains(card.type!!)) {
+                    if (card.game == "mtg" && !listOfTypes.contains(card.type!!)) {
                         listOfTypes.add(card.type)
                     }
                     if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
                         listOfAttributes.add(card.attribute)
+                    }
+                    if (card.rarity != null && !listOfRarities.contains(card.rarity)) {
+                        listOfRarities.add(card.rarity!!)
                     }
                 }
             }
@@ -518,214 +549,301 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     }
                 }
                 if (showFilters) {
+                    val alwaysFilters = listOf<@Composable (Modifier) -> Unit> (
+                        {modifier -> MinMaxIntComponent(
+                            minVal = selectedMinQuantity,
+                            maxVal = selectedMaxQuantity,
+                            onMinValChange = { selectedMinQuantity = it },
+                            onMaxValChange = { selectedMaxQuantity = it },
+                            label = stringResource(R.string.quantity_filter_label),
+                            minError = minQuantErr,
+                            onMinErrChange = { minQuantErr = it },
+                            maxError = maxQuantErr,
+                            onMaxErrChange = { maxQuantErr = it },
+                            modifier = modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(colorResource(R.color.darkGray))
+                                .padding(5.dp)
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach {
+                                    func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        {modifier -> MinMaxDoubleComponent(
+                            minVal = selectedMinPrice,
+                            maxVal = selectedMaxPrice,
+                            onMinValChange = { selectedMinPrice = it },
+                            onMaxValChange = {  selectedMaxPrice = it },
+                            label = stringResource(R.string.price_filter_label),
+                            minError = minPriceErr,
+                            onMinErrChange = { minPriceErr = it },
+                            maxError = maxPriceErr,
+                            modifier = modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(colorResource(R.color.darkGray))
+                                .padding(5.dp),
+                            onMaxErrChange = { maxPriceErr = it }
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach {
+                                    func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        {modifier -> DropdownSelectorFilter(
+                            label = "Rarity",
+                            data = selectedRarityFilterIndex,
+                            options = listOfRarities.toList(),
+                            onSelectedValChange = { rarity, index ->
+                                selectedRarityFilter = rarity
+                                selectedRarityFilterIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp)
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                    )
+
+                    val conditionalFilters = listOf<Pair<Boolean, @Composable (Modifier) -> Unit>>(
+                        (game == "yugioh") to {modifier -> MinMaxIntComponent(
+                            minVal = selectedMinLevel,
+                            maxVal = selectedMaxLevel,
+                            onMinValChange = { selectedMinLevel = it },
+                            onMaxValChange = { selectedMaxLevel = it },
+                            label = stringResource(R.string.level_filter_label),
+                            minError = minLevelErr,
+                            onMinErrChange = { minLevelErr = it },
+                            maxError = maxLevelErr,
+                            onMaxErrChange = { maxLevelErr = it },
+                            modifier = modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(colorResource(R.color.darkGray))
+                                .padding(5.dp)
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        (game == "yugioh" || game == "mtg") to { modifier -> DropdownSelectorFilter(
+                            label = "Type",
+                            data = selectedTypeFilterIndex,
+                            options = listOfTypes.toList(),
+                            onSelectedValChange = { type, index ->
+                                selectedTypeFilter = type
+                                selectedTypeFilterIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp)
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        (game == "yugioh") to { modifier -> DropdownSelectorFilter(
+                            label = "Attribute",
+                            data = selectedAttributeFilterIndex,
+                            options = listOfAttributes.toList(),
+                            onSelectedValChange = { attr, index ->
+                                selectedAttributeFilter = attr
+                                selectedAttributeFilterIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp),
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        (game == "yugioh") to { modifier -> DropdownSelectorFilter(
+                            label = "Border",
+                            data = selectedFrameFilterIndex,
+                            options = listOfFrames.toList(),
+                            onSelectedValChange = { attr, index ->
+                                selectedFrameFilter = attr
+                                selectedFrameFilterIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp),
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        (game == "mtg") to {modifier -> DropdownSelectorFilter(
+                            label = "Color",
+                            data = selectedAttributeFilterIndex,
+                            options = listOfAttributes.toList(),
+                            onSelectedValChange = {attr, index ->
+                                selectedAttributeFilter = attr
+                                selectedAttributeFilterIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp),
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        (game == "pokemon") to { modifier -> DropdownSelectorFilter(
+                            label = "Type",
+                            data = selectedAttributeFilterIndex,
+                            options = listOfAttributes.toList(),
+                            onSelectedValChange = {attr, index ->
+                                selectedAttributeFilter = attr
+                                selectedAttributeFilterIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp),
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                    )
+
+                    val visibleItems = buildList {
+                        addAll(alwaysFilters)
+                        addAll(conditionalFilters.filter { it.first }.map { it.second })
+                    }
+
+                    val rows = visibleItems.chunked(2)
+
                     Column(modifier = Modifier
                         .fillMaxWidth(.9f)
                         .clip(RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp))
                         .background(color = colorResource(R.color.darkGray)),
                         horizontalAlignment = Alignment.CenterHorizontally) {
-                        Row(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp)) {
-                            MinMaxIntComponent(
-                                minVal = selectedMinQuantity,
-                                maxVal = selectedMaxQuantity,
-                                onMinValChange = { selectedMinQuantity = it },
-                                onMaxValChange = { selectedMaxQuantity = it },
-                                label = stringResource(R.string.quantity_filter_label),
-                                minError = minQuantErr,
-                                onMinErrChange = { minQuantErr = it },
-                                maxError = maxQuantErr,
-                                onMaxErrChange = { maxQuantErr = it },
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(colorResource(R.color.darkGray))
-                                    .padding(5.dp)
-                                    .weight(.48f),
-                            ) {
-                                filterList.clear()
-                                recalculateFilterList(
-                                    type = selectedTypeFilter,
-                                    quantityMin = selectedMinQuantity,
-                                    levelMin = selectedMinLevel,
-                                    quantityMax = selectedMaxQuantity,
-                                    levelMax = selectedMaxLevel,
-                                    priceMin = selectedMinPrice,
-                                    priceMax = selectedMaxPrice,
-                                    attribute = selectedAttributeFilter,
-                                ).forEach {
-                                        func ->
-                                    filterList.add(func)
+                        for (row in rows) {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                row.getOrNull(0)?.let { item ->
+                                    item(
+                                        Modifier
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(colorResource(R.color.darkGray))
+                                            .padding(5.dp)
+                                            .weight(0.48f)
+                                    )
                                 }
-                            }
 
-                            Spacer(modifier = Modifier.weight(.04f))
-
-                            MinMaxDoubleComponent(
-                                minVal = selectedMinPrice,
-                                maxVal = selectedMaxPrice,
-                                onMinValChange = { selectedMinPrice = it },
-                                onMaxValChange = {  selectedMaxPrice = it },
-                                label = stringResource(R.string.price_filter_label),
-                                minError = minPriceErr,
-                                onMinErrChange = { minPriceErr = it },
-                                maxError = maxPriceErr,
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(Color.White)
-                                    .padding(5.dp)
-                                    .weight(.48f),
-                                onMaxErrChange = { maxPriceErr = it }
-                            ) {
-                                filterList.clear()
-                                recalculateFilterList(
-                                    type = selectedTypeFilter,
-                                    quantityMin = selectedMinQuantity,
-                                    levelMin = selectedMinLevel,
-                                    quantityMax = selectedMaxQuantity,
-                                    levelMax = selectedMaxLevel,
-                                    priceMin = selectedMinPrice,
-                                    priceMax = selectedMaxPrice,
-                                    attribute = selectedAttributeFilter,
-                                ).forEach {
-                                        func ->
-                                    filterList.add(func)
-                                }
-                            }
-                        }
-                        Column(modifier = Modifier.padding(vertical = 10.dp)) {
-                            when (game) {
-                                "yugioh" -> {
-                                    Row(
-                                        modifier = Modifier.padding(
-                                            vertical = 10.dp,
-                                            horizontal = 5.dp
-                                        )
-                                    ) {
-                                        MinMaxIntComponent(
-                                            minVal = selectedMinLevel,
-                                            maxVal = selectedMaxLevel,
-                                            onMinValChange = { selectedMinLevel = it },
-                                            onMaxValChange = { selectedMaxLevel = it },
-                                            label = stringResource(R.string.level_filter_label),
-                                            minError = minLevelErr,
-                                            onMinErrChange = { minLevelErr = it },
-                                            maxError = maxLevelErr,
-                                            onMaxErrChange = { maxLevelErr = it },
-                                            modifier = Modifier
+                                if (row.size == 2) {
+                                    Spacer(modifier = Modifier.weight(0.04f))
+                                    row.getOrNull(1)?.let { item ->
+                                        item(
+                                            Modifier
                                                 .clip(RoundedCornerShape(10.dp))
-                                                .background(Color.White)
+                                                .background(colorResource(R.color.darkGray))
                                                 .padding(5.dp)
-                                                .weight(.48f)
-                                        ) {
-                                            filterList.clear()
-                                            recalculateFilterList(
-                                                type = selectedTypeFilter,
-                                                quantityMin = selectedMinQuantity,
-                                                levelMin = selectedMinLevel,
-                                                quantityMax = selectedMaxQuantity,
-                                                levelMax = selectedMaxLevel,
-                                                priceMin = selectedMinPrice,
-                                                priceMax = selectedMaxPrice,
-                                                attribute = selectedAttributeFilter,
-                                            ).forEach { func ->
-                                                filterList.add(func)
-                                            }
-                                        }
-                                        Spacer(modifier = Modifier.weight(.04f))
-                                        DropdownSelectorFilter(
-                                            label = "Type",
-                                            data = 1,
-                                            options = listOfTypes.toList(),
-                                            onSelectedValChange = {
-                                                selectedTypeFilter = it
-                                            },
-                                            modifier = Modifier.weight(.48f)
-                                        ) {
-                                            filterList.clear()
-                                            recalculateFilterList(
-                                                type = selectedTypeFilter,
-                                                quantityMin = selectedMinQuantity,
-                                                levelMin = selectedMinLevel,
-                                                quantityMax = selectedMaxQuantity,
-                                                levelMax = selectedMaxLevel,
-                                                priceMin = selectedMinPrice,
-                                                priceMax = selectedMaxPrice,
-                                                attribute = selectedAttributeFilter,
-                                            ).forEach { func ->
-                                                filterList.add(func)
-                                            }
-                                        }
+                                                .weight(0.48f)
+                                        )
                                     }
-                                    DropdownSelectorFilter(
-                                        label = "Attribute",
-                                        data = 1,
-                                        options = listOfAttributes.toList(),
-                                        onSelectedValChange = {
-                                            selectedAttributeFilter = it
-                                        },
-                                    ) {
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                            priceMin = selectedMinPrice,
-                                            priceMax = selectedMaxPrice,
-                                            attribute = selectedAttributeFilter,
-                                        ).forEach { func ->
-                                            filterList.add(func)
-                                        }
-                                    }
-                                }
-
-                                "mtg" -> {
-                                    DropdownSelectorFilter(
-                                        label = "Color",
-                                        data = 1,
-                                        options = listOfAttributes.toList(),
-                                        onSelectedValChange = {
-                                            selectedAttributeFilter = it
-                                        },
-                                    ) {
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                            priceMin = selectedMinPrice,
-                                            priceMax = selectedMaxPrice,
-                                            attribute = selectedAttributeFilter,
-                                        ).forEach { func ->
-                                            filterList.add(func)
-                                        }
-                                    }
-                                }
-
-                                "pokemon" -> {
-                                    DropdownSelectorFilter(
-                                        label = "Type",
-                                        data = 1,
-                                        options = listOfAttributes.toList(),
-                                        onSelectedValChange = {
-                                            selectedAttributeFilter = it
-                                        },
-                                    ) {
-                                        filterList.clear()
-                                        recalculateFilterList(
-                                            type = selectedTypeFilter,
-                                            quantityMin = selectedMinQuantity,
-                                            levelMin = selectedMinLevel,
-                                            quantityMax = selectedMaxQuantity,
-                                            levelMax = selectedMaxLevel,
-                                            priceMin = selectedMinPrice,
-                                            priceMax = selectedMaxPrice,
-                                            attribute = selectedAttributeFilter,
-                                        ).forEach { func ->
-                                            filterList.add(func)
-                                        }
-                                    }
+                                } else {
+                                    // Fills remaining space if only one item
+                                    Spacer(modifier = Modifier.weight(0.52f))
                                 }
                             }
                         }
@@ -1765,7 +1883,7 @@ fun MinMaxIntComponent(minVal: String,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = label,
-            style = appTypography.labelSmall
+            style = appTypography.labelLarge
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -1850,7 +1968,7 @@ fun MinMaxDoubleComponent(minVal: String,
         horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = label,
-            style = appTypography.labelSmall
+            style = appTypography.labelLarge
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -1919,7 +2037,7 @@ fun MinMaxDoubleComponent(minVal: String,
 @Composable
 fun DropdownSelectorFilter(label: String, data: Int,
                            options: List<String>,
-                           onSelectedValChange: (String) -> Unit,
+                           onSelectedValChange: (String, Int) -> Unit,
                            modifier: Modifier = Modifier,
                            recalculateFilter: () -> Unit) {
     var mExpanded by remember { mutableStateOf(false) }
@@ -1929,18 +2047,18 @@ fun DropdownSelectorFilter(label: String, data: Int,
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
+    val interactionSource = remember { MutableInteractionSource() }
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-        border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = colorResource(R.color.darkGray)),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
             .fillMaxWidth()
             .height(70.dp)
             .requiredHeight(70.dp)) {
-        Row {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = label,
-                style = appTypography.labelSmall,
+                style = appTypography.labelLarge,
                 textAlign = TextAlign.Left
             )
             Spacer(Modifier.weight(1f))
@@ -1954,21 +2072,26 @@ fun DropdownSelectorFilter(label: String, data: Int,
                             // This value is used to assign to
                             // the DropDown the same width
                             mTextFieldSize = coordinates.size.toSize()
+                        }
+                        .clickable(interactionSource = interactionSource, indication = null) {
+                            mExpanded = !mExpanded
                         },
                     trailingIcon = {
                         Icon(icon,"contentDescription",
                             Modifier.clickable { mExpanded = !mExpanded })
-                    }
+                    },
+                    enabled = false,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Black, unfocusedBorderColor = Color.Black)
                 )
                 DropdownMenu(
                     expanded = mExpanded,
                     onDismissRequest = {mExpanded = false}
                 ) {
-                    options.forEach{ optionLabel ->
+                    options.forEachIndexed{ index, optionLabel ->
                         DropdownMenuItem(
                             onClick = {
                                 mSelectedText = optionLabel
-                                onSelectedValChange(optionLabel)
+                                onSelectedValChange(optionLabel, index)
                                 recalculateFilter()
                                 mExpanded = false
                             },
@@ -2246,13 +2369,21 @@ fun recalculateFilterList(type: String,
                           levelMax: String,
                           priceMin: String,
                           priceMax: String,
-                          attribute: String): MutableList<(CardData) -> Boolean> {
+                          attribute: String,
+                          rarity: String,
+                          frame: String): MutableList<(CardData) -> Boolean> {
     val ret = mutableListOf<(CardData) -> Boolean>()
     if (type != "") {
         ret.add { it.type == type }
     }
     if (attribute != "") {
         ret.add { it.attribute != null && it.attribute == attribute }
+    }
+    if (rarity != "") {
+        ret.add { it.rarity != null && it.rarity == rarity }
+    }
+    if(frame != "") {
+        ret.add { it.frameType != null && it.frameType == frame}
     }
     if (quantityMin != "" && (quantityMax == "" || quantityMin.toInt() < quantityMax.toInt())) {
         ret.add { it.quantity >= quantityMin.toInt() }
