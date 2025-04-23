@@ -56,6 +56,15 @@ fun mapGameToFullName(game : String): String {
     }
 }
 
+fun mapGameToMaxCopiesInDeck(game: String): Int {
+    if (game == "yugioh") {
+        return 3
+    }
+    else {
+        return 4
+    }
+}
+
 fun mapRarityToPlaceholder(rarity: String): Pair<Int, Int> {
     return when (rarity) {
         "Common" -> Pair(R.drawable.common, R.string.yugioh_common_description)

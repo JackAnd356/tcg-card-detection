@@ -1043,16 +1043,18 @@ fun CardPopup(cardData: CardData,
 
                 },
                 plusOnClick = {
-                    saveToSubcollectionPost(
-                        card = cardData,
-                        userid = userid,
-                        subcollection = subcolInfo.subcollectionid,
-                        subcolInfo = subcolInfo,
-                        refreshUI = {
-                            refreshUI()
-                        },
-                    )
-                    subColQuant = (subColQuant.toInt() + 1).toString()
+                    if (subcolInfo.isDeck && cardData.subcollections!!.count{ it == subcolInfo.subcollectionid} < mapGameToMaxCopiesInDeck(subcolInfo.game)) {
+                        saveToSubcollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            subcollection = subcolInfo.subcollectionid,
+                            subcolInfo = subcolInfo,
+                            refreshUI = {
+                                refreshUI()
+                            },
+                        )
+                        subColQuant = (subColQuant.toInt() + 1).toString()
+                    }
                 },
                 subColQuant = subColQuant
             )
@@ -1522,8 +1524,8 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
                                 onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit,
                                 subcolInfo: SubcollectionInfo, refreshUI: () -> Unit,
                                 showCardDeletePopup: () -> Unit) {
-    val optionInfo = subcollections.filter( predicate = {
-        it.game == game
+    val optionInfo = subcollections.filter( predicate = { subCol ->
+        subCol.game == game && (!subCol.isDeck|| cardData.subcollections == null || cardData.subcollections!!.count {it == subCol.subcollectionid} < mapGameToMaxCopiesInDeck(subCol.game))
     })
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
     val optionList = optionInfo.map { it.name }
@@ -1673,8 +1675,33 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                          refreshUI: () -> Unit,
                          modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
+    val deckMap = mutableMapOf<String, Int>()
+
+    if (subcolInfo.isDeck) {
+        allCards.forEach {
+            card ->
+            var numInSubCol = 0
+            if (card.subcollections != null) {
+                numInSubCol = card.subcollections!!.count { it == subcollection}
+            }
+            if (card.game == game && numInSubCol > 0) {
+                deckMap[card.cardname] = deckMap.getOrDefault(card.cardname, 0) + numInSubCol
+            }
+        }
+    }
+
     val cardList = allCards.filter {
-        it.game == game
+        if (subcolInfo.isDeck) {
+            if (deckMap.containsKey(it.cardname)) {
+                it.game == game && deckMap[it.cardname]!! < mapGameToMaxCopiesInDeck(game)
+            }
+            else {
+                it.game == game
+            }
+        }
+        else {
+            it.game == game
+        }
     }
     val checkedStates = remember { mutableStateListOf<Boolean>() }
     repeat(cardList.size) {
