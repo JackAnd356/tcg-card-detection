@@ -3,9 +3,17 @@ package com.example.tcgcarddetectionapp
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
+import androidx.camera.core.Preview as CameraPreview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,17 +23,26 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -36,9 +53,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.tcgcarddetectionapp.models.AddRemoveCardModel
 import com.example.tcgcarddetectionapp.models.CardData
 import com.example.tcgcarddetectionapp.models.GenericSuccessErrorResponseModel
@@ -70,13 +89,120 @@ fun ScanScreen(modifier: Modifier = Modifier, userid: String, collectionNavigate
 
     when (stage.value) {
         Stages.Home -> {
-            ScanHome(modifier, stage)
+            CameraPreviewScreen(modifier, stage)
         }
         Stages.Confirmation -> {
             ScanConfirmation(modifier, userid, stage, addToOverallCards = addToOverallCards)
         }
         Stages.PostConfirmation -> {
             ScanPostConfirmation(modifier, stage, collectionNavigate)
+        }
+    }
+}
+
+@Composable
+fun CameraPreviewScreen(modifier: Modifier, stage: MutableState<Stages>) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+    val err = remember { mutableIntStateOf(0) }
+
+    val imageCapture = remember {
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
+    }
+
+    val previewView = remember { PreviewView(context) }
+
+    var showPhotoTipsDialog by remember { mutableStateOf(true) }
+
+    if (showPhotoTipsDialog) {
+        AlertDialog(
+            onDismissRequest = { showPhotoTipsDialog = false },
+            title = { Text(stringResource(R.string.scan_screen_tips_title)) },
+            text = {
+                Text(stringResource(R.string.scan_screen_tips_1) + "\n" +
+                        stringResource(R.string.scan_screen_tips_2) + "\n" +
+                        stringResource(R.string.scan_screen_tips_3) + "\n" +
+                        stringResource(R.string.scan_screen_tips_4) + "\n" +
+                        stringResource(R.string.scan_screen_tips_5))
+            },
+            confirmButton = {
+                TextButton(onClick = { showPhotoTipsDialog = false }) {
+                    Text("Got it!")
+                }
+            }
+        )
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        AndroidView(factory = {
+            val preview = CameraPreview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+
+            val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                .build()
+
+            cameraProviderFuture.addListener({
+                val cameraProvider = cameraProviderFuture.get()
+                try {
+                    cameraProvider.unbindAll()
+                    cameraProvider.bindToLifecycle(
+                        lifecycleOwner,
+                        cameraSelector,
+                        preview,
+                        imageCapture
+                    )
+                } catch (e: Exception) {
+                    Log.e("CameraX", "Use case binding failed", e)
+                }
+            }, ContextCompat.getMainExecutor(context))
+
+            previewView
+        }, modifier = Modifier.fillMaxSize())
+
+        // Overlay corners
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val cornerLength = 40.dp.toPx()
+            val strokeWidth = 4.dp.toPx()
+            val padding = 32.dp.toPx()
+
+            val left = padding
+            val top = padding
+            val right = size.width - padding
+            val bottom = size.height - padding
+
+            drawRectGuideCorners(left, top, right, bottom, cornerLength, strokeWidth)
+        }
+    }
+
+    // Floating Action Button to capture image
+    Box(modifier = Modifier.fillMaxSize()) {
+        Button(onClick = {
+            val photoFile = context.createImageFile()
+            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+            imageCapture.takePicture(
+                outputOptions,
+                ContextCompat.getMainExecutor(context),
+                object : ImageCapture.OnImageSavedCallback {
+                    override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                        scanPhotoPost(photoFile, stage, err)
+                    }
+
+                    override fun onError(exception: ImageCaptureException) {
+                        Log.e("CameraX", "Photo capture failed: ${exception.message}", exception)
+                    }
+                }
+            )
+        },
+            modifier = modifier.align(Alignment.BottomCenter)
+                .padding(bottom = 200.dp) // Adjust this value to fine-tune the vertical position
+                .size(125.dp)) {
+            Text("Capture")
         }
     }
 }
@@ -99,7 +225,8 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Box(modifier = Modifier.height((screenHeight/1.7).dp)
+        Box(modifier = Modifier
+            .height((screenHeight / 1.7).dp)
             .padding(horizontal = 10.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(colorResource(R.color.textLightGrey))) {
@@ -165,8 +292,10 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
     Column(verticalArrangement = Arrangement.Top, modifier = modifier
         .fillMaxSize()
         .wrapContentWidth(Alignment.CenterHorizontally)) {
-        Column(verticalArrangement = Arrangement.Top, modifier = modifier.padding(16.dp)
-            .background(Color.Gray).padding(16.dp)) {
+        Column(verticalArrangement = Arrangement.Top, modifier = modifier
+            .padding(16.dp)
+            .background(Color.Gray)
+            .padding(16.dp)) {
             val map = cards.groupBy { it.game }
             map.forEach { entry ->
                 val game = entry.key
@@ -183,15 +312,35 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                             .fillMaxWidth()
                             .padding(8.dp)
                             .background(
-                                color = if (cardData.possRarities != null) Color(ContextCompat.getColor(context, R.color.extremelyLightRed))
-                                else if (isChecked.value) Color(ContextCompat.getColor(context, R.color.extremelyLightBlue))
+                                color = if (cardData.possRarities != null) Color(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.extremelyLightRed
+                                    )
+                                )
+                                else if (isChecked.value) Color(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.extremelyLightBlue
+                                    )
+                                )
                                 else Color(ContextCompat.getColor(context, R.color.gray)),
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .border(
                                 width = 2.dp,
-                                color = if (cardData.possRarities != null) Color(ContextCompat.getColor(context, R.color.buttonRedBorder))
-                                else if (isChecked.value) Color(ContextCompat.getColor(context, R.color.buttonBlueBorder))
+                                color = if (cardData.possRarities != null) Color(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.buttonRedBorder
+                                    )
+                                )
+                                else if (isChecked.value) Color(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.buttonBlueBorder
+                                    )
+                                )
                                 else Color.Transparent,
                                 shape = RoundedCornerShape(8.dp)
                             )
@@ -518,7 +667,9 @@ fun ImageCaptureFromCamera(modifier: Modifier, stage: MutableState<Stages>, err:
     })
 
     val image = painterResource(R.drawable.takepicture)
-    Button(modifier = modifier.width(125.dp).height(125.dp), onClick =  {
+    Button(modifier = modifier
+        .width(125.dp)
+        .height(125.dp), onClick =  {
         if (cameraPermission) {
             takePictureLauncher.launch(uri)
         } else {
@@ -527,6 +678,79 @@ fun ImageCaptureFromCamera(modifier: Modifier, stage: MutableState<Stages>, err:
     }) {
         Icon(painter = image, contentDescription = "")
     }
+}
+
+fun DrawScope.drawRectGuideCorners(
+    left: Float,
+    top: Float,
+    right: Float,
+    bottom: Float,
+    cornerLength: Float,
+    strokeWidth: Float,
+    inset: Float = 10f,      // Bring corners closer to the edge
+    bottomOffset: Float = 900f // Pull bottom corners upward
+) {
+    val color = Color.White
+    val adjustedLeft = left + inset
+    val adjustedTop = top + inset
+    val adjustedRight = right - inset
+    val adjustedBottom = bottom - inset - bottomOffset
+
+    // Top-left
+    drawLine(
+        start = Offset(adjustedLeft, adjustedTop),
+        end = Offset(adjustedLeft + cornerLength, adjustedTop),
+        color = color,
+        strokeWidth = strokeWidth
+    )
+    drawLine(
+        start = Offset(adjustedLeft, adjustedTop),
+        end = Offset(adjustedLeft, adjustedTop + cornerLength),
+        color = color,
+        strokeWidth = strokeWidth
+    )
+
+    // Top-right
+    drawLine(
+        start = Offset(adjustedRight, adjustedTop),
+        end = Offset(adjustedRight - cornerLength, adjustedTop),
+        color = color,
+        strokeWidth = strokeWidth
+    )
+    drawLine(
+        start = Offset(adjustedRight, adjustedTop),
+        end = Offset(adjustedRight, adjustedTop + cornerLength),
+        color = color,
+        strokeWidth = strokeWidth
+    )
+
+    // Bottom-left
+    drawLine(
+        start = Offset(adjustedLeft, adjustedBottom),
+        end = Offset(adjustedLeft + cornerLength, adjustedBottom),
+        color = color,
+        strokeWidth = strokeWidth
+    )
+    drawLine(
+        start = Offset(adjustedLeft, adjustedBottom),
+        end = Offset(adjustedLeft, adjustedBottom - cornerLength),
+        color = color,
+        strokeWidth = strokeWidth
+    )
+
+    // Bottom-right
+    drawLine(
+        start = Offset(adjustedRight, adjustedBottom),
+        end = Offset(adjustedRight - cornerLength, adjustedBottom),
+        color = color,
+        strokeWidth = strokeWidth
+    )
+    drawLine(
+        start = Offset(adjustedRight, adjustedBottom),
+        end = Offset(adjustedRight, adjustedBottom - cornerLength),
+        color = color,
+        strokeWidth = strokeWidth
+    )
 }
 
 @Preview(showBackground = true)

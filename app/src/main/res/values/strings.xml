@@ -113,4 +113,10 @@
     <string name="max">Max:</string>
     <string name="edit_subcollection_info_title">Edit Collection Info</string>
     <string name="edit_subcollection_info_warning">Name is required</string>
+    <string name="scan_screen_tips_title">Before You Scan:</string>
+    <string name="scan_screen_tips_1">1. Make sure you are in a well lit area</string>
+    <string name="scan_screen_tips_2">2. Keep area around card clear</string>
+    <string name="scan_screen_tips_3">3. Try to position the card an a simple, monotone background</string>
+    <string name="scan_screen_tips_4">4. Keep the card as straight and centered as possible</string>
+    <string name="scan_screen_tips_5">5. Make sure the image is fully focused</string>
 </resources>
