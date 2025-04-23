@@ -1051,7 +1051,7 @@ fun CardPopup(cardData: CardData,
 
                 },
                 plusOnClick = {
-                    if (subcolInfo.isDeck && cardData.subcollections!!.count{ it == subcolInfo.subcollectionid} < mapGameToMaxCopiesInDeck(subcolInfo.game)) {
+                    if (!subcolInfo.isDeck || (cardData.subcollections!!.count{ it == subcolInfo.subcollectionid} < mapGameToMaxCopiesInDeck(subcolInfo.game))) {
                         saveToSubcollectionPost(
                             card = cardData,
                             userid = userid,
@@ -1250,7 +1250,8 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                         modifier = Modifier.padding(vertical = 5.dp),
                         infoType = stringResource(R.string.cost_label),
                         infoData = "",
-                        icons = stripColorString(cardData.cost)
+                        icons = stripColorString(cardData.cost),
+                        split = 0.5f
                     )
                 }
 
@@ -1258,7 +1259,8 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                     CardInfoBox(
                         modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.type_label),
-                        infoData = cardData.type
+                        infoData = cardData.type,
+                        split = 0.5f
                     )
                 }
 
@@ -1266,7 +1268,8 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                     CardInfoBox(
                         modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.power_label),
-                        infoData = cardData.atk
+                        infoData = cardData.atk,
+                        split = 0.5f
                     )
                 }
 
@@ -1274,7 +1277,8 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                     CardInfoBox(
                         modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.toughness_label),
-                        infoData = cardData.def
+                        infoData = cardData.def,
+                        split = 0.5f
                     )
                 }
             }
@@ -2151,7 +2155,12 @@ fun DropdownSelectorFilter(label: String? = null, data: Int,
                             Modifier.clickable { mExpanded = !mExpanded })
                     },
                     enabled = false,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.Black, unfocusedBorderColor = Color.Black)
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        disabledContainerColor = Color.White)
                 )
                 DropdownMenu(
                     expanded = mExpanded,
