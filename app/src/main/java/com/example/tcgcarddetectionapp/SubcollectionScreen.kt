@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -71,6 +72,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
@@ -970,7 +972,7 @@ fun CardImage(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(y = 5.dp)
+                    .offset(y = 7.dp)
                     .background(Color.Black.copy(alpha = 0.7f), shape = RoundedCornerShape(4.dp))
                     .padding(4.dp)
             )
@@ -1015,13 +1017,19 @@ fun CardPopup(cardData: CardData,
                 userid = userid,
                 game = game,
                 subcollections = subcollections,
+            )
+            ChangeQuantityCardComponent(
+                modifier = Modifier,
+                label = stringResource(R.string.quantity_filter_label),
+                cardData = cardData,
+                userid = userid,
                 fullCardPool = fullCardPool,
                 onCollectionChange = onCollectionChange,
                 removeCard = removeCard,
-                subcolInfo = subcolInfo,
                 refreshUI = refreshUI,
+                subcolInfo = subcolInfo,
                 showCardDeletePopup = { showCardDeletePopup = true }
-                )
+            )
         } else {
             ChangeQuantityCardComponent(modifier = Modifier,
                 minusOnClick = {
@@ -1056,7 +1064,8 @@ fun CardPopup(cardData: CardData,
                         subColQuant = (subColQuant.toInt() + 1).toString()
                     }
                 },
-                subColQuant = subColQuant
+                subColQuant = subColQuant,
+                label = stringResource(R.string.subcollection_quantity_label)
             )
             /*Column {
                 Button(onClick = {
@@ -1107,10 +1116,10 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
                     Image(
                         painter = painterResource(R.drawable.nocardimage),
                         contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                        modifier = Modifier
+                        modifier = Modifier.padding(end = 5.dp)
                     )
                 }
-                CardPriceComponent(modifier = Modifier.padding(top = 10.dp, bottom = 5.dp),
+                CardPriceComponent(modifier = Modifier.padding(vertical = 5.dp),
                     cardData = cardData, navWebsite = navWebsite)
             }
             Column(modifier = Modifier.weight(.6f)) {
@@ -1192,7 +1201,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
             }
         }
         Card(
-            modifier = Modifier.height(120.dp).padding(5.dp),
+            modifier = Modifier.height(120.dp).padding(vertical = 5.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
@@ -1220,23 +1229,25 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                     Image(
                         bitmap = cardData.imageBitmap!!,
                         contentDescription = "Card",
-                        modifier = Modifier
+                        modifier = Modifier.padding(end = 5.dp)
                     )
                 } else {
                     Image(
                         painter = painterResource(R.drawable.nocardimage),
                         contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                        Modifier
-                            .size(120.dp, 200.dp)
+                        Modifier.padding(end = 5.dp)
                     )
                 }
 
-                CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
+                CardPriceComponent(modifier = Modifier.padding(vertical = 5.dp),
+                    cardData = cardData,
+                    navWebsite = navWebsite
+                )
             }
             Column(modifier = Modifier.weight(.6f)) {
                 if (cardData.cost != null) {
                     CardInfoBox(
-                        modifier = Modifier.padding(vertical = 10.dp),
+                        modifier = Modifier.padding(vertical = 5.dp),
                         infoType = stringResource(R.string.cost_label),
                         infoData = "",
                         icons = stripColorString(cardData.cost)
@@ -1245,7 +1256,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
 
                 if (cardData.type != null) {
                     CardInfoBox(
-                        modifier = Modifier.padding(bottom = 10.dp),
+                        modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.type_label),
                         infoData = cardData.type
                     )
@@ -1253,7 +1264,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
 
                 if (cardData.atk != null) {
                     CardInfoBox(
-                        modifier = Modifier.padding(bottom = 10.dp),
+                        modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.power_label),
                         infoData = cardData.atk
                     )
@@ -1261,7 +1272,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
 
                 if (cardData.def != null) {
                     CardInfoBox(
-                        modifier = Modifier.padding(bottom = 10.dp),
+                        modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.toughness_label),
                         infoData = cardData.def
                     )
@@ -1269,7 +1280,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
             }
         }
         Card(
-            modifier = Modifier.height(120.dp).padding(5.dp),
+            modifier = Modifier.height(120.dp).padding(vertical = 5.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
@@ -1307,38 +1318,45 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                     Image(
                         bitmap = cardData.imageBitmap!!,
                         contentDescription = "Card",
-                        modifier = Modifier
+                        modifier = Modifier.padding(end = 5.dp)
                     )
                 } else {
                     Image(
                         painter = painterResource(R.drawable.nocardimage),
                         contentDescription = stringResource(R.string.card_image_not_loaded_context),
-                        modifier = Modifier
+                        modifier = Modifier.padding(end = 5.dp)
                     )
                 }
-                Text(
-                    text = String.format(stringResource(R.string.pokemon_type_label), cardData.type),
-                    style = appTypography.labelSmall
-                )
 
-                CardPriceComponent(cardData = cardData, navWebsite = navWebsite)
+                CardPriceComponent(modifier = Modifier.padding(vertical = 5.dp),
+                    cardData = cardData,
+                    navWebsite = navWebsite
+                )
             }
             Column(modifier = Modifier.weight(.6f)) {
                 CardInfoBox(
-                    modifier = Modifier.padding(vertical = 10.dp),
+                    modifier = Modifier.padding(vertical = 5.dp),
                     infoType = stringResource(R.string.card_id_label),
                     infoData = cardData.cardid,
                     split = .5f
                 )
                 CardInfoBox(
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    modifier = Modifier.padding(bottom = 5.dp),
                     infoType = stringResource(R.string.card_setcode_label),
                     infoData = cardData.setcode,
                     split = .5f
                 )
+                if (cardData.type != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 5.dp),
+                        infoType =  stringResource(R.string.pokemon_type_label),
+                        infoData = cardData.type,
+                        split = .5f
+                    )
+                }
                 if (cardData.hp != null) {
                     CardInfoBox(
-                        modifier = Modifier.padding(bottom = 10.dp),
+                        modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.hp),
                         infoData = cardData.hp,
                         split = .5f
@@ -1346,14 +1364,14 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                 }
                 if (cardData.weaknesses != null) {
                     CardInfoBox(
-                        modifier = Modifier.padding(bottom = 10.dp),
+                        modifier = Modifier.padding(bottom = 5.dp),
                         weaknesses = cardData.weaknesses,
                         split = .5f
                     )
                 }
                 if (cardData.retreat != null) {
                     CardInfoBox(
-                        modifier = Modifier.padding(bottom = 10.dp),
+                        modifier = Modifier.padding(bottom = 5.dp),
                         infoType = stringResource(R.string.retreat),
                         icons = cardData.retreat,
                         split = .5f
@@ -1368,7 +1386,7 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
 
 @Composable
 fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: String,
-                icons: CharArray? = null, split: Float = 0.4f) {
+                icons: CharArray? = null, split: Float = 0.4f, iconSize: Dp = 16.dp) {
     Card(
         modifier = modifier
     ) {
@@ -1392,7 +1410,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
                         for (icon in icons) {
                             Image(painter = painterResource(mapMTGColorToIcon(icon)),
                                 contentDescription = icon.toString(),
-                                modifier = Modifier.size(24.dp))
+                                modifier = Modifier.size(iconSize))
                         }
                     }
                 } else {
@@ -1408,7 +1426,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
 
 @Composable
 fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
-                split: Float = .4f, iconSize: Dp = 24.dp
+                split: Float = .4f, iconSize: Dp = 16.dp
 ) {
     Card(
         modifier = modifier
@@ -1442,7 +1460,7 @@ fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
 
 @Composable
 fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
-                split: Float = .4f, iconSize: Dp = 24.dp) {
+                split: Float = .4f, iconSize: Dp = 16.dp) {
     Card(
         modifier = modifier
     ) {
@@ -1455,7 +1473,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
                     style = appTypography.labelMedium,
-                    text = "Weakness:",
+                    text = stringResource(R.string.weakness_label),
                 )
             }
             Box(modifier = Modifier
@@ -1479,16 +1497,18 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
 
 @Composable
 fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
-    Card(modifier = modifier.padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+    Card(modifier = modifier.padding(bottom = 5.dp)
         .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+        .clip(RectangleShape)
         .padding(5.dp),
         colors = CardColors(containerColor = Color.White, contentColor = Color.Black,
             disabledContainerColor = Color.White, disabledContentColor = Color.Black)
     ) {
         cardData.attacks!!.forEach { attack ->
             Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                Row {
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     for (icon in attack.cost) {
                         Image(painter = painterResource(mapPokemonTypeToIcon(icon)),
                             contentDescription = icon,
@@ -1519,11 +1539,8 @@ fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
 }
 
 @Composable
-fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: String, game: String,
-                                subcollections: Array<SubcollectionInfo>, fullCardPool: Array<CardData>,
-                                onCollectionChange: (Array<CardData>) -> Unit, removeCard: (CardData) -> Unit,
-                                subcolInfo: SubcollectionInfo, refreshUI: () -> Unit,
-                                showCardDeletePopup: () -> Unit) {
+fun AddCardToSubcollectionPopup(modifier: Modifier = Modifier, cardData: CardData, userid: String, game: String,
+                                subcollections: Array<SubcollectionInfo>) {
     val optionInfo = subcollections.filter( predicate = { subCol ->
         subCol.game == game && (!subCol.isDeck|| cardData.subcollections == null || cardData.subcollections!!.count {it == subCol.subcollectionid} < mapGameToMaxCopiesInDeck(subCol.game))
     })
@@ -1532,128 +1549,44 @@ fun AddCardToSubcollectionPopup(modifier: Modifier, cardData: CardData, userid: 
     var selectedOption by remember { mutableStateOf("") }
     var selectedIndex by remember { mutableIntStateOf(1) }
     var responseText by remember { mutableStateOf("")}
-    var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
-    var cardQuantErr by remember { mutableStateOf(false) }
 
-    UserDropdownSelector(
-        label = stringResource(R.string.subcollection_page),
-        data = 1,
-        onUserStorefrontChange = {
-            selectedOption = optionInfo[it - 1].subcollectionid
-            selectedIndex = it - 1
-        },
-        options = optionList,
-    )
-    Button(
-        onClick = {
-            saveToSubcollectionPost(
-                card = cardData,
-                userid = userid,
-                subcollection = selectedOption,
-                subcolInfo = optionInfo[selectedIndex],
-                refreshUI = { }
-            )
-            responseText = staticResponseText
-        },
-        enabled = selectedOption != ""
-    ) {
-        Text(
-            text = stringResource(R.string.add_to_subcollection_button_label),
-            style = appTypography.labelLarge
-        )
-    }
-    Row {
-        Text(
-            text = stringResource(R.string.quantity_filter_label) + ": ",
-            style = appTypography.labelMedium
-        )
+    Row(modifier = modifier) {
         Button(
             onClick = {
-                if (cardData.quantity > 1) {
-                    removeFromCollectionPost(
-                        card = cardData,
-                        userid = userid,
-                        game = cardData.game,
-                        quantity = 1,
-                        fullCardPool = fullCardPool,
-                        onCollectionChange = onCollectionChange,
-                        removeCard = removeCard,
-                        subcolInfo = subcolInfo,
-                        refreshUI = refreshUI,
-                    )
-                    cardQuantity = (cardQuantity.toInt() - 1).toString()
-                }
-                else {
-                    showCardDeletePopup()
-                }
-            }
-        ) {
-            Text(
-                text = "-",
-                style = appTypography.labelLarge
-            )
-        }
-        TextField(
-            value = cardQuantity,
-            onValueChange = {
-                if (it != "" && it.toInt() > 0) {
-                    cardQuantErr = false
-                    val quantityChange = (it.toInt() - cardData.quantity)
-                    if (quantityChange > 0) {
-                        increaseQuantityPost(
-                            userid = userid,
-                            card = cardData,
-                            quantityChange = quantityChange
-                        )
-                    }
-                    else {
-                        removeFromCollectionPost(
-                            card = cardData,
-                            userid = userid,
-                            game = cardData.game,
-                            quantity = (quantityChange * -1),
-                            fullCardPool = fullCardPool,
-                            onCollectionChange = onCollectionChange,
-                            removeCard = removeCard,
-                            subcolInfo = subcolInfo,
-                            refreshUI = refreshUI,
-                        )
-                    }
-                }
-                else {
-                    cardQuantErr = true
-                }
-                cardQuantity = it
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = modifier.fillMaxWidth(.25f),
-            isError = cardQuantErr,
-            supportingText = {
-                if (cardQuantErr) {
-                    Text(
-                        text = stringResource(R.string.invalid_value_error),
-                        style = appTypography.labelSmall,
-                        color = Color.Red
-                    )
-                }
-            }
-        )
-        Button(
-            onClick = {
-                increaseQuantityPost(
-                    userid = userid,
+                saveToSubcollectionPost(
                     card = cardData,
-                    quantityChange = 1
+                    userid = userid,
+                    subcollection = selectedOption,
+                    subcolInfo = optionInfo[selectedIndex],
+                    refreshUI = { }
                 )
-                cardQuantity = (cardQuantity.toInt() + 1).toString()
-            }
+                responseText = staticResponseText
+            },
+            enabled = selectedOption != "",
+            colors = ButtonColors(
+                containerColor = colorResource(R.color.lightGreen),
+                contentColor = Color.Black,
+                disabledContainerColor = colorResource(R.color.gray),
+                disabledContentColor = Color.Black
+            )
         ) {
             Text(
-                text = "+",
+                text = stringResource(R.string.add_to_subcollection_button_label),
                 style = appTypography.labelLarge
             )
         }
+        DropdownSelectorFilter(
+            label = stringResource(R.string.subcollection_page),
+            data = selectedIndex,
+            options = optionList,
+            onSelectedValChange = { _, newIndex ->
+                selectedOption = optionInfo[newIndex - 1].subcollectionid
+                selectedIndex = newIndex - 1
+            },
+            recalculateFilter = { }
+        )
     }
+
     /*Column {
         Button(onClick = {
             showCardPopup()
@@ -1825,7 +1758,7 @@ fun CardPriceComponent(modifier: Modifier = Modifier,
                        cardData: CardData, navWebsite: (String) -> Unit) {
     Box(modifier = modifier
         .fillMaxWidth()
-        .padding(horizontal = 5.dp)
+        .padding(end = 5.dp)
         .clickable(onClick = {
             if (cardData.purchaseurl != null) {
                 navWebsite(cardData.purchaseurl!!)
@@ -1854,11 +1787,12 @@ fun CardPriceComponent(modifier: Modifier = Modifier,
 
 @Composable
 fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () -> Unit,
-                                plusOnClick: () -> Unit, subColQuant: String) {
+                                plusOnClick: () -> Unit, subColQuant: String,
+                                label: String) {
     Row(modifier = modifier.padding(horizontal = 5.dp),
         verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = stringResource(R.string.subcollection_quantity_label) + ": ",
+            text = "$label: ",
             style = appTypography.labelSmall
         )
         IconButton(
@@ -1868,7 +1802,6 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .padding(5.dp)
                 .clip(CircleShape)
                 .background(Color.White)
-                .border(1.dp, Color.Black, CircleShape)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.minus_icon),
@@ -1876,7 +1809,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
         }
         Text(
             text = subColQuant,
-            style = appTypography.labelSmall
+            style = appTypography.labelLarge
         )
         IconButton(
             onClick = plusOnClick,
@@ -1885,7 +1818,115 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .padding(5.dp)
                 .clip(CircleShape)
                 .background(Color.White)
-                .border(1.dp, Color.Black, CircleShape)
+                .padding(5.dp)
+        ) {
+            Icon(painter = painterResource(R.drawable.plus_icon),
+                contentDescription = "Plus")
+        }
+    }
+}
+
+@Composable
+fun ChangeQuantityCardComponent(modifier: Modifier = Modifier,
+                                label: String, cardData: CardData,
+                                userid: String, fullCardPool: Array<CardData>,
+                                onCollectionChange: (Array<CardData>) -> Unit,
+                                removeCard: (CardData) -> Unit,
+                                subcolInfo: SubcollectionInfo,
+                                refreshUI: () -> Unit,
+                                showCardDeletePopup: () -> Unit) {
+    var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
+    var cardQuantErr by remember { mutableStateOf(false) }
+    Row(modifier = modifier.fillMaxWidth().padding(horizontal = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center) {
+        Text(
+            text = "$label: ",
+            style = appTypography.labelLarge
+        )
+        IconButton(
+            onClick = {
+                if (cardData.quantity > 1) {
+                    removeFromCollectionPost(
+                        card = cardData,
+                        userid = userid,
+                        game = cardData.game,
+                        quantity = 1,
+                        fullCardPool = fullCardPool,
+                        onCollectionChange = onCollectionChange,
+                        removeCard = removeCard,
+                        subcolInfo = subcolInfo,
+                        refreshUI = refreshUI,
+                    )
+                    cardQuantity = (cardQuantity.toInt() - 1).toString()
+                }
+                else {
+                    showCardDeletePopup()
+                }
+            },
+            modifier = Modifier
+                .size(36.dp)
+                .padding(5.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .padding(5.dp)
+        ) {
+            Icon(painter = painterResource(R.drawable.minus_icon),
+                contentDescription = "Minus")
+        }
+
+        FilterTextfield(
+            modifier = Modifier.fillMaxWidth(.2f),
+            label = null,
+            value = cardQuantity,
+            onValueChange = { currQuantity: String ->
+                if (currQuantity != "" && currQuantity.toInt() > 0) {
+                    cardQuantErr = false
+                    val quantityChange = (currQuantity.toInt() - cardData.quantity)
+                    if (quantityChange > 0) {
+                        increaseQuantityPost(
+                            userid = userid,
+                            card = cardData,
+                            quantityChange = quantityChange
+                        )
+                    }
+                    else {
+                        removeFromCollectionPost(
+                            card = cardData,
+                            userid = userid,
+                            game = cardData.game,
+                            quantity = (quantityChange * -1),
+                            fullCardPool = fullCardPool,
+                            onCollectionChange = onCollectionChange,
+                            removeCard = removeCard,
+                            subcolInfo = subcolInfo,
+                            refreshUI = refreshUI,
+                        )
+                    }
+                }
+                else {
+                    cardQuantErr = true
+                }
+                cardQuantity = currQuantity
+            },
+            isError = cardQuantErr,
+            textStyle = appTypography.labelLarge
+        )
+
+        IconButton(
+            onClick = {
+                increaseQuantityPost(
+                    userid = userid,
+                    card = cardData,
+                    quantityChange = 1
+                )
+                cardQuantity = (cardQuantity.toInt() + 1).toString()
+            },
+            modifier = Modifier
+                .size(36.dp)
+                .padding(5.dp)
+                .clip(CircleShape)
+                .background(Color.White)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.plus_icon),
@@ -2062,7 +2103,7 @@ fun MinMaxDoubleComponent(minVal: String,
 }
 
 @Composable
-fun DropdownSelectorFilter(label: String, data: Int,
+fun DropdownSelectorFilter(label: String? = null, data: Int,
                            options: List<String>,
                            onSelectedValChange: (String, Int) -> Unit,
                            modifier: Modifier = Modifier,
@@ -2083,11 +2124,13 @@ fun DropdownSelectorFilter(label: String, data: Int,
             .height(70.dp)
             .requiredHeight(70.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = label,
-                style = appTypography.labelLarge,
-                textAlign = TextAlign.Left
-            )
+            if (label != null) {
+                Text(
+                    text = label,
+                    style = appTypography.labelLarge,
+                    textAlign = TextAlign.Left
+                )
+            }
             Spacer(Modifier.weight(1f))
             Column {
                 OutlinedTextField(

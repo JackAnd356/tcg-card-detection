@@ -733,16 +733,18 @@ fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
 }
 
 @Composable
-fun FilterTextfield(modifier: Modifier, label: String, value: String,
+fun FilterTextfield(modifier: Modifier, label: String? = null, value: String,
                     onValueChange: (String) -> Unit, isError: Boolean,
                     textStyle: TextStyle = appTypography.labelMedium) {
     Column(modifier = modifier) {
-        Text(
-            text = label,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Start,
-            style = textStyle,
-        )
+        if (label != null) {
+            Text(
+                text = label,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                style = textStyle,
+            )
+        }
 
         BasicTextField(
             value = value,
