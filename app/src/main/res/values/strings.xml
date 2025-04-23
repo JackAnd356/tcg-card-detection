@@ -35,7 +35,7 @@
     <string name="filter_button_label">Filter</string>
     <string name="card_id_label">ID:</string>
     <string name="card_name_label">Name:</string>
-    <string name="pokemon_type_label">%1$s Pokemon</string>
+    <string name="pokemon_type_label">Pokemon:</string>
     <string name="card_setcode_label">Set:</string>
     <string name="card_price_label">Price: %2$s%1$.2f</string>
     <string name="all_cards_subcol_label">All Cards</string>
@@ -61,7 +61,7 @@
     <string name="toughness_label">Toughness:</string>
     <string name="damage_label">Damage: %1$s</string>
     <string name="effect_label">Effect: %1$s</string>
-    <string name="weakness_label">Weakness: %1$s %2$s</string>
+    <string name="weakness_label">Weakness:</string>
     <string name="hp">HP:</string>
     <string name="retreat">Retreat:</string>
     <string name="add_to_subcollection_button_label">Add</string>
@@ -86,7 +86,7 @@
     <string name="fb_login_protocol_scheme">fb1037081011515399</string>
     <string name="facebook_client_token">bf7c1944226b43d35f290c1045b39ad4</string>
     <string name="facebook_login_placeholder">Login With Facebook</string>
-    <string name="subcollection_quantity_label">Amount In SubCollection</string>
+    <string name="subcollection_quantity_label">Amount In Collection</string>
     <string name="remove_card_title">Remove Card?</string>
     <string name="remove_card_all_cards_text">Are you sure you want to remove this card from your collection (This Cannot Be Undone)?</string>
     <string name="remove_card_subcollection_text">Are you sure you want to remove this card from %1$s?</string>

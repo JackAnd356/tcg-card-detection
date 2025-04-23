@@ -538,7 +538,7 @@ fun cardImagePost(cardid: String, game: String, setCardImage: (String, ImageBitm
             if (respData != null && respData.image != null) {
                 val decodedString = Base64.decode(respData.image, 0)
                 val img = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                val resized = Bitmap.createScaledBitmap(img, 413, 602, true);
+                //val resized = Bitmap.createScaledBitmap(img, 413, 602, true);
                 setCardImage(respData.image, img.asImageBitmap())
             }
         }
