@@ -1201,7 +1201,9 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
             }
         }
         Card(
-            modifier = Modifier.height(120.dp).padding(vertical = 5.dp),
+            modifier = Modifier
+                .height(120.dp)
+                .padding(vertical = 5.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
@@ -1284,7 +1286,9 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
             }
         }
         Card(
-            modifier = Modifier.height(120.dp).padding(vertical = 5.dp),
+            modifier = Modifier
+                .height(120.dp)
+                .padding(vertical = 5.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
@@ -1501,7 +1505,8 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
 
 @Composable
 fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
-    Card(modifier = modifier.padding(bottom = 5.dp)
+    Card(modifier = modifier
+        .padding(bottom = 5.dp)
         .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
         .clip(RectangleShape)
         .padding(5.dp),
@@ -1613,6 +1618,9 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                          modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
     val deckMap = mutableMapOf<String, Int>()
+    var searchTerm by remember { mutableStateOf("") }
+
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     if (subcolInfo.isDeck) {
         allCards.forEach {
@@ -1627,19 +1635,20 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
         }
     }
 
-    val cardList = allCards.filter {
+    var cardList = allCards.filter {
         if (subcolInfo.isDeck) {
             if (deckMap.containsKey(it.cardname)) {
-                it.game == game && deckMap[it.cardname]!! < mapGameToMaxCopiesInDeck(game)
+                it.game == game && deckMap[it.cardname]!! < mapGameToMaxCopiesInDeck(game) && (if (searchTerm != "") { it.cardname.uppercase().contains(searchTerm.uppercase()) } else { true })
             }
             else {
-                it.game == game
+                it.game == game && (if (searchTerm != "") { it.cardname.uppercase().contains(searchTerm.uppercase()) } else { true })
             }
         }
         else {
-            it.game == game
+            it.game == game && (if (searchTerm != "") { it.cardname.uppercase().contains(searchTerm.uppercase()) } else { true })
         }
     }
+    cardList = cardList.sortedBy { it.cardname }
     val checkedStates = remember { mutableStateListOf<Boolean>() }
     repeat(cardList.size) {
         checkedStates.add(false)
@@ -1647,39 +1656,76 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = modifier
+            .width(300.dp) // or adjust as needed
+            .height(screenHeight * 0.8f) // 80% of screen height
     ) {
         Column(
-             modifier = modifier.verticalScroll(scrollState)
+            modifier = Modifier.fillMaxSize(),
         ) {
-            cardList.forEachIndexed { index, card ->
-                Row {
+            // Search Bar
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                value = searchTerm,
+                onValueChange = { searchTerm = it },
+                singleLine = true,
+                label = {
                     Text(
-                        text = card.cardname,
-                        style = appTypography.labelSmall
-                    )
-                    Checkbox(
-                        checked = checkedStates[index],
-                        onCheckedChange = {
-                            isChecked ->
-                            checkedStates[index] = isChecked
-                        }
+                        text = stringResource(R.string.search_label),
+                        style = appTypography.labelMedium
                     )
                 }
-            }
-        }
-        Button(
-            onClick = {
+            )
+
+            // Scrollable List
+            Column(
+                modifier = Modifier
+                    .weight(1f) // takes up all space between search and button
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 8.dp)
+            ) {
                 cardList.forEachIndexed { index, card ->
-                    if (checkedStates[index]) {
-                        saveToSubcollectionPost(card = card, userid = userid, subcollection = subcollection, subcolInfo = subcolInfo, refreshUI = refreshUI)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .border(width = 1.dp, color = Color.Black)
+                            .padding(8.dp)
+                    ) {
+                        Text(
+                            text = card.cardname + " " + mapRarityToShortenedVersion(card.rarity!!),
+                            style = appTypography.labelSmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Checkbox(
+                            checked = checkedStates[index],
+                            onCheckedChange = { isChecked ->
+                                checkedStates[index] = isChecked
+                            }
+                        )
                     }
                 }
             }
-        ) {
-            Text(
-                text = stringResource(R.string.add_to_subcollection_button_label),
-                style = appTypography.labelLarge
-            )
+
+            // Submit Button
+            Button(
+                onClick = {
+                    cardList.forEachIndexed { index, card ->
+                        if (checkedStates[index]) {
+                            saveToSubcollectionPost(card = card, userid = userid, subcollection = subcollection, subcolInfo = subcolInfo, refreshUI = refreshUI)
+                        }
+                    }
+                          },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.add_to_subcollection_button_label),
+                    style = appTypography.labelLarge
+                )
+            }
         }
     }
 }
@@ -1767,9 +1813,11 @@ fun CardPriceComponent(modifier: Modifier = Modifier,
             if (cardData.purchaseurl != null) {
                 navWebsite(cardData.purchaseurl!!)
             }
-        }).border(width = 1.dp, color = Color.Black),
+        })
+        .border(width = 1.dp, color = Color.Black),
     ) {
-        Row(modifier = Modifier.fillMaxWidth()
+        Row(modifier = Modifier
+            .fillMaxWidth()
             .padding(vertical = 1.dp, horizontal = 3.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
@@ -1841,7 +1889,9 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier,
                                 showCardDeletePopup: () -> Unit) {
     var cardQuantity by remember { mutableStateOf(cardData.quantity.toString())}
     var cardQuantErr by remember { mutableStateOf(false) }
-    Row(modifier = modifier.fillMaxWidth().padding(horizontal = 5.dp),
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center) {
         Text(

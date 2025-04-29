@@ -79,6 +79,42 @@ fun mapRarityToRibbon(rarity: String?): Int {
     }
 }
 
+fun mapRarityToShortenedVersion(rarity: String): String {
+    return when (rarity) {
+        "Normal" -> "(N)"
+        "Common" -> "(C)"
+        "Normal Rare" -> "(NR)"
+        "Short Print" -> "(SP)"
+        "Super Short Print" -> "(SSP)"
+        "Rare" -> "(R)"
+        "Super Rare" -> "(SR)"
+        "Holofoil Rare" -> "(HFR)"
+        "Ultra Rare" -> "(UR)"
+        "Ultimate Rare" -> "(UtR)"
+        "Collector's Rare" -> "(CR)"
+        "Secret Rare" -> "(ScR)"
+        "Ultra Secret Rare" -> "(UScR)"
+        "Secret Ultra Rare" -> "(ScUR)"
+        "Prismatic Secret Rare" -> "(PScR)"
+        "Holographic Rare" -> "(HGR)"
+        "Ghost Rare" -> "(GR)"
+        "Parallel Rare" -> "(PR)"
+        "Normal Parallel Rare" -> "(NPR)"
+        "Parallel Common" -> "(PC)"
+        "Super Parallel Rare" -> "(SPR)"
+        "Ultra Parallel Rare" -> "(UPR)"
+        "Duel Terminal Normal Parallel Rare" -> "(DNPR)"
+        "Duel Terminal Rare Parallel Rare" -> "(DRPR)"
+        "Duel Terminal Super Parallel Rare" -> "(DSPR)"
+        "Duel Terminal Ultra Parallel Rare" -> "(DUPR)"
+        "Duel Terminal Secret Parallel Rare" -> "(DScPR)"
+        "Gold Rare" -> "(GUR)"
+        "Quarter Century Secret Rare" -> "(QCR)"
+        "Starlight Rare" -> "(StR)"
+        else -> ""
+    }
+}
+
 fun mapMTGColorToIcon(color: Char): Int {
     return when (color) {
         'W' -> R.drawable.white_icon
