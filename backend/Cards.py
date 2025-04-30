@@ -40,7 +40,7 @@ with open(mtg_hash_path, 'r', encoding='utf-8') as json_file:
     mtg_hash_dict = json.load(json_file)
 
 #Classification Model
-model_path = os.path.join(os.path.dirname(__file__), 'card_classifier_model_ver2.h5')
+model_path = os.path.join(os.path.dirname(__file__), 'card_classifier_ver4.h5')
 model = tf.keras.models.load_model(model_path)
 
 

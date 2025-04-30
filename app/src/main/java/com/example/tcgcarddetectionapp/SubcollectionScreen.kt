@@ -336,7 +336,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
             Box(modifier = Modifier
                 .clickable(
                     onClick = navBack,
-                    onClickLabel = "Back To Collection Manager",
+                    onClickLabel = stringResource(R.string.back_to_main_collections_button_label),
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
                     enabled = true
@@ -347,7 +347,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     .height(backArrowSize.dp)
                     .width(backArrowSize.dp),
                     painter = painterResource(R.drawable.arrow_left_icon),
-                    contentDescription = "Back Arrow",
+                    contentDescription = stringResource(R.string.back_to_main_collections_button_label),
                     tint = Color.Black
                 )
             }
@@ -405,7 +405,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.MoreVert,
-                                        contentDescription = "More"
+                                        contentDescription = stringResource(R.string.more)
                                     )
                                 }
                                 DropdownMenu(
@@ -617,7 +617,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             }
                         }},
                         {modifier -> DropdownSelectorFilter(
-                            label = "Rarity",
+                            label = stringResource(R.string.rarity_label),
                             data = selectedRarityFilterIndex,
                             options = listOfRarities.toList(),
                             onSelectedValChange = { rarity, index ->
@@ -703,7 +703,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             }
                         }},
                         (game == "yugioh") to { modifier -> DropdownSelectorFilter(
-                            label = "Attribute",
+                            label = stringResource(R.string.attribute_label),
                             data = selectedAttributeFilterIndex,
                             options = listOfAttributes.toList(),
                             onSelectedValChange = { attr, index ->
@@ -755,7 +755,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             }
                         }},
                         (game == "mtg") to {modifier -> DropdownSelectorFilter(
-                            label = "Color",
+                            label = stringResource(R.string.color_label),
                             data = selectedAttributeFilterIndex,
                             options = listOfAttributes.toList(),
                             onSelectedValChange = {attr, index ->
@@ -781,7 +781,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             }
                         }},
                         (game == "pokemon") to { modifier -> DropdownSelectorFilter(
-                            label = "Type",
+                            label = stringResource(R.string.type_label),
                             data = selectedAttributeFilterIndex,
                             options = listOfAttributes.toList(),
                             onSelectedValChange = {attr, index ->
@@ -1109,7 +1109,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
                 if (cardData.imageBitmap != null) {
                     Image(
                         bitmap = cardData.imageBitmap!!,
-                        contentDescription = "Card",
+                        contentDescription = cardData.cardname,
                         modifier = Modifier.padding(end = 5.dp)
                     )
                 } else {
@@ -1230,7 +1230,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
                 if (cardData.imageBitmap != null) {
                     Image(
                         bitmap = cardData.imageBitmap!!,
-                        contentDescription = "Card",
+                        contentDescription = cardData.cardname,
                         modifier = Modifier.padding(end = 5.dp)
                     )
                 } else {
@@ -1325,7 +1325,7 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                 if (cardData.imageBitmap != null) {
                     Image(
                         bitmap = cardData.imageBitmap!!,
-                        contentDescription = "Card",
+                        contentDescription = cardData.cardname,
                         modifier = Modifier.padding(end = 5.dp)
                     )
                 } else {
@@ -1559,8 +1559,21 @@ fun AddCardToSubcollectionPopup(modifier: Modifier = Modifier, cardData: CardDat
     var selectedIndex by remember { mutableIntStateOf(1) }
     var responseText by remember { mutableStateOf("")}
 
-    Row(modifier = modifier) {
+    Row(modifier = modifier.padding(5.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        UserDropdownSelector(
+            modifier = Modifier.weight(.7f).padding(end = 10.dp),
+            label = stringResource(R.string.subcollection_page),
+            data = selectedIndex,
+            onUserStorefrontChange = { newIndex ->
+                selectedOption = optionInfo[newIndex - 1].subcollectionid
+                selectedIndex = newIndex - 1
+            },
+            options = optionList
+        )
+
         Button(
+            modifier = Modifier.weight(.3f),
             onClick = {
                 saveToSubcollectionPost(
                     card = cardData,
@@ -1584,16 +1597,6 @@ fun AddCardToSubcollectionPopup(modifier: Modifier = Modifier, cardData: CardDat
                 style = appTypography.labelLarge
             )
         }
-        DropdownSelectorFilter(
-            label = stringResource(R.string.subcollection_page),
-            data = selectedIndex,
-            options = optionList,
-            onSelectedValChange = { _, newIndex ->
-                selectedOption = optionInfo[newIndex - 1].subcollectionid
-                selectedIndex = newIndex - 1
-            },
-            recalculateFilter = { }
-        )
     }
 
     /*Column {
@@ -1857,7 +1860,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.minus_icon),
-                contentDescription = "Minus")
+                contentDescription = stringResource(R.string.minus_label))
         }
         Text(
             text = subColQuant,
@@ -1873,7 +1876,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.plus_icon),
-                contentDescription = "Plus")
+                contentDescription = stringResource(R.string.plus_label))
         }
     }
 }
@@ -1926,7 +1929,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier,
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.minus_icon),
-                contentDescription = "Minus")
+                contentDescription = stringResource(R.string.minus_label))
         }
 
         FilterTextfield(
@@ -1984,7 +1987,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier,
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.plus_icon),
-                contentDescription = "Plus")
+                contentDescription = stringResource(R.string.plus_label))
         }
     }
 }
@@ -2201,7 +2204,7 @@ fun DropdownSelectorFilter(label: String? = null, data: Int,
                             mExpanded = !mExpanded
                         },
                     trailingIcon = {
-                        Icon(icon,"contentDescription",
+                        Icon(icon, stringResource(R.string.edit_option_label),
                             Modifier.clickable { mExpanded = !mExpanded })
                     },
                     enabled = false,

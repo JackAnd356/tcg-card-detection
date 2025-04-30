@@ -209,7 +209,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
         ) {
             Image(
                 painter = painterResource(id = R.drawable.facebook_icon_white_logo),
-                contentDescription = "Login With Facebook",
+                contentDescription = stringResource(R.string.facebook_login_placeholder),
             )
             Text(
                 text = stringResource( R.string.facebook_login_placeholder),

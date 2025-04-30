@@ -471,7 +471,7 @@ fun CreateNewCollectionPopup(
                                 createNewSubcollectionPost(gameName = gameName, userid = userid, isDeck = isDeck, subcolName = subColName, physLoc = subColLocation, onUserSubColInfoChange = onUserSubColInfoChange)
                                 onSubmitRequest()
                             } else {
-                                Toast.makeText(context, "Fill out all required fields", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.fill_out_fields_warning), Toast.LENGTH_SHORT).show()
                             }
                         },
                         shape = RoundedCornerShape(10),

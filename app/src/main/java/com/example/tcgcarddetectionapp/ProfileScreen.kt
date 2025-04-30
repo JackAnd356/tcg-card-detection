@@ -4,6 +4,7 @@ import androidx.compose.ui.window.Dialog
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -39,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,13 +70,14 @@ fun ProfileScreen(username: String,
                   onLogout: () -> Unit,
                   lockdownEmail: Boolean,
                   modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     var usernameEditFlag by remember { mutableStateOf(false) }
     var passwordEditFlag by remember { mutableStateOf(false) }
     var emailEditFlag by remember { mutableStateOf(false) }
-    var enteredPassword by remember { mutableStateOf("******")}
     var oldUsername by remember { mutableStateOf(username) }
     var oldEmail by remember { mutableStateOf(email) }
     var showDeletePopup by remember { mutableStateOf(false) }
+    var enteredPassword by remember { mutableStateOf(context.getString(R.string.password_label))}
 
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier.fillMaxSize(),
@@ -111,10 +116,10 @@ fun ProfileScreen(username: String,
             },
             onClickSave = {
                 SavePasswordPost(userid = userid, password = enteredPassword)
-                enteredPassword = "******"
+                enteredPassword = context.getString(R.string.password_placeholder)
                 passwordEditFlag = !passwordEditFlag
             },
-            oldData = "******"
+            oldData = context.getString(R.string.password_placeholder)
         )
         UserDataComponent(
             label = stringResource(R.string.email_label),
@@ -251,23 +256,23 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
     var mExpanded by remember { mutableStateOf(false) }
     var mSelectedText by remember { mutableStateOf(options[data - 1]) }
     var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    val interactionSource = remember { MutableInteractionSource() }
+    val context = LocalContext.current
     val icon = if (mExpanded)
         Icons.Filled.KeyboardArrowUp
     else
         Icons.Filled.KeyboardArrowDown
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-        border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
             .fillMaxWidth()
             .height(70.dp)
             .requiredHeight(70.dp)) {
-        Row {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = label,
-                fontSize = 20.sp,
-                lineHeight = 50.sp,
+                style = appTypography.labelLarge,
                 textAlign = TextAlign.Left
             )
             Spacer(Modifier.weight(1f))
@@ -281,11 +286,21 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
                             // This value is used to assign to
                             // the DropDown the same width
                             mTextFieldSize = coordinates.size.toSize()
+                        }
+                        .clickable(interactionSource = interactionSource, indication = null) {
+                            mExpanded = !mExpanded
                         },
                     trailingIcon = {
-                        Icon(icon,"contentDescription",
+                        Icon(icon,context.getString(R.string.password_placeholder),
                             Modifier.clickable { mExpanded = !mExpanded })
-                    }
+                    },
+                    enabled = false,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        disabledContainerColor = Color.White)
                 )
                 DropdownMenu(
                     expanded = mExpanded,

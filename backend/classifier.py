@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import json
 from PIL import Image
 import imagehash
+from sklearn.utils import shuffle
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 load_dotenv(find_dotenv())
 
@@ -28,10 +30,13 @@ def getYugiohSample(numCards):
 
         counter = 0
 
+        random.shuffle(cards)
+
         for i,card in enumerate(cards):
             img_url = card["card_images"][0]["image_url"]
-            card_name = card["name"]
-            filename = f'../sample_images/yugioh/temp_img.jpg'
+            card_name = card["name"].replace(' ', '_').replace('/', '_')
+            card_name = sanitize_filename(card_name)
+            filename = f'../sample_images/yugioh/{card_name}.jpg'
 
             img = requests.get(img_url)
             if img.status_code == 200:
@@ -42,6 +47,7 @@ def getYugiohSample(numCards):
             else:
                 print(f'Failed to get Image of: {card_name}')
             time.sleep(0.1)
+            if counter >= numCards: return
     else:
         print(f'API Gave Error Status Code: {resp.status_code}')
 
@@ -107,7 +113,29 @@ def getPokemonSample(numCards):
     headers = {'X-Api-Key' : apikey}
     params = {'pageSize' : 250}
 
-    while (numCards > 0):
+    counter = 0
+    for i, filename in enumerate(os.listdir("../sample_images/pokemon_jsons")):
+        with open(f'../sample_images/pokemon_jsons/{filename}', 'r', encoding='utf-8') as completed_json_file:
+            pokemon_json = json.load(completed_json_file)
+            for card in pokemon_json:
+                image_url = card['images']['large']
+                card_name = card['name'].replace(' ', '_').replace('/', '_').replace('δ', 'delta')
+                card_name = sanitize_filename(card_name)
+                filename = f"../sample_images/pokemon/{card_name}_{card['id']}.jpg"
+
+                img_response = requests.get(image_url)
+
+                if img_response.status_code == 200:
+                    counter += 1
+                    with open(filename, "wb") as img_file:
+                        img_file.write(img_response.content)
+                    print(f"Downloaded: {card_name} Total Downloaded: {counter}")
+                else:
+                    print(f"Failed to download image for card: {card_name}")
+                
+                if counter >= numCards: return
+
+    """while (numCards > 0):
         resp = requests.get(url, headers=headers, params=params)
 
         if resp.status_code == 200:
@@ -119,7 +147,7 @@ def getPokemonSample(numCards):
 
             for i, card in enumerate(cards):
                 image_url = card['images']['large']
-                card_name = card['name'].replace(' ', '_').replace('/', '_')
+                card_name = card['name'].replace(' ', '_').replace('/', '_').replace('δ', 'delta')
                 card_name = sanitize_filename(card_name)
                 filename = f"../sample_images/pokemon/{card_name}.jpg"
 
@@ -135,7 +163,7 @@ def getPokemonSample(numCards):
                 if counter >= numCards: break
             numCards -= counter
         else:
-            print(f'API Gave Error Status Code: {resp.status_code}')
+            print(f'API Gave Error Status Code: {resp.status_code}')"""
 
 def getTrainingData():
     training_images = []
@@ -143,23 +171,21 @@ def getTrainingData():
     test_images = []
     test_labels = []
 
-    """getYugiohSample(1000)
-    getMTGSample(1000)
-    getPokemonSample(1000)"""
-
-    for i, filename in enumerate(os.listdir("../sample_images/yugioh")):
-        filepath = os.path.join("../sample_images/yugioh", filename)
+    for i, filename in enumerate(os.listdir("../sample_images/pokemon")):
+        filepath = os.path.join("../sample_images/pokemon", filename)
+        print(filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
         if i < 900: 
             training_images.append(imgSmall)
-            training_labels.append(0)
+            training_labels.append(2)
         else: 
             test_images.append(imgSmall)
-            test_labels.append(0)
+            test_labels.append(2)
 
     for i, filename in enumerate(os.listdir("../sample_images/mtg")):
         filepath = os.path.join("../sample_images/mtg", filename)
+        print(filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
         if i < 900: 
@@ -169,17 +195,17 @@ def getTrainingData():
             test_images.append(imgSmall)
             test_labels.append(1)
 
-    print(len(os.listdir("../sample_images/pokemon")))
-    for i, filename in enumerate(os.listdir("../sample_images/pokemon")):
-        filepath = os.path.join("../sample_images/pokemon", filename)
+    for i, filename in enumerate(os.listdir("../sample_images/yugioh")):
+        filepath = os.path.join("../sample_images/yugioh", filename)
+        print(filename)
         img = cv2.imread(filepath)
         imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
         if i < 900: 
             training_images.append(imgSmall)
-            training_labels.append(2)
+            training_labels.append(0)
         else: 
             test_images.append(imgSmall)
-            test_labels.append(2)
+            test_labels.append(0)
 
     training_images = np.array(training_images)
     training_labels = np.array(training_labels)
@@ -215,13 +241,23 @@ def trainModel(training_data, test_data):
     model.compile(optimizer='adam',
         loss='sparse_categorical_crossentropy',
         metrics=['accuracy'])
+    
+    datagen = ImageDataGenerator(
+        rotation_range=10,        # Random rotation up to 10 degrees
+        width_shift_range=0.1,    # Shift width up to 10% of the image width
+        height_shift_range=0.1,   # Shift height up to 10% of the image height
+        zoom_range=0.1,           # Random zoom
+        horizontal_flip=True,     # Random horizontal flip
+        fill_mode='nearest'       # Fill strategy for missing pixels after augmentation
+    )
+
+    datagen.fit(training_data[0])
         
     epochs = 10
     history = model.fit(
-        training_data[0],
-        training_data[1],
+        datagen.flow(training_data[0], training_data[1], batch_size=32),
         validation_data=(test_data[0], test_data[1]),
-        epochs=epochs
+        epochs=10
     )
 
     val_loss, val_acc = model.evaluate(test_data[0], test_data[1])
@@ -279,16 +315,35 @@ def hash_image(img):
 
     return hash
 
+
+"""getYugiohSample(2000)
+getMTGSample(2000)
+getPokemonSample(2000)"""
+
 """training_data, test_data = getTrainingData()
 print(f"Training data: {training_data[0].shape}, Training labels: {training_data[1].shape}")
 print(f"Test data: {test_data[0].shape}, Test labels: {test_data[1].shape}")
 print(test_data[1])
 model, history = trainModel(training_data, test_data)
 plot_training_history(history)
-model.save('card_classifier_model_ver2.h5')"""
+model.save('card_classifier_model_ver3.h5')"""
 
-"""model = tf.keras.models.load_model('card_classifier_model_ver2.h5')
-img = cv2.imread("../sample_images/other/Adley_Rutschman_Topps_Vintage.jpg")
+(training_images, training_labels), (test_images, test_labels) = getTrainingData()
+
+# Normalize and shuffle
+training_images = training_images / 255.0
+test_images = test_images / 255.0
+
+training_images, training_labels = shuffle(training_images, training_labels)
+
+# Build and train the model
+model, history = trainModel((training_images, training_labels), (test_images, test_labels))
+
+# Save the trained model
+model.save("card_classifier_ver4.h5")
+
+"""model = tf.keras.models.load_model('card_classifier_model_ver3.h5')
+img = cv2.imread("../sample_images/yugioh/Deskbot_007.jpg")
 imgSmall = cv2.resize(img, (128, 128), cv2.INTER_AREA)
 
 img_array = tf.expand_dims(imgSmall, 0) # Create a batch of size 1
@@ -391,10 +446,10 @@ def getAndHashAllYugiohCards(yugiohCompleted, yugiohMissed):
                 json.dump(yugiohMissed, f, indent=4)
 
 
-with open("./cardHashes/yugioh_dphash_16byte.json", 'r', encoding='utf-8') as completed_json_file:
+"""with open("./cardHashes/yugioh_dphash_16byte.json", 'r', encoding='utf-8') as completed_json_file:
     yugiohCompleted = json.load(completed_json_file)
 
 with open("./cardHashes/missed_yugioh_cards.json", 'r', encoding='utf-8') as missed_json_file:
     yugiohMissed = json.load(missed_json_file)
 
-getAndHashAllYugiohCards(yugiohCompleted, yugiohMissed)
+getAndHashAllYugiohCards(yugiohCompleted, yugiohMissed)"""

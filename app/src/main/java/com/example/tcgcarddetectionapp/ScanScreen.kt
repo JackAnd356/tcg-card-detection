@@ -130,7 +130,7 @@ fun CameraPreviewScreen(modifier: Modifier, stage: MutableState<Stages>) {
             },
             confirmButton = {
                 TextButton(onClick = { showPhotoTipsDialog = false }) {
-                    Text("Got it!")
+                    Text(stringResource(R.string.confirm_tips_button_label))
                 }
             }
         )
@@ -202,7 +202,7 @@ fun CameraPreviewScreen(modifier: Modifier, stage: MutableState<Stages>) {
             modifier = modifier.align(Alignment.BottomCenter)
                 .padding(bottom = 200.dp) // Adjust this value to fine-tune the vertical position
                 .size(125.dp)) {
-            Text("Capture")
+            Text(stringResource(R.string.photo_button_label))
         }
     }
 }
@@ -388,7 +388,7 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                     stage.value = Stages.Home
                 }) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.cancel_button_label),
                         style = appTypography.labelLarge
                     )
                 }
@@ -406,7 +406,7 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                     stage.value = Stages.PostConfirmation
                 }) {
                     Text(
-                        text = "Submit",
+                        text = stringResource(R.string.submit),
                         style = appTypography.labelLarge
                     )
                 }
@@ -474,7 +474,7 @@ fun ScanSetCodeChoicePopup(modifier: Modifier, card: CardData, dismissPopup: () 
                         card.possRarities = null
                         dismissPopup()
                     } else {
-                        Toast.makeText(context, "Please select a rarity first", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.select_rarity_error), Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Text(
@@ -501,7 +501,7 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
         .fillMaxSize()
         .wrapContentWidth(Alignment.CenterHorizontally)) {
 
-        Text(text = "Added Cards: ",
+        Text(text = stringResource(R.string.added_cards),
             style = appTypography.displaySmall
         )
 
@@ -524,7 +524,7 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
             }
             if (!cardsFromGame) {
                 Text(
-                    text = "None",
+                    text = stringResource(R.string.none),
                     style = appTypography.labelMedium
                 )
             }
@@ -537,14 +537,14 @@ fun ScanPostConfirmation(modifier: Modifier, stage: MutableState<Stages>, collec
                 onClick = { stage.value = Stages.Home }
             ) {
                 Text(
-                    text = "Take Another Photo",
+                    text = stringResource(R.string.take_another_photo_label),
                     style = appTypography.labelLarge
                 )
             }
 
             Button(onClick = collectionNavigate) {
                 Text(
-                    text = "Go To Yu-Gi-Oh Collection",
+                    text = stringResource(R.string.go_to_collection_label),
                     style = appTypography.labelLarge
                 )
             }
@@ -676,7 +676,7 @@ fun ImageCaptureFromCamera(modifier: Modifier, stage: MutableState<Stages>, err:
             cameraPermLauncher.launch(Manifest.permission.CAMERA)
         }
     }) {
-        Icon(painter = image, contentDescription = "")
+        Icon(painter = image, contentDescription = stringResource(R.string.photo_button_label))
     }
 }
 

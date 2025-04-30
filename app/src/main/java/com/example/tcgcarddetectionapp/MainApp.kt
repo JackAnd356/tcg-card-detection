@@ -59,19 +59,19 @@ fun CardDetectionBottomBar(
             Row(modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly) {
                 IconButton(onClick = { navigateScan() }) {
-                    Icon(Icons.Filled.AddCircle, contentDescription = "Scan Card")
+                    Icon(Icons.Filled.AddCircle, contentDescription = stringResource(R.string.scan_page))
                 }
                 IconButton(onClick = { navigateYugioh() }) {
-                    Icon(Icons.Filled.ShoppingCart, contentDescription = "YuGiOh Collection")
+                    Icon(Icons.Filled.ShoppingCart, contentDescription = stringResource(R.string.yugioh_collection))
                 }
                 IconButton(onClick = { navigateMTG() }) {
-                    Icon(Icons.Filled.Create, contentDescription = "MTG Collection")
+                    Icon(Icons.Filled.Create, contentDescription = stringResource(R.string.mtg_collection))
                 }
                 IconButton(onClick = { navigatePokemon() }) {
-                    Icon(Icons.Filled.Face, contentDescription = "Pokemon Collection")
+                    Icon(Icons.Filled.Face, contentDescription = stringResource(R.string.pokemon_collection))
                 }
                 IconButton(onClick = { navigateProfile() }) {
-                    Icon(Icons.Filled.Person, contentDescription = "YuGiOh Collection")
+                    Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.profile_page))
                 }
             }
         }

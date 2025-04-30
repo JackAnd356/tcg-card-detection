@@ -148,7 +148,7 @@ fun NewUserDataComponent(label: String,
             .requiredHeight(70.dp)) {
         Row {
             Text(
-                text = label + ":",
+                text = "$label:",
                 style = appTypography.labelMedium,
                 modifier = modifier.align(Alignment.CenterVertically)
             )
@@ -205,7 +205,7 @@ fun NewUserDropdownSelector(label: String, data: Int, options: List<String>, onC
                             mTextFieldSize = coordinates.size.toSize()
                         },
                     trailingIcon = {
-                        Icon(icon,"contentDescription",
+                        Icon(icon, stringResource(R.string.edit_option_label),
                             Modifier.clickable { mExpanded = !mExpanded })
                     }
                 )
