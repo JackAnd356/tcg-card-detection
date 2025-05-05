@@ -62,6 +62,7 @@
     <string name="damage_label">Damage: %1$s</string>
     <string name="effect_label">Effect: %1$s</string>
     <string name="weakness_label">Weakness:</string>
+    <string name="evolves_from">Evolves From:</string>
     <string name="hp">HP:</string>
     <string name="retreat">Retreat:</string>
     <string name="add_to_subcollection_button_label">Add</string>

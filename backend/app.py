@@ -652,6 +652,10 @@ def create_app():
                     payload['hp'] = clientUserInfo['hp']
                 if "retreat" in clientUserInfo:
                     payload['retreat'] = clientUserInfo['retreat']
+                if "abilities" in clientUserInfo:
+                    payload["abilities"] = clientUserInfo["abilities"]
+                if "evolvesfrom" in clientUserInfo:
+                    payload["evolvesfrom"] = clientUserInfo["evolvesfrom"]
             if result == None:
                 payload['quantity'] = clientUserInfo['quantity']
                 payload['price'] = clientUserInfo['price']

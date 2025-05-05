@@ -26,6 +26,8 @@ data class CardData(
     val def: String? = null,
     val cost: String? = null,
     val hp: String? = null,
+    val abilities: Array<Ability>? = null,
+    val evolvesFrom: String? = null,
     val retreat: Array<String>? = null,
     val weaknesses: Array<Weakness>? = null,
     val attacks: Array<Attack>? = null,
@@ -53,4 +55,10 @@ data class Attack(
     val cost: Array<String>,
     val damage: String,
     val text: String?,
+)
+
+data class Ability(
+    val name: String,
+    val text: String,
+    val type: String
 )

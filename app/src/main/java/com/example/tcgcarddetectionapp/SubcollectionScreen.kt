@@ -1386,7 +1386,19 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                     )
                 }
 
+                if (cardData.evolvesFrom != null) {
+                    CardInfoBox(
+                        modifier = Modifier.padding(bottom = 5.dp),
+                        infoType = stringResource(R.string.evolves_from),
+                        infoData = cardData.evolvesFrom,
+                        split = .5f
+                    )
+                }
+
             }
+        }
+        if (cardData.abilities != null) {
+            PokemonAbilityBox(cardData = cardData)
         }
         PokemonAttackBox(cardData = cardData)
     }
@@ -1548,13 +1560,47 @@ fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
 }
 
 @Composable
+fun PokemonAbilityBox(modifier: Modifier = Modifier, cardData: CardData) {
+    Card(
+        modifier = modifier
+            .padding(bottom = 5.dp)
+            .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+            .clip(RectangleShape)
+            .padding(5.dp),
+        colors = CardColors(
+            containerColor = Color.White, contentColor = Color.Black,
+            disabledContainerColor = Color.White, disabledContentColor = Color.Black
+        )
+    ) {
+        cardData.abilities!!.forEach { ability ->
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically) {
+                Text(modifier = Modifier.padding(end = 10.dp),
+                    text = ability.type,
+                    style = appTypography.labelLarge)
+                Text(modifier = Modifier,
+                    text = ability.name,
+                    style = appTypography.labelLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Text(
+                text = ability.text,
+                style = appTypography.labelSmall,
+            )
+        }
+
+    }
+}
+
+@Composable
 fun AddCardToSubcollectionPopup(modifier: Modifier = Modifier, cardData: CardData, userid: String, game: String,
                                 subcollections: Array<SubcollectionInfo>) {
     val optionInfo = subcollections.filter( predicate = { subCol ->
         subCol.game == game && (!subCol.isDeck|| cardData.subcollections == null || cardData.subcollections!!.count {it == subCol.subcollectionid} < mapGameToMaxCopiesInDeck(subCol.game))
     })
     val staticResponseText = stringResource(R.string.card_added_to_subcollection_message)
-    val optionList = optionInfo.map { it.name }
+    val optionList = listOf("") + optionInfo.map { it.name }
     var selectedOption by remember { mutableStateOf("") }
     var selectedIndex by remember { mutableIntStateOf(1) }
     var responseText by remember { mutableStateOf("")}
