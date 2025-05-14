@@ -283,7 +283,7 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
             description = "Negate the effects of all face-up monsters your opponent currently controls, until the end of this turn, also, for the rest of this turn after this card resolves, your opponent takes no damage. Neither player can activate monster effects in response to this card's activation")
         val sampleCard3 = CardData(cardid = "8d1ec351-5e70-4eb2-b590-6bff94ef8178", setcode = "FDN", game = "mtg", cardname = "Boltwave",
             rarity = "U", quantity = 1, price = 2.60, userid = "1", subcollections = null, image = null, cost = "R",
-            attribute = "R", description = "Boltwave deals 3 damage to each opponent.", atk = "", def = "", type = "sorcery")
+            attribute = "R", description = "Boltwave deals 3 damage to each opponent.", atk = "", def = "", type = "sorcery", color = arrayOf("R"))
         cards = arrayOf(sampleCard2, sampleCard3, sampleCard1)
     }
     val context = LocalContext.current
@@ -559,10 +559,7 @@ fun addToCollectionPost(userid: String, card: CardData, addToOverallCards: (Card
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
 
-    val requestData = AddRemoveCardModel(userid = userid, game = card.game, cardid = card.cardid, setcode = card.setcode,
-        cardname = card.cardname, price = card.price, quantity = card.quantity, level = card.level, attribute = card.attribute,
-        type = card.type, atk = card.atk, def = card.def, description = card.description, cost = card.cost, attacks = card.attacks,
-        weaknesses = card.weaknesses, hp = card.hp, retreat = card.retreat, rarity = card.rarity)
+    val requestData = cardToAddRemoveCard(card, userid, card.quantity)
 
     retrofitAPI.addToCollection(requestData).enqueue(object:
         Callback<GenericSuccessErrorResponseModel> {

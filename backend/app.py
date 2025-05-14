@@ -605,7 +605,12 @@ def create_app():
             clientUserInfo = request.get_json()
             database = client['card_detection_info']
             collection = database['card_collection']
-            payload = {'userid' : clientUserInfo['userid'], 'cardid' : clientUserInfo['cardid'], 'setcode' : clientUserInfo['setcode'], 'game' : clientUserInfo['game'], 'cardname' : clientUserInfo['cardname']}
+            payload = {'userid' : clientUserInfo['userid'], 
+                       'cardid' : clientUserInfo['cardid'], 
+                       'setcode' : clientUserInfo['setcode'], 
+                       'game' : clientUserInfo['game'], 
+                       'cardname' : clientUserInfo['cardname'],
+                       'purchaseurl' : clientUserInfo['purchaseurl']}
             if 'rarity' in clientUserInfo:
                 payload['rarity'] = clientUserInfo['rarity']
             else :
@@ -633,15 +638,17 @@ def create_app():
                     payload['type'] = clientUserInfo['type']
                 if "description" in clientUserInfo:
                     payload['description'] = clientUserInfo['description'] #This is the effect text
-                if "attribute" in clientUserInfo:
-                    payload['attribute'] = clientUserInfo['attribute'] #This is the color
+                if "color" in clientUserInfo:
+                    payload['color'] = clientUserInfo['color'] #This is the color
                 if "atk" in clientUserInfo:
                     payload['atk'] = clientUserInfo['atk'] #This is the power
                 if "def" in clientUserInfo:
                     payload['def'] = clientUserInfo['def'] #This is the toughness
+                if "legalities" in clientUserInfo:
+                    payload["legalities"] = clientUserInfo["legalities"]
             else:
-                if "cost" in clientUserInfo:
-                    payload['cost'] = clientUserInfo['attribute'] #This is the energy type
+                if "color" in clientUserInfo:
+                    payload['color'] = clientUserInfo['color'] #This is the energy type
                 if "type" in clientUserInfo:
                     payload['type'] = clientUserInfo['type'] #This is the stage
                 if "attacks" in clientUserInfo:
@@ -654,8 +661,8 @@ def create_app():
                     payload['retreat'] = clientUserInfo['retreat']
                 if "abilities" in clientUserInfo:
                     payload["abilities"] = clientUserInfo["abilities"]
-                if "evolvesfrom" in clientUserInfo:
-                    payload["evolvesfrom"] = clientUserInfo["evolvesfrom"]
+                if "evolvesFrom" in clientUserInfo:
+                    payload["evolvesFrom"] = clientUserInfo["evolvesFrom"]
             if result == None:
                 payload['quantity'] = clientUserInfo['quantity']
                 payload['price'] = clientUserInfo['price']
@@ -852,7 +859,7 @@ def processCardImage(cardImagePath):
             payload = '&'.join([k if v is None else f'{k}={v}' for k, v in payload.items()])
             resp = requests.get(url, params=payload)
             if resp.status_code == 200:
-                ygoCard = resp.json()
+                ygoCard = resp.json()["data"][0]
                 cardData = Cards.ygoprodeck_to_card_data(ygoCard, cardSetCode)
                 if cardData is None:
                     scannedCards.append({'error': 'scanned set code does not match a valid printing. Card could be fake or try scanning again'})
@@ -880,7 +887,6 @@ def processCardImage(cardImagePath):
                    print('Fuzzy ratio is: ', fuzz.ratio(cardData['collector_number'], cardId))
                    scannedCards.append({'error': 'card search returned wrong card. please try scanning again'})
                    continue
-
                 scannedCards.append(cardData)
                 continue
             scannedCards.append({'error': 'card not found'})
@@ -893,6 +899,7 @@ def processCardImage(cardImagePath):
             resp = requests.get(url, headers=headers)
             if resp.status_code == 200:
                 cardData = resp.json()
+                cardData = Cards.pokemontcg_to_card_data(cardData["data"])
                 scannedCards.append(cardData)
                 continue
             scannedCards.append({'error': 'card not found'})

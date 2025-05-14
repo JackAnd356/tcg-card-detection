@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -40,6 +41,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,6 +87,8 @@ fun NewUserRegistrationScreen(username: String,
             data = enteredPassword,
             modifier = modifier,
             onChange = {enteredPassword = it},
+            keyboardType = KeyboardType.Password,
+            visTrans = PasswordVisualTransformation()
         )
         NewUserDataComponent(
             label = stringResource(R.string.email_label),
@@ -107,7 +113,7 @@ fun NewUserRegistrationScreen(username: String,
             colors = ButtonColors(
                 containerColor = colorResource(R.color.buttonLightBlue),
                 contentColor = Color.White,
-                disabledContainerColor = colorResource(R.color.buttonLightBlue),
+                disabledContainerColor = colorResource(R.color.darkGray),
                 disabledContentColor = Color.White
             ),
         ) {
@@ -137,7 +143,9 @@ fun NewUserRegistrationScreen(username: String,
 fun NewUserDataComponent(label: String,
                          data: String,
                          modifier: Modifier = Modifier,
-                         onChange: (String) -> Unit) {
+                         onChange: (String) -> Unit,
+                         keyboardType: KeyboardType? = null,
+                         visTrans: VisualTransformation? = null) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color.Black),
@@ -163,6 +171,8 @@ fun NewUserDataComponent(label: String,
                 ) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType ?: KeyboardType.Text),
+                visualTransformation = visTrans ?: VisualTransformation.None
             )
         }
     }

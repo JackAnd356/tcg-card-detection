@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.play.services.base)
     implementation(libs.facebook.login)
+    implementation("org.apache.commons:commons-text:1.10.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

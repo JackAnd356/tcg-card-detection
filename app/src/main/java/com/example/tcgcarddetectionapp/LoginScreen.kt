@@ -230,7 +230,8 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
         ) {
             Text(
                 text = stringResource(R.string.new_user_button_label),
-                style = appTypography.labelMedium
+                style = appTypography.labelMedium,
+                color = colorResource(R.color.hyperlinkBlue)
             )
         }
     }

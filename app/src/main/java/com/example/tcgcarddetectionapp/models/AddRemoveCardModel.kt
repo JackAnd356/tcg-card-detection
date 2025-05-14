@@ -1,14 +1,14 @@
 package com.example.tcgcarddetectionapp.models
 
 data class AddRemoveCardModel (
-    val userid: String,
-    val game: String,
+    val userid : String? = null,
     val cardid: String,
-    val setcode : String,
-    val cardname: String,
-    val quantity: Int,
-    val rarity: String? = null,
+    val setcode: String,
+    var quantity: Int,
+    var rarity: String? = null,
+    val game: String,
     val price: Double,
+    val cardname: String,
     val attribute: String? = null,
     val level: String? = null,
     val type: String? = null,
@@ -17,8 +17,13 @@ data class AddRemoveCardModel (
     val def: String? = null,
     val cost: String? = null,
     val hp: String? = null,
+    val abilities: Array<Ability>? = null,
+    val evolvesFrom: String? = null,
     val retreat: Array<String>? = null,
     val weaknesses: Array<Weakness>? = null,
     val attacks: Array<Attack>? = null,
-    val subcollection: String? = null
+    var purchaseurl: String? = null,
+    val frameType: String? = null,
+    val color: Array<String>? = null,
+    val subcollection: String? = null,
 )

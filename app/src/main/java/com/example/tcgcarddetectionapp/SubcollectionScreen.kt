@@ -114,6 +114,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Collections
+import org.apache.commons.text.StringEscapeUtils
 
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
@@ -194,6 +195,16 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         listOfFrames.add("")
     }
 
+    val listOfMTGFormats = listOf("",
+        stringResource(R.string.mtg_standard),
+        stringResource(R.string.mtg_legacy),
+        stringResource(R.string.mtg_pioneer),
+        stringResource(R.string.mtg_pauper),
+        stringResource(R.string.mtg_modern),
+        stringResource(R.string.mtg_commander),
+        stringResource(R.string.mtg_vintage),)
+    var selectedLegalityIndex by remember { mutableStateOf(1) }
+
 
     if (navWebsite != "") {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(navWebsite))
@@ -218,6 +229,13 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 }
                 if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
                     listOfAttributes.add(card.attribute)
+                }
+                if (card.color != null) {
+                    for (color in card.color) {
+                        if (!listOfAttributes.contains(color)) {
+                            listOfAttributes.add(color)
+                        }
+                    }
                 }
                 if (card.rarity != null && !listOfRarities.contains(card.rarity)) {
                     listOfRarities.add(card.rarity!!)
@@ -284,7 +302,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         }
         else {
             fullCardPool.sortedWith( compareBy<CardData> {
-                it.attribute
+                it.color!![0]
             }.thenBy { it.cardname }).forEach {
                     card ->
                 var filterFlag = true
@@ -311,8 +329,12 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     if (card.game == "mtg" && !listOfTypes.contains(card.type!!)) {
                         listOfTypes.add(card.type)
                     }
-                    if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
-                        listOfAttributes.add(card.attribute)
+                    if (card.color != null) {
+                        for (color in card.color) {
+                            if (!listOfAttributes.contains(color)) {
+                                listOfAttributes.add(color)
+                            }
+                        }
                     }
                     if (card.rarity != null && !listOfRarities.contains(card.rarity)) {
                         listOfRarities.add(card.rarity!!)
@@ -579,6 +601,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach {
                                     func ->
                                 filterList.add(func)
@@ -611,6 +634,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach {
                                     func ->
                                 filterList.add(func)
@@ -638,6 +662,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -672,6 +697,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -698,6 +724,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -724,6 +751,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -750,6 +778,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -776,6 +805,33 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        (game == "mtg") to {modifier -> DropdownSelectorFilter(
+                            label = stringResource(R.string.mtg_legalities),
+                            data = selectedLegalityIndex,
+                            options = listOfMTGFormats,
+                            onSelectedValChange = { _, index ->
+                                selectedLegalityIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp),
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -802,6 +858,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -1099,7 +1156,7 @@ fun CardPopup(cardData: CardData,
 @Composable
 fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Column(modifier = modifier.padding(3.dp)) {
-        Text(text = cardData.cardname,
+        Text(text = StringEscapeUtils.unescapeJava(cardData.cardname),
             style = appTypography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
@@ -1207,7 +1264,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
-                text = cardData.description!!.replace("\\n", "\n"),
+                text = StringEscapeUtils.unescapeJava(cardData.description!!),
                 fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
                 modifier = Modifier.fillMaxSize(),
                 color = Color.Black,
@@ -1220,7 +1277,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
 fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Column(modifier = modifier.padding(3.dp)) {
         Text(
-            text = cardData.cardname,
+            text = StringEscapeUtils.unescapeJava(cardData.cardname),
             style = appTypography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
@@ -1292,7 +1349,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
-                text = cardData.description!!.replace("\\n", "\n"),
+                text = StringEscapeUtils.unescapeJava(cardData.description!!),
                 fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
                 modifier = Modifier.fillMaxSize(),
                 color = Color.Black,
@@ -1307,16 +1364,18 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center) {
             Text(
-                text = cardData.cardname,
+                text = StringEscapeUtils.unescapeJava(cardData.cardname),
                 style = appTypography.headlineSmall,
                 textAlign = TextAlign.Center,
             )
-            if (cardData.attribute != null) {
-                Image(
-                    painter = painterResource(mapPokemonTypeToIcon(cardData.attribute)),
-                    contentDescription = cardData.attribute,
-                    modifier = Modifier.size(24.dp)
-                )
+            if (cardData.color != null) {
+                for (color in cardData.color) {
+                    Image(
+                        painter = painterResource(mapPokemonTypeToIcon(color)),
+                        contentDescription = color,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
 
@@ -1551,7 +1610,7 @@ fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
             }
             if (attack.text != null) {
                 Text(
-                    text = attack.text,
+                    text = StringEscapeUtils.unescapeJava(attack.text),
                     style = appTypography.labelSmall,
                 )
             }
@@ -1585,7 +1644,7 @@ fun PokemonAbilityBox(modifier: Modifier = Modifier, cardData: CardData) {
                 )
             }
             Text(
-                text = ability.text,
+                text = StringEscapeUtils.unescapeJava(ability.text),
                 style = appTypography.labelSmall,
             )
         }
@@ -1745,7 +1804,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                     ) {
                         Text(
                             text = card.cardname + " " + mapRarityToShortenedVersion(card.rarity!!),
-                            style = appTypography.labelSmall,
+                            style = appTypography.labelMedium,
                             modifier = Modifier.weight(1f)
                         )
                         Checkbox(
@@ -1769,7 +1828,13 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                           },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(8.dp),
+                enabled = checkedStates.any { it },
+                colors = ButtonColors(
+                    containerColor = colorResource(R.color.buttonLightBlue),
+                    contentColor = Color.Black,
+                    disabledContainerColor = Color.Gray,
+                    disabledContentColor = Color.Black)
             ) {
                 Text(
                     text = stringResource(R.string.add_to_subcollection_button_label),
@@ -2081,7 +2146,7 @@ fun MinMaxIntComponent(minVal: String,
                         }
                     }
                 },
-                isError = minError,
+                isError = false,
             )
 
             Spacer(modifier = Modifier.weight(.09f))
@@ -2119,7 +2184,13 @@ fun MinMaxIntComponent(minVal: String,
                         }
                     }
                 },
-                isError = maxError,
+                isError = false,
+            )
+        }
+        if (minError || maxError) {
+            Text(
+                text = stringResource(R.string.invalid_value_error),
+                color = Color.Red
             )
         }
     }
@@ -2164,7 +2235,7 @@ fun MinMaxDoubleComponent(minVal: String,
                         recalculateFilter()
                     }
                 },
-                isError = minError
+                isError = false
             )
 
             Spacer(modifier = Modifier.weight(.09f))
@@ -2200,7 +2271,13 @@ fun MinMaxDoubleComponent(minVal: String,
                         recalculateFilter()
                     }
                 },
-                isError = maxError
+                isError = false
+            )
+        }
+        if (minError || maxError) {
+            Text(
+                text = stringResource(R.string.invalid_value_error),
+                color = Color.Red
             )
         }
     }
@@ -2410,7 +2487,7 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
-    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = quantity, rarity = card.rarity)
+    val requestData = cardToAddRemoveCard(card, userid, quantity)
     var successful = false
     retrofitAPI.removeFromCollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
         override fun onResponse(
@@ -2451,10 +2528,7 @@ fun increaseQuantityPost(userid: String, card: CardData, quantityChange: Int) {
 
     card.quantity += quantityChange
 
-    val requestData = AddRemoveCardModel(userid = userid, game = card.game, cardid = card.cardid, setcode = card.setcode,
-        cardname = card.cardname, price = card.price, quantity = quantityChange, level = card.level, attribute = card.attribute,
-        type = card.type, atk = card.atk, def = card.def, description = card.description, cost = card.cost, attacks = card.attacks,
-        weaknesses = card.weaknesses, hp = card.hp, retreat = card.retreat, rarity = card.rarity)
+    val requestData = cardToAddRemoveCard(card, userid, quantityChange)
 
     retrofitAPI.addToCollection(requestData).enqueue(object:
         Callback<GenericSuccessErrorResponseModel> {
@@ -2481,7 +2555,7 @@ fun removeFromSubcollectionPost(card: CardData, userid: String, subcolInfo: Subc
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
-    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = card.quantity, rarity = card.rarity, subcollection = subcolInfo.subcollectionid)
+    val requestData = cardToAddRemoveCard(card, userid, card.quantity, subcollection = subcolInfo.subcollectionid)
     var successful = false
 
     retrofitAPI.removeFromSubcollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
@@ -2550,19 +2624,31 @@ fun recalculateFilterList(type: String,
                           priceMax: String,
                           attribute: String,
                           rarity: String,
-                          frame: String): MutableList<(CardData) -> Boolean> {
+                          frame: String,
+                          legality: Int): MutableList<(CardData) -> Boolean> {
     val ret = mutableListOf<(CardData) -> Boolean>()
     if (type != "") {
         ret.add { it.type == type }
     }
     if (attribute != "") {
-        ret.add { it.attribute != null && it.attribute == attribute }
+        ret.add { (it.attribute != null && it.attribute == attribute) || (it.color != null && it.color.contains(attribute)) }
     }
     if (rarity != "") {
         ret.add { it.rarity != null && it.rarity == rarity }
     }
     if(frame != "") {
         ret.add { it.frameType != null && it.frameType == frame}
+    }
+    if (legality > 1) {
+        when(legality) {
+            2 -> ret.add {it.legalities != null && it.legalities.standard == "legal"}
+            3 -> ret.add {it.legalities != null &&it.legalities.legacy == "legal"}
+            4 -> ret.add {it.legalities != null &&it.legalities.pioneer == "legal"}
+            5 -> ret.add {it.legalities != null &&it.legalities.pauper == "legal"}
+            6 -> ret.add {it.legalities != null &&it.legalities.modern == "legal"}
+            7 -> ret.add {it.legalities != null &&it.legalities.commander == "legal"}
+            8 -> ret.add {it.legalities != null &&it.legalities.vintage == "legal"}
+        }
     }
     if (quantityMin != "" && (quantityMax == "" || quantityMin.toInt() < quantityMax.toInt())) {
         ret.add { it.quantity >= quantityMin.toInt() }
@@ -2592,7 +2678,7 @@ fun sortSubcollection(subCol: MutableList<CardData> , game: String): MutableList
         }.thenBy { it.cardname }).toMutableList()
     }
     return subCol.sortedWith( compareBy<CardData> {
-        it.attribute
+        it.color!![0]
     }.thenBy { it.cardname }).toMutableList()
 }
 
