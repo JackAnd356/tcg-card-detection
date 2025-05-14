@@ -1803,7 +1803,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                     ) {
                         Text(
                             text = card.cardname + " " + mapRarityToShortenedVersion(card.rarity!!),
-                            style = appTypography.labelSmall,
+                            style = appTypography.labelMedium,
                             modifier = Modifier.weight(1f)
                         )
                         Checkbox(
@@ -1827,7 +1827,13 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                           },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(8.dp),
+                enabled = checkedStates.any { it },
+                colors = ButtonColors(
+                    containerColor = colorResource(R.color.buttonLightBlue),
+                    contentColor = Color.Black,
+                    disabledContainerColor = Color.Gray,
+                    disabledContentColor = Color.Black)
             ) {
                 Text(
                     text = stringResource(R.string.add_to_subcollection_button_label),

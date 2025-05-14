@@ -107,7 +107,7 @@ fun NewUserRegistrationScreen(username: String,
             colors = ButtonColors(
                 containerColor = colorResource(R.color.buttonLightBlue),
                 contentColor = Color.White,
-                disabledContainerColor = colorResource(R.color.buttonLightBlue),
+                disabledContainerColor = colorResource(R.color.darkGray),
                 disabledContentColor = Color.White
             ),
         ) {
