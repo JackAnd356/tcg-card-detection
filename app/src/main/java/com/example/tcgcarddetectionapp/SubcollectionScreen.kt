@@ -2145,7 +2145,7 @@ fun MinMaxIntComponent(minVal: String,
                         }
                     }
                 },
-                isError = minError,
+                isError = false,
             )
 
             Spacer(modifier = Modifier.weight(.09f))
@@ -2183,7 +2183,13 @@ fun MinMaxIntComponent(minVal: String,
                         }
                     }
                 },
-                isError = maxError,
+                isError = false,
+            )
+        }
+        if (minError || maxError) {
+            Text(
+                text = stringResource(R.string.invalid_value_error),
+                color = Color.Red
             )
         }
     }
@@ -2228,7 +2234,7 @@ fun MinMaxDoubleComponent(minVal: String,
                         recalculateFilter()
                     }
                 },
-                isError = minError
+                isError = false
             )
 
             Spacer(modifier = Modifier.weight(.09f))
@@ -2264,7 +2270,13 @@ fun MinMaxDoubleComponent(minVal: String,
                         recalculateFilter()
                     }
                 },
-                isError = maxError
+                isError = false
+            )
+        }
+        if (minError || maxError) {
+            Text(
+                text = stringResource(R.string.invalid_value_error),
+                color = Color.Red
             )
         }
     }
