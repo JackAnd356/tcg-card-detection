@@ -1062,7 +1062,7 @@ fun CardPopup(cardData: CardData,
 
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = modifier
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         when (cardData.game) {
             "yugioh" -> {
@@ -1669,21 +1669,22 @@ fun AddCardToSubcollectionPopup(modifier: Modifier = Modifier, cardData: CardDat
     var selectedIndex by remember { mutableIntStateOf(1) }
     var responseText by remember { mutableStateOf("")}
 
-    Row(modifier = modifier.padding(5.dp),
-        verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = modifier.padding(5.dp)) {
         UserDropdownSelector(
-            modifier = Modifier.weight(.7f).padding(end = 10.dp),
+            modifier = Modifier.weight(.7f).padding(end = 10.dp).align(Alignment.CenterVertically),
             label = stringResource(R.string.subcollection_page),
             data = selectedIndex,
             onUserStorefrontChange = { newIndex ->
-                selectedOption = optionInfo[newIndex - 1].subcollectionid
+                if (newIndex > 1) selectedOption = optionInfo[newIndex - 2].subcollectionid
+                else selectedOption = ""
+                //Log.i("DropDownSelector", "Selected Index: $newIndex, Selected Option: $selectedOption")
                 selectedIndex = newIndex - 1
             },
             options = optionList
         )
 
         Button(
-            modifier = Modifier.weight(.3f),
+            modifier = Modifier.weight(.3f).align(Alignment.Bottom),
             onClick = {
                 saveToSubcollectionPost(
                     card = cardData,

@@ -77,7 +77,7 @@ fun ProfileScreen(username: String,
     var oldUsername by remember { mutableStateOf(username) }
     var oldEmail by remember { mutableStateOf(email) }
     var showDeletePopup by remember { mutableStateOf(false) }
-    var enteredPassword by remember { mutableStateOf(context.getString(R.string.password_label))}
+    var enteredPassword by remember { mutableStateOf(context.getString(R.string.password_placeholder))}
 
     Column(verticalArrangement = Arrangement.Top,
         modifier = modifier.fillMaxSize(),
@@ -95,7 +95,7 @@ fun ProfileScreen(username: String,
         }
         UserDataComponent(label = stringResource(R.string.username_label),
             data = username,
-            modifier = modifier,
+            modifier = Modifier,
             onChange = onUsernameChange,
             flag = usernameEditFlag,
             onClickEdit = {usernameEditFlag = !usernameEditFlag},
@@ -108,7 +108,7 @@ fun ProfileScreen(username: String,
         UserDataComponent(
             label = stringResource(R.string.password_label),
             data = enteredPassword,
-            modifier = modifier,
+            modifier = Modifier,
             flag = passwordEditFlag,
             onChange = {enteredPassword = it},
             onClickEdit = {
@@ -124,7 +124,7 @@ fun ProfileScreen(username: String,
         UserDataComponent(
             label = stringResource(R.string.email_label),
             data = email,
-            modifier = modifier,
+            modifier = Modifier,
             flag = emailEditFlag,
             onChange = onUserEmailChange,
             onClickEdit = { emailEditFlag = !emailEditFlag },
@@ -144,7 +144,7 @@ fun ProfileScreen(username: String,
                 disabledContainerColor = Color(0xFFFF7A7A),
                 disabledContentColor = Color.White
             ),
-            modifier = modifier.fillMaxWidth(.9f).padding(top = 30.dp),
+            modifier = Modifier.fillMaxWidth(.9f).padding(top = 30.dp),
         ) {
             Text(
                 text = stringResource(R.string.delete_account_button_label),
@@ -159,11 +159,11 @@ fun ProfileScreen(username: String,
                 disabledContainerColor = Color(0xFF77E6FF),
                 disabledContentColor = Color.White
             ),
-            modifier = modifier.fillMaxWidth(.9f).padding(top = 30.dp),
+            modifier = Modifier.fillMaxWidth(.9f).padding(top = 30.dp),
         ) {
             Text(
                 text = stringResource(R.string.logout_button_label),
-                style = appTypography.bodyLarge
+                style = appTypography.labelLarge
             )
         }
 
@@ -188,26 +188,28 @@ fun UserDataComponent(label: String,
             .fillMaxWidth()
             .height(70.dp)
             .requiredHeight(70.dp)) {
-        Row {
+        Row(modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
             if (flag) {
-                TextField(
+                TextField(modifier = Modifier.padding(start = 5.dp),
                     value = data,
                     onValueChange = onChange,
                     label = { Text(
                         text = label,
-                        style = appTypography.labelMedium
+                        style = appTypography.labelLarge
                     ) }
                 )
             }
             else {
-                Text(
+                Text(modifier = Modifier.padding(start = 5.dp),
                     text = "$label: $data",
-                    style = appTypography.labelMedium,
+                    style = appTypography.labelLarge,
                     textAlign = TextAlign.Left
                 )
             }
 
-            Spacer(Modifier.weight(1f))
+            //Spacer(modifier = Modifier.weight(1f))
             if (mutable == true) {
                 Button(
                     onClick = {
@@ -217,13 +219,14 @@ fun UserDataComponent(label: String,
                             onClickEdit()
                         }
                     }, modifier = Modifier
-                        .size(width = 100.dp, height = 40.dp)
-                        .align(Alignment.CenterVertically),
+                        .height(40.dp)
+                        .align(Alignment.CenterVertically)
+                        .padding(end = 5.dp),
                     colors = ButtonColors(
-                        containerColor = Color(0xFFDD9D9D9),
-                        contentColor = Color(0xFF8A8A8A),
-                        disabledContainerColor = Color(0xFFDD9D9D9),
-                        disabledContentColor = Color(0xFF8A8A8A)
+                        containerColor = colorResource(R.color.gray),
+                        contentColor = Color.Black,
+                        disabledContainerColor = colorResource(R.color.gray),
+                        disabledContentColor = Color.Black
                     )
                 ) {
                     if (flag && data != oldData) {
@@ -331,13 +334,18 @@ fun DeleteUserWarningPopup(
     Dialog(
         onDismissRequest = onDismiss
     ) {
-        Card {
-            Text(
+        Card(modifier = Modifier) {
+            Text(modifier = Modifier.padding(5.dp),
                 text = stringResource(R.string.delete_account_confirmation_message),
-                style = appTypography.headlineMedium
+                style = appTypography.headlineMedium,
+                textAlign = TextAlign.Center
             )
-            Row {
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)) {
                 Button(
+                    modifier = Modifier.padding(end = 5.dp),
                     onClick = {
                         deleteUserPost(userid = userid, navLogin = navLogin)
                     },
@@ -354,11 +362,12 @@ fun DeleteUserWarningPopup(
                     )
                 }
                 Button(
+                    modifier = Modifier.padding(horizontal = 10.dp),
                     onClick = { onDismiss() },
                     colors = ButtonColors(
-                        containerColor = Color.Gray,
+                        containerColor = colorResource(R.color.textLightGrey),
                         contentColor = Color.White,
-                        disabledContainerColor = Color.Gray,
+                        disabledContainerColor = colorResource(R.color.textLightGrey),
                         disabledContentColor = Color.White
                     )
                 ) {
