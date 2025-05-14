@@ -6,7 +6,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 
 
 data class CardData(
-    val userid : String,
+    val userid : String? = null,
     val cardid: String,
     val setcode: String,
     var quantity: Int,
@@ -34,6 +34,7 @@ data class CardData(
     var added: MutableState<Boolean> = mutableStateOf(true),
     var purchaseurl: String? = null,
     val frameType: String? = null,
+    val color: Array<String>? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (other !is CardData) return false

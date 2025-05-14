@@ -8,6 +8,7 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.sp
+import com.example.tcgcarddetectionapp.models.AddRemoveCardModel
 import com.example.tcgcarddetectionapp.models.CardData
 import com.example.tcgcarddetectionapp.models.SubcollectionInfo
 
@@ -157,6 +158,36 @@ fun arrToPrintableString(arr: Array<String>): String {
         str += "$itm,"
     }
     return str
+}
+
+fun cardToAddRemoveCard(card: CardData, userid: String, quantity: Int, subcollection: String? = null): AddRemoveCardModel {
+    return AddRemoveCardModel(
+        userid = userid,
+        cardid = card.cardid,
+        setcode = card.setcode,
+        quantity = card.quantity,
+        rarity = card.rarity,
+        game = card.game,
+        price = card.price,
+        cardname = card.cardname,
+        attribute = card.attribute,
+        level = card.level,
+        type = card.type,
+        description = card.description,
+        atk = card.atk,
+        def = card.def,
+        cost = card.cost,
+        hp = card.hp,
+        abilities = card.abilities,
+        evolvesFrom = card.evolvesFrom,
+        retreat = card.retreat,
+        weaknesses = card.weaknesses,
+        attacks = card.attacks,
+        purchaseurl = card.purchaseurl,
+        frameType = card.frameType,
+        color = card.color,
+        subcollection = subcollection
+    )
 }
 
 val appTypography = Typography(

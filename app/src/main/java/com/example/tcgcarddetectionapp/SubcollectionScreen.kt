@@ -219,6 +219,13 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
                     listOfAttributes.add(card.attribute)
                 }
+                if (card.color != null) {
+                    for (color in card.color) {
+                        if (!listOfAttributes.contains(color)) {
+                            listOfAttributes.add(color)
+                        }
+                    }
+                }
                 if (card.rarity != null && !listOfRarities.contains(card.rarity)) {
                     listOfRarities.add(card.rarity!!)
                 }
@@ -284,7 +291,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         }
         else {
             fullCardPool.sortedWith( compareBy<CardData> {
-                it.attribute
+                it.color!![0]
             }.thenBy { it.cardname }).forEach {
                     card ->
                 var filterFlag = true
@@ -311,8 +318,12 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     if (card.game == "mtg" && !listOfTypes.contains(card.type!!)) {
                         listOfTypes.add(card.type)
                     }
-                    if (card.attribute != null && !listOfAttributes.contains(card.attribute)) {
-                        listOfAttributes.add(card.attribute)
+                    if (card.color != null) {
+                        for (color in card.color) {
+                            if (!listOfAttributes.contains(color)) {
+                                listOfAttributes.add(color)
+                            }
+                        }
                     }
                     if (card.rarity != null && !listOfRarities.contains(card.rarity)) {
                         listOfRarities.add(card.rarity!!)
@@ -1311,12 +1322,14 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
                 style = appTypography.headlineSmall,
                 textAlign = TextAlign.Center,
             )
-            if (cardData.attribute != null) {
-                Image(
-                    painter = painterResource(mapPokemonTypeToIcon(cardData.attribute)),
-                    contentDescription = cardData.attribute,
-                    modifier = Modifier.size(24.dp)
-                )
+            if (cardData.color != null) {
+                for (color in cardData.color) {
+                    Image(
+                        painter = painterResource(mapPokemonTypeToIcon(color)),
+                        contentDescription = color,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
 
@@ -2409,7 +2422,7 @@ fun removeFromCollectionPost(card: CardData, userid: String, game: String, quant
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
-    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = quantity, rarity = card.rarity)
+    val requestData = cardToAddRemoveCard(card, userid, quantity)
     var successful = false
     retrofitAPI.removeFromCollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
         override fun onResponse(
@@ -2450,10 +2463,7 @@ fun increaseQuantityPost(userid: String, card: CardData, quantityChange: Int) {
 
     card.quantity += quantityChange
 
-    val requestData = AddRemoveCardModel(userid = userid, game = card.game, cardid = card.cardid, setcode = card.setcode,
-        cardname = card.cardname, price = card.price, quantity = quantityChange, level = card.level, attribute = card.attribute,
-        type = card.type, atk = card.atk, def = card.def, description = card.description, cost = card.cost, attacks = card.attacks,
-        weaknesses = card.weaknesses, hp = card.hp, retreat = card.retreat, rarity = card.rarity)
+    val requestData = cardToAddRemoveCard(card, userid, quantityChange)
 
     retrofitAPI.addToCollection(requestData).enqueue(object:
         Callback<GenericSuccessErrorResponseModel> {
@@ -2480,7 +2490,7 @@ fun removeFromSubcollectionPost(card: CardData, userid: String, subcolInfo: Subc
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val retrofitAPI = retrofit.create(ApiService::class.java)
-    val requestData = AddRemoveCardModel(userid = userid, game = game, cardid = card.cardid, setcode = card.setcode, cardname = card.cardname, price = card.price, quantity = card.quantity, rarity = card.rarity, subcollection = subcolInfo.subcollectionid)
+    val requestData = cardToAddRemoveCard(card, userid, card.quantity, subcollection = subcolInfo.subcollectionid)
     var successful = false
 
     retrofitAPI.removeFromSubcollection(requestData).enqueue(object : Callback<GenericSuccessErrorResponseModel> {
@@ -2555,7 +2565,7 @@ fun recalculateFilterList(type: String,
         ret.add { it.type == type }
     }
     if (attribute != "") {
-        ret.add { it.attribute != null && it.attribute == attribute }
+        ret.add { (it.attribute != null && it.attribute == attribute) || (it.color != null && it.color.contains(attribute)) }
     }
     if (rarity != "") {
         ret.add { it.rarity != null && it.rarity == rarity }
@@ -2591,7 +2601,7 @@ fun sortSubcollection(subCol: MutableList<CardData> , game: String): MutableList
         }.thenBy { it.cardname }).toMutableList()
     }
     return subCol.sortedWith( compareBy<CardData> {
-        it.attribute
+        it.color!![0]
     }.thenBy { it.cardname }).toMutableList()
 }
 
