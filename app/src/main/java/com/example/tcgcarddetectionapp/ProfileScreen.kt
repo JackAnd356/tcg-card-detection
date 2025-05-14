@@ -334,13 +334,18 @@ fun DeleteUserWarningPopup(
     Dialog(
         onDismissRequest = onDismiss
     ) {
-        Card {
-            Text(
+        Card(modifier = Modifier) {
+            Text(modifier = Modifier.padding(5.dp),
                 text = stringResource(R.string.delete_account_confirmation_message),
-                style = appTypography.headlineMedium
+                style = appTypography.headlineMedium,
+                textAlign = TextAlign.Center
             )
-            Row {
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)) {
                 Button(
+                    modifier = Modifier.padding(end = 5.dp),
                     onClick = {
                         deleteUserPost(userid = userid, navLogin = navLogin)
                     },
@@ -357,11 +362,12 @@ fun DeleteUserWarningPopup(
                     )
                 }
                 Button(
+                    modifier = Modifier.padding(horizontal = 10.dp),
                     onClick = { onDismiss() },
                     colors = ButtonColors(
-                        containerColor = Color.Gray,
+                        containerColor = colorResource(R.color.textLightGrey),
                         contentColor = Color.White,
-                        disabledContainerColor = Color.Gray,
+                        disabledContainerColor = colorResource(R.color.textLightGrey),
                         disabledContentColor = Color.White
                     )
                 ) {
