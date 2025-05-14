@@ -114,6 +114,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Collections
+import org.apache.commons.text.StringEscapeUtils
 
 @Composable
 fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
@@ -1155,7 +1156,7 @@ fun CardPopup(cardData: CardData,
 @Composable
 fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Column(modifier = modifier.padding(3.dp)) {
-        Text(text = cardData.cardname,
+        Text(text = StringEscapeUtils.unescapeJava(cardData.cardname),
             style = appTypography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
@@ -1263,7 +1264,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
-                text = cardData.description!!.replace("\\n", "\n"),
+                text = StringEscapeUtils.unescapeJava(cardData.description!!),
                 fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
                 modifier = Modifier.fillMaxSize(),
                 color = Color.Black,
@@ -1276,7 +1277,7 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
 fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier: Modifier) {
     Column(modifier = modifier.padding(3.dp)) {
         Text(
-            text = cardData.cardname,
+            text = StringEscapeUtils.unescapeJava(cardData.cardname),
             style = appTypography.headlineSmall,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
@@ -1348,7 +1349,7 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
             colors = CardDefaults.cardColors(containerColor = Color.Gray)
         ) {
             AutoResizeText(
-                text = cardData.description!!.replace("\\n", "\n"),
+                text = StringEscapeUtils.unescapeJava(cardData.description!!),
                 fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
                 modifier = Modifier.fillMaxSize(),
                 color = Color.Black,
@@ -1363,7 +1364,7 @@ fun PokemonCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modif
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center) {
             Text(
-                text = cardData.cardname,
+                text = StringEscapeUtils.unescapeJava(cardData.cardname),
                 style = appTypography.headlineSmall,
                 textAlign = TextAlign.Center,
             )
@@ -1609,7 +1610,7 @@ fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
             }
             if (attack.text != null) {
                 Text(
-                    text = attack.text,
+                    text = StringEscapeUtils.unescapeJava(attack.text),
                     style = appTypography.labelSmall,
                 )
             }
@@ -1643,7 +1644,7 @@ fun PokemonAbilityBox(modifier: Modifier = Modifier, cardData: CardData) {
                 )
             }
             Text(
-                text = ability.text,
+                text = StringEscapeUtils.unescapeJava(ability.text),
                 style = appTypography.labelSmall,
             )
         }
