@@ -194,6 +194,16 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         listOfFrames.add("")
     }
 
+    val listOfMTGFormats = listOf("",
+        stringResource(R.string.mtg_standard),
+        stringResource(R.string.mtg_legacy),
+        stringResource(R.string.mtg_pioneer),
+        stringResource(R.string.mtg_pauper),
+        stringResource(R.string.mtg_modern),
+        stringResource(R.string.mtg_commander),
+        stringResource(R.string.mtg_vintage),)
+    var selectedLegalityIndex by remember { mutableStateOf(1) }
+
 
     if (navWebsite != "") {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(navWebsite))
@@ -590,6 +600,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach {
                                     func ->
                                 filterList.add(func)
@@ -622,6 +633,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach {
                                     func ->
                                 filterList.add(func)
@@ -649,6 +661,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -683,6 +696,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -709,6 +723,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -735,6 +750,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -761,6 +777,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -787,6 +804,33 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
+                            ).forEach { func ->
+                                filterList.add(func)
+                            }
+                        }},
+                        (game == "mtg") to {modifier -> DropdownSelectorFilter(
+                            label = stringResource(R.string.mtg_legalities),
+                            data = selectedLegalityIndex,
+                            options = listOfMTGFormats,
+                            onSelectedValChange = { _, index ->
+                                selectedLegalityIndex = index + 1
+                            },
+                            modifier = modifier.padding(5.dp),
+                        ) {
+                            filterList.clear()
+                            recalculateFilterList(
+                                type = selectedTypeFilter,
+                                quantityMin = selectedMinQuantity,
+                                levelMin = selectedMinLevel,
+                                quantityMax = selectedMaxQuantity,
+                                levelMax = selectedMaxLevel,
+                                priceMin = selectedMinPrice,
+                                priceMax = selectedMaxPrice,
+                                attribute = selectedAttributeFilter,
+                                rarity = selectedRarityFilter,
+                                frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -813,6 +857,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 attribute = selectedAttributeFilter,
                                 rarity = selectedRarityFilter,
                                 frame = selectedFrameFilter,
+                                legality = selectedLegalityIndex,
                             ).forEach { func ->
                                 filterList.add(func)
                             }
@@ -2559,7 +2604,8 @@ fun recalculateFilterList(type: String,
                           priceMax: String,
                           attribute: String,
                           rarity: String,
-                          frame: String): MutableList<(CardData) -> Boolean> {
+                          frame: String,
+                          legality: Int): MutableList<(CardData) -> Boolean> {
     val ret = mutableListOf<(CardData) -> Boolean>()
     if (type != "") {
         ret.add { it.type == type }
@@ -2572,6 +2618,17 @@ fun recalculateFilterList(type: String,
     }
     if(frame != "") {
         ret.add { it.frameType != null && it.frameType == frame}
+    }
+    if (legality > 1) {
+        when(legality) {
+            2 -> ret.add {it.legalities != null && it.legalities.standard == "legal"}
+            3 -> ret.add {it.legalities != null &&it.legalities.legacy == "legal"}
+            4 -> ret.add {it.legalities != null &&it.legalities.pioneer == "legal"}
+            5 -> ret.add {it.legalities != null &&it.legalities.pauper == "legal"}
+            6 -> ret.add {it.legalities != null &&it.legalities.modern == "legal"}
+            7 -> ret.add {it.legalities != null &&it.legalities.commander == "legal"}
+            8 -> ret.add {it.legalities != null &&it.legalities.vintage == "legal"}
+        }
     }
     if (quantityMin != "" && (quantityMax == "" || quantityMin.toInt() < quantityMax.toInt())) {
         ret.add { it.quantity >= quantityMin.toInt() }

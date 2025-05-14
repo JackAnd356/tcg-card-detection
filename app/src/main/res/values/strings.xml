@@ -130,4 +130,12 @@
     <string name="scan_screen_tips_3">3. Try to position the card an a simple, monotone background</string>
     <string name="scan_screen_tips_4">4. Keep the card as straight and centered as possible</string>
     <string name="scan_screen_tips_5">5. Make sure the image is fully focused</string>
+    <string name="mtg_legalities">Legality</string>
+    <string name="mtg_standard">Standard</string>
+    <string name="mtg_legacy">Legacy</string>
+    <string name="mtg_pioneer">Pioneer</string>
+    <string name="mtg_pauper">Pauper</string>
+    <string name="mtg_modern">Modern</string>
+    <string name="mtg_commander">Commander</string>
+    <string name="mtg_vintage">Vintage</string>
 </resources>

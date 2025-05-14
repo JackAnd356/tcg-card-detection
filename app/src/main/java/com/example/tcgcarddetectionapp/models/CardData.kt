@@ -35,6 +35,7 @@ data class CardData(
     var purchaseurl: String? = null,
     val frameType: String? = null,
     val color: Array<String>? = null,
+    val legalities: Legalities? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (other !is CardData) return false
@@ -62,4 +63,29 @@ data class Ability(
     val name: String,
     val text: String,
     val type: String
+)
+
+data class Legalities(
+    val standard: String,
+    val future: String,
+    val historic: String,
+    val timeless: String,
+    val gladiator: String,
+    val pioneer: String,
+    val explorer: String,
+    val modern: String,
+    val legacy: String,
+    val pauper: String,
+    val vintage: String,
+    val penny: String,
+    val commander: String,
+    val oathbreaker: String,
+    val standardbrawl: String,
+    val brawl: String,
+    val alchemy: String,
+    val paupercommander: String,
+    val duel: String,
+    val oldschool: String,
+    val premodern: String,
+    val predh: String,
 )
