@@ -496,6 +496,7 @@ def scryfall_to_card_data(scryfallCard):
         cardData["atk"] = scryfallCard["power"]
     if "toughness" in scryfallCard:
         cardData["def"] = scryfallCard["toughness"]
+    cardData["legalities"] = scryfallCard["legalities"]
     return cardData
 
 def pokemontcg_to_card_data(pokemonCard):

@@ -644,6 +644,8 @@ def create_app():
                     payload['atk'] = clientUserInfo['atk'] #This is the power
                 if "def" in clientUserInfo:
                     payload['def'] = clientUserInfo['def'] #This is the toughness
+                if "legalities" in clientUserInfo:
+                    payload["legalities"] = clientUserInfo["legalities"]
             else:
                 if "color" in clientUserInfo:
                     payload['color'] = clientUserInfo['color'] #This is the energy type
