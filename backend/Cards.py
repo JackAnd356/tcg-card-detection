@@ -9,6 +9,7 @@ from PIL import Image
 import json
 import imutils
 import easyocr
+import urllib
 from fuzzywuzzy import fuzz
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -440,6 +441,7 @@ def ygoprodeck_to_card_data(ygoCard, setcode):
     cardData = {}
     cardData["quantity"] = 1
     cardData["game"] = "yugioh"
+    cardData["cardid"] = ygoCard["id"]
     cardData["cardname"] = ygoCard["name"]
     cardData["attribute"] = ygoCard["attribute"]
     cardData["level"] = ygoCard["level"]
@@ -450,13 +452,23 @@ def ygoprodeck_to_card_data(ygoCard, setcode):
     cardData["frameType"] = ygoCard["frameType"]
     setname = ''
     rarities = []
+    purchaseURL = ''
+    price = -1
     for set in ygoCard["card_sets"]:
         if setcode == set["set_code"]:
             setname = set["set_name"]
+            price = set['set_price']
             rarities.append(set["set_rarity"])
+            purchaseURL = urllib.parse.unquote(set['set_url'].split('u=')[1], encoding='utf-8', errors='replace')
     
     if setname == '':
         return None
+    
+    if not purchaseURL == '':
+        cardData['purchaseurl'] = purchaseURL
+        
+    if not price == -1:
+        cardData['price'] = price
     
     cardData["setcode"] = setcode
     if (len(rarities) == 1):
@@ -470,7 +482,52 @@ def scryfall_to_card_data(scryfallCard):
     cardData = {}
     cardData["quantity"] = 1
     cardData["game"] = "mtg"
+    cardData["cardid"] = scryfallCard["id"]
     cardData["cardname"] = scryfallCard["name"]
+    cardData["setcode"] = scryfallCard["set"]
+    cardData["rarity"] = scryfallCard["rarity"]
+    cardData["cost"] = scryfallCard["mana_cost"]
+    cardData["description"] = scryfallCard["oracle_text"]
+    cardData["type"] = scryfallCard["type_line"]
+    cardData["purchaseurl"] = urllib.parse.unquote(cardData['purchase_uris']['tcgplayer'].split('u=')[1], encoding='utf-8', errors='replace')
+    cardData["price"] = cardData['prices']['usd']
+    cardData["color"] = cardData["colors"]
+    if "power" in scryfallCard:
+        cardData["atk"] = scryfallCard["power"]
+    if "toughness" in scryfallCard:
+        cardData["def"] = scryfallCard["toughness"]
+    return cardData
+
+def pokemontcg_to_card_data(pokemonCard):
+    cardData = {}
+    cardData["quantity"] = 1
+    cardData["game"] = "pokemon"
+    cardData["cardid"] = pokemonCard["id"]
+    cardData["cardname"] = pokemonCard["name"]
+    cardData["setcode"] = pokemonCard["set"]["name"]
+    cardData["rarity"] = pokemonCard["rarity"]
+    price = -1
+    if cardData['rarity'] in list(pokemonCard['data']['tcgplayer']['prices'].keys()):
+        price = pokemonCard['data']['tcgplayer']['prices'][cardData['rarirty']]['market']
+    elif "normal" in list(pokemonCard['data']['tcgplayer']['prices'].keys()):
+        price = pokemonCard['data']['tcgplayer']['prices']['normal']['market']
+    else:
+        dictKey = list(pokemonCard['data']['tcgplayer']['prices'].keys())[0]
+        price = pokemonCard['data']['tcgplayer']['prices'][dictKey]['market']
+    purchaseURL = pokemonCard['data']['tcgplayer']['url']
+    if not price == -1:
+        cardData["price"] = price
+        cardData["purchaseurl"] = purchaseURL
+    cardData["attacks"] = pokemonCard["attacks"]
+    cardData["hp"] = pokemonCard["hp"]
+    cardData["retreat"] = pokemonCard["retreatCost"]
+    cardData["weaknesses"] = pokemonCard["weaknesses"]
+    cardData["type"] = pokemonCard["subtypes"][0]
+    cardData["color"] = pokemonCard["types"]
+    if "abilities" in pokemonCard:
+        cardData["abilities"] = pokemonCard["abilities"]
+    if "evolvesFrom" in pokemonCard:
+        cardData["evolvesFrom"] = pokemonCard["evolvesFrom"]
     return cardData
 
 def get_one_card_contour(imgIn):
