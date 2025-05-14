@@ -302,7 +302,12 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
         }
         else {
             fullCardPool.sortedWith( compareBy<CardData> {
-                it.color!![0]
+                if (it.color != null) {
+                    it.color[0]
+                }
+                else {
+                    "Error handling"
+                }
             }.thenBy { it.cardname }).forEach {
                     card ->
                 var filterFlag = true
@@ -2677,7 +2682,12 @@ fun sortSubcollection(subCol: MutableList<CardData> , game: String): MutableList
         }.thenBy { it.cardname }).toMutableList()
     }
     return subCol.sortedWith( compareBy<CardData> {
-        it.color!![0]
+        if (it.color != null) {
+            it.color[0]
+        }
+        else {
+            "Error handling"
+        }
     }.thenBy { it.cardname }).toMutableList()
 }
 
