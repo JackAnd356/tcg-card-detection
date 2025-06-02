@@ -138,4 +138,6 @@
     <string name="mtg_modern">Modern</string>
     <string name="mtg_commander">Commander</string>
     <string name="mtg_vintage">Vintage</string>
+    <string name="export_to_ydk">Export To YDK</string>
+    <string name="export_to_decklist">Export To Decklist</string>
 </resources>

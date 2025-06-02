@@ -61,8 +61,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.tcgcarddetectionapp.models.CardData
 import com.example.tcgcarddetectionapp.models.CreateSubcollectionModel
 import com.example.tcgcarddetectionapp.models.DeleteUserSubcollectionRequestModel
+import com.example.tcgcarddetectionapp.models.ExportModel
 import com.example.tcgcarddetectionapp.models.GenericSuccessErrorResponseModel
 import com.example.tcgcarddetectionapp.models.SubcollectionInfo
 import com.example.tcgcarddetectionapp.models.UpdateUserSubcollectionRequestModel
@@ -82,6 +84,8 @@ fun CollectionScreen(gameName: String,
                      navController: NavController,
                      modifier: Modifier = Modifier,
                      userid: String,
+                     fullCardPool: Array<CardData>,
+                     email: String,
                      removeSubcollection: (SubcollectionInfo) -> Unit,
                      onUserSubColInfoChange: (Array<SubcollectionInfo>) -> Unit) {
     var searchTerm by remember { mutableStateOf("") }
@@ -257,6 +261,8 @@ fun CollectionScreen(gameName: String,
                                 subcollection = subcollection,
                                 game = gameFilter,
                                 navController = navController,
+                                fullCardPool = fullCardPool,
+                                email = email,
                                 onEditSubcollectionInfo = {
                                     selectedSubcollectionInfo = it
                                     showEditPopup = !showEditPopup
@@ -279,6 +285,8 @@ fun CollectionScreen(gameName: String,
 fun CollectionSummary(subcollection: SubcollectionInfo,
                       game: String,
                       navController: NavController,
+                      fullCardPool: Array<CardData>,
+                      email: String,
                       onEditSubcollectionInfo: (SubcollectionInfo) -> Unit,
                       onDeleteSubcollection: (SubcollectionInfo) -> Unit,
                       modifier: Modifier = Modifier) {
@@ -376,6 +384,29 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                             onDeleteSubcollection(subcollection)
                         }
                     )
+                    if (subcollection.game == "yugioh" && subcollection.isDeck) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.export_to_ydk),
+                                    style = appTypography.labelSmall)
+                            },
+                            onClick = {
+                                var cardsInDeck = mutableListOf<CardData>()
+                                for (card in fullCardPool) {
+                                    if (card.subcollections?.contains(subColId) == true) {
+                                        cardsInDeck.add(card)
+                                    }
+                                }
+                                exportToYDKPost(
+                                    cards = cardsInDeck.toTypedArray(),
+                                    subColID = subColId,
+                                    subColName = subcollection.name,
+                                    email = email
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -732,6 +763,28 @@ fun deleteSubcollectionPost(subcollection: SubcollectionInfo) {
     })
 }
 
+fun exportToYDKPost(cards: Array<CardData>, subColID: String, subColName: String, email: String) {
+    val retrofit = Retrofit.Builder()
+        .baseUrl(api_url)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    val retrofitAPI = retrofit.create(ApiService::class.java)
+    val requestData = ExportModel(cards = cards, subColID = subColID, subColName = subColName, email = email)
+    retrofitAPI.exportToYDK(requestData).enqueue(object: Callback<GenericSuccessErrorResponseModel> {
+        override fun onResponse(
+            call: Call<GenericSuccessErrorResponseModel>,
+            response: Response<GenericSuccessErrorResponseModel>
+        ) {
+            //Do nothing
+        }
+
+        override fun onFailure(call: Call<GenericSuccessErrorResponseModel>, t: Throwable) {
+            t.printStackTrace()
+        }
+
+    })
+}
+
 @Composable
 fun FilterTextfield(modifier: Modifier, label: String? = null, value: String,
                     onValueChange: (String) -> Unit, isError: Boolean,
@@ -826,6 +879,8 @@ fun CollectionScreenPreview() {
             totalCardCount = 200,
             totalCardValue = 1000000.00,
             userid = "1",
+            fullCardPool = arrayOf(),
+            email = "",
             onUserSubColInfoChange = {},
             removeSubcollection = {  }
         )

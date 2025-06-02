@@ -138,6 +138,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
                     userid = userid,
+                    fullCardPool = collection,
+                    email = email,
                     onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) },
                     removeSubcollection = {
                         val removedSubcol = it
@@ -176,6 +178,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
                     userid = userid,
+                    fullCardPool = collection,
+                    email = email,
                     onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) },
                     removeSubcollection = {
                         val removedSubcol = it
@@ -214,6 +218,8 @@ fun MainApp(navController: NavHostController = rememberNavController()) {
                     totalCardCount = cardCount,
                     totalCardValue = cardPriceTotal,
                     userid = userid,
+                    fullCardPool = collection,
+                    email = email,
                     onUserSubColInfoChange = { onUserSubColInfoChange(subColInfo = it, cardDataCollection = collection, setSubColInfo = {subColInfo = it}) },
                     removeSubcollection = {
                         val removedSubcol = it

@@ -4,6 +4,7 @@ import com.example.tcgcarddetectionapp.models.AddRemoveCardModel
 import com.example.tcgcarddetectionapp.models.CardData
 import com.example.tcgcarddetectionapp.models.CreateSubcollectionModel
 import com.example.tcgcarddetectionapp.models.DeleteUserSubcollectionRequestModel
+import com.example.tcgcarddetectionapp.models.ExportModel
 import com.example.tcgcarddetectionapp.models.GenericSuccessErrorResponseModel
 import com.example.tcgcarddetectionapp.models.GetCardImageRequestModel
 import com.example.tcgcarddetectionapp.models.GetCardImageResponseModel
@@ -94,4 +95,7 @@ interface ApiService {
 
     @POST("deleteUserSubcollection")
     fun deleteUserSubcollection(@Body deleteUserSubcollectionRequestModel: DeleteUserSubcollectionRequestModel): Call<GenericSuccessErrorResponseModel>
+
+    @POST("exportToYDK")
+    fun exportToYDK(@Body exportModel: ExportModel): Call<GenericSuccessErrorResponseModel>
 }
