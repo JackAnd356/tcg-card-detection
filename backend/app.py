@@ -12,6 +12,9 @@ import datetime
 import Cards
 import cv2
 import urllib
+import smtplib
+import os
+from email.message import EmailMessage
 from datetime import date, timezone
 from dotenv import load_dotenv, find_dotenv
 from pymongo import database
@@ -832,6 +835,33 @@ def create_app():
             cardCollection.update_many({}, {'$pull' : {'subcollections' : subcollectionid}})
             return {'success' : 1}, 201
         return {'error': 'Request must be JSON'}, 201
+
+    @app.post('/exportToYDK')
+    def post_exportToYDK():
+        if request.is_json:
+            clientUserInfo = request.get_json()
+            subColID = clientUserInfo["subColID"]
+            subColName = clientUserInfo["subColName"]
+            cards = clientUserInfo["cards"]
+            with open(subColName + ".ydk", "w") as f:
+                f.write("#main\n")
+                for card in cards:
+                    if card["frameType"] == "normal" or card["frameType"] == "effect" or card["frameType"] == "spell" or card["frameType"] == "trap" or card["frameType"] == "effect_pendulum":
+                        cardid = card["cardid"]
+                        quantity = card["subcollections"].count(subColID)
+                        for i in range(quantity):
+                            f.write(cardid + "\n")
+                f.write("\n#extra\n")
+                for card in cards:
+                    if not (card["frameType"] == "normal" or card["frameType"] == "effect" or card["frameType"] == "spell" or card["frameType"] == "trap" or card["frameType"] == "effect_pendulum"):
+                        cardid = card["cardid"]
+                        quantity = card["subcollections"].count(subColID)
+                        for i in range(quantity):
+                            f.write(cardid + "\n")
+                f.write("\n!side\n")
+            return {'success' : 1}, 201
+        return {'error': 'Request must be JSON'}, 201
+    
 
     return app
 
