@@ -13,7 +13,6 @@ import Cards
 import cv2
 import urllib
 import smtplib
-import os
 from email.message import EmailMessage
 from datetime import date, timezone
 from dotenv import load_dotenv, find_dotenv
@@ -51,6 +50,8 @@ testCardContentData = [{'cardID': '46986414', 'card-name': 'Dark Magician', 'car
 
 UPLOAD_FOLDER = 'uploads/'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+SENDER_EMAIL = "tcgcompanionnoreply@gmail.com"
 
 #MongoDB Integration
     
@@ -859,6 +860,11 @@ def create_app():
                         for i in range(quantity):
                             f.write(cardid + "\n")
                 f.write("\n!side\n")
+            send_file_via_email(SENDER_EMAIL, os.getenv("GOOGLE_APP_PASSWORD"), clientUserInfo["email"], 'YDK Export From TCG Companion', "Please find attached your decklist in ydk format", subColName + ".ydk")
+            if os.path.exists(subColName + ".ydk"):
+                os.remove(subColName + ".ydk")
+            else:
+                print("File does not exist, cannot delete.")
             return {'success' : 1}, 201
         return {'error': 'Request must be JSON'}, 201
     
@@ -935,6 +941,25 @@ def processCardImage(cardImagePath):
             scannedCards.append({'error': 'card not found'})
             continue
     return scannedCards
+
+def send_file_via_email(sender_email, app_password, recipient_email, subject, body, file_path):
+    # Create the email
+    msg = EmailMessage()
+    msg["From"] = sender_email
+    msg["To"] = recipient_email
+    msg["Subject"] = subject
+    msg.set_content(body)
+
+    # Attach the file
+    with open(file_path, "rb") as f:
+        file_data = f.read()
+        file_name = os.path.basename(file_path)
+        msg.add_attachment(file_data, maintype="application", subtype="octet-stream", filename=file_name)
+
+    # Send the email using SMTP
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(sender_email, app_password)
+        smtp.send_message(msg)
 
 #Main Run Method
 if __name__ == '__main__':
