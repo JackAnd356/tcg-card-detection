@@ -860,7 +860,18 @@ def create_app():
                         for i in range(quantity):
                             f.write(cardid + "\n")
                 f.write("\n!side\n")
-            send_file_via_email(SENDER_EMAIL, os.getenv("GOOGLE_APP_PASSWORD"), clientUserInfo["email"], 'YDK Export From TCG Companion', "Please find attached your decklist in ydk format", subColName + ".ydk")
+            send_file_via_email(SENDER_EMAIL, os.getenv("GOOGLE_APP_PASSWORD"), clientUserInfo["email"], 'Your Yu-Gi-Oh! Decklist is Ready!', 
+f'''Hi Duelist,
+Thanks for using TCG Companion!
+Attached to this email is your Yu-Gi-Oh! decklist in .ydk format, ready to import directly into your favorite dueling platform.
+
+Deck Name: {subColName}
+Date Generated: {date.today()}
+
+If you run into any issues importing the file or have feedback, feel free to reach out to our support team.
+
+Best of luck in your next duel!
+- The TCG Companion Team''', subColName + ".ydk")
             if os.path.exists(subColName + ".ydk"):
                 os.remove(subColName + ".ydk")
             else:
