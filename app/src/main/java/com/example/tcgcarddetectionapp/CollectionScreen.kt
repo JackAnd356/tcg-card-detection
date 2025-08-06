@@ -34,6 +34,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -112,7 +113,7 @@ fun CollectionScreen(gameName: String,
 
     Box(
         modifier
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.background)
             .fillMaxWidth()
             .fillMaxHeight(.9f)) {
         Column(
@@ -120,7 +121,7 @@ fun CollectionScreen(gameName: String,
             modifier = Modifier
                 .wrapContentWidth(Alignment.CenterHorizontally)
         ) {
-            Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                 modifier = Modifier
                     .fillMaxWidth(cardWidth)
                     .align(Alignment.CenterHorizontally)
@@ -134,7 +135,7 @@ fun CollectionScreen(gameName: String,
                     style = appTypography.displayLarge
                 )
             }
-            Card(colors = CardDefaults.cardColors(containerColor = Color(ContextCompat.getColor(context, R.color.gray))),
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                 modifier = Modifier
                     .fillMaxWidth(cardWidth)
                     .align(Alignment.CenterHorizontally)
@@ -196,10 +197,10 @@ fun CollectionScreen(gameName: String,
                     },
                     shape = RoundedCornerShape(10),
                     colors = ButtonColors(
-                        containerColor = colorResource(R.color.lightGreen),
-                        contentColor = Color.Black,
-                        disabledContainerColor = colorResource(R.color.lightGreen),
-                        disabledContentColor = Color.Black
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                        disabledContentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text(
@@ -296,7 +297,7 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
     val location = subcollection.physLoc
     val totalValue = subcollection.totalValue ?: 0.0
     val subColId = subcollection.subcollectionid
-    Card(colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gray)),
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 20.dp),
@@ -482,10 +483,10 @@ fun CreateNewCollectionPopup(
                         },
                         shape = RoundedCornerShape(10),
                         colors = ButtonColors(
-                            containerColor = colorResource(R.color.gray),
-                            contentColor = Color.Black,
-                            disabledContainerColor = colorResource(R.color.gray),
-                            disabledContentColor = Color.Black
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            disabledContentColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         Text(
@@ -507,10 +508,10 @@ fun CreateNewCollectionPopup(
                         },
                         shape = RoundedCornerShape(10),
                         colors = ButtonColors(
-                            containerColor = colorResource(R.color.lightGreen),
-                            contentColor = Color.Black,
-                            disabledContainerColor = colorResource(R.color.lightGreen),
-                            disabledContentColor = Color.Black
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                            disabledContentColor = MaterialTheme.colorScheme.primary
                         )
                     ) {
                         Text(
@@ -592,10 +593,10 @@ fun EditSubcollectionPopup(
                     },
                     shape = RoundedCornerShape(10),
                     colors = ButtonColors(
-                        containerColor = colorResource(R.color.gray),
-                        contentColor = Color.Black,
-                        disabledContainerColor = colorResource(R.color.gray),
-                        disabledContentColor = Color.Black
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text(
@@ -621,10 +622,10 @@ fun EditSubcollectionPopup(
                     },
                     shape = RoundedCornerShape(10),
                     colors = ButtonColors(
-                        containerColor = colorResource(R.color.lightGreen),
-                        contentColor = Color.Black,
-                        disabledContainerColor = colorResource(R.color.lightGreen),
-                        disabledContentColor = Color.Black
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                        disabledContentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     Text(
@@ -648,7 +649,7 @@ fun DeleteSubcollectionPopup(
 ) {
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         modifier = modifier
     ) {
         Text(
@@ -807,11 +808,11 @@ fun FilterTextfield(modifier: Modifier, label: String? = null, value: String,
                 .padding(vertical = 4.dp)
                 .border(
                     width = 1.dp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(8.dp)
                 )
-                .background(Color.White, shape = RoundedCornerShape(8.dp)),
-            textStyle = TextStyle(color = Color.Black),
+                .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp)),
+            textStyle = TextStyle(color = MaterialTheme.colorScheme.primary),
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.padding(
@@ -830,7 +831,7 @@ fun FilterTextfield(modifier: Modifier, label: String? = null, value: String,
         if (isError) {
             Text(
                 text = stringResource(R.string.invalid_value_error),
-                color = Color.Red
+                color = MaterialTheme.colorScheme.error
             )
         }
     }

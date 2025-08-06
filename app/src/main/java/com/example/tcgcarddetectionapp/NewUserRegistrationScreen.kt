@@ -2,11 +2,14 @@ package com.example.tcgcarddetectionapp
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -70,71 +74,90 @@ fun NewUserRegistrationScreen(username: String,
     var enteredPassword by remember { mutableStateOf("")}
     var errorText by remember { mutableStateOf("")}
 
-    Column(verticalArrangement = Arrangement.Top,
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = stringResource(R.string.new_user_registration_screen_heading),
-            style = appTypography.displayLarge,
-            textAlign = TextAlign.Center
-        )
-        NewUserDataComponent(label = stringResource(R.string.username_label),
-            data = username,
+    Box(modifier = modifier.background(MaterialTheme.colorScheme.background).fillMaxSize()) {
+        Column(
+            verticalArrangement = Arrangement.Top,
             modifier = modifier,
-            onChange = onUsernameChange)
-        NewUserDataComponent(
-            label = stringResource(R.string.password_label),
-            data = enteredPassword,
-            modifier = modifier,
-            onChange = {enteredPassword = it},
-            keyboardType = KeyboardType.Password,
-            visTrans = PasswordVisualTransformation()
-        )
-        NewUserDataComponent(
-            label = stringResource(R.string.email_label),
-            data = email,
-            modifier = modifier,
-            onChange = onUserEmailChange,
-        )
-        Button(
-            onClick = {
-                SaveNewUserPost(
-                    username = username,
-                    password = enteredPassword,
-                    storefront = 1, //Still save new user's storefront as 1 in case we want to support it down the road
-                    email = email,
-                    onUseridChange = onUseridChange,
-                    setErrorText = {errorText = it},
-                    onLoginNavigate = onLoginNavigate,
-                )
-            },
-            enabled = username != "" && enteredPassword != "",
-            modifier = modifier.fillMaxWidth(.9f).padding(top = 50.dp),
-            colors = ButtonColors(
-                containerColor = colorResource(R.color.buttonLightBlue),
-                contentColor = Color.White,
-                disabledContainerColor = colorResource(R.color.darkGray),
-                disabledContentColor = Color.White
-            ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.register_button_label),
-                style = appTypography.labelLarge
+                text = stringResource(R.string.new_user_registration_screen_heading),
+                style = appTypography.displayLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
             )
-        }
-        Button(
-            onClick = {onBackNavigate()},
-            modifier = modifier.fillMaxWidth(.9f).padding(top = 20.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.back_to_login_button_label),
-                style = appTypography.labelLarge)
-        }
-        if (errorText != "") {
-            Text(
-                text = errorText,
-                style = appTypography.labelSmall,
-                color = Color.Red)
+            NewUserDataComponent(
+                label = stringResource(R.string.username_label),
+                data = username,
+                modifier = modifier,
+                onChange = onUsernameChange
+            )
+            NewUserDataComponent(
+                label = stringResource(R.string.password_label),
+                data = enteredPassword,
+                modifier = modifier,
+                onChange = { enteredPassword = it },
+                keyboardType = KeyboardType.Password,
+                visTrans = PasswordVisualTransformation()
+            )
+            NewUserDataComponent(
+                label = stringResource(R.string.email_label),
+                data = email,
+                modifier = modifier,
+                onChange = onUserEmailChange,
+            )
+            Button(
+                onClick = {
+                    SaveNewUserPost(
+                        username = username,
+                        password = enteredPassword,
+                        storefront = 1, //Still save new user's storefront as 1 in case we want to support it down the road
+                        email = email,
+                        onUseridChange = onUseridChange,
+                        setErrorText = { errorText = it },
+                        onLoginNavigate = onLoginNavigate,
+                    )
+                },
+                enabled = username != "" && enteredPassword != "",
+                modifier = modifier
+                    .fillMaxWidth(.9f)
+                    .padding(top = 50.dp),
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                    disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                ),
+            ) {
+                Text(
+                    text = stringResource(R.string.register_button_label),
+                    style = appTypography.labelLarge
+                )
+            }
+            Button(
+                onClick = { onBackNavigate() },
+                modifier = modifier
+                    .fillMaxWidth(.9f)
+                    .padding(top = 20.dp),
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.back_to_login_button_label),
+                    style = appTypography.labelLarge
+                )
+            }
+            if (errorText != "") {
+                Text(
+                    text = errorText,
+                    style = appTypography.labelSmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
@@ -147,8 +170,8 @@ fun NewUserDataComponent(label: String,
                          keyboardType: KeyboardType? = null,
                          visTrans: VisualTransformation? = null) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
             .fillMaxWidth()
@@ -164,12 +187,14 @@ fun NewUserDataComponent(label: String,
             TextField(
                 value = data,
                 onValueChange = onChange,
-                modifier = modifier.fillMaxWidth(.8f).align(Alignment.CenterVertically),
+                modifier = modifier
+                    .fillMaxWidth(.8f)
+                    .align(Alignment.CenterVertically),
                 label = { Text(
                     text = String.format(stringResource(R.string.labeled_data_entry_ghost_text), label),
                     style = appTypography.labelSmall
                 ) },
-                colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer, unfocusedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType ?: KeyboardType.Text),
                 visualTransformation = visTrans ?: VisualTransformation.None
@@ -188,8 +213,8 @@ fun NewUserDropdownSelector(label: String, data: Int, options: List<String>, onC
     else
         Icons.Filled.KeyboardArrowDown
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-        border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
             .fillMaxWidth()
