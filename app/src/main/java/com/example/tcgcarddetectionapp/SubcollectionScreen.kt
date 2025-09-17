@@ -414,7 +414,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             Text(
                                 text = subcolInfo.name,
                                 style = appTypography.displayMedium,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = String.format(
@@ -423,7 +424,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     "$"
                                 ),
                                 style = appTypography.headlineMedium,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                         if (subcolInfo.subcollectionid != "all") {
@@ -475,7 +477,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     subcolInfo.physLoc
                                 ),
                                 style = appTypography.bodyLarge,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(Modifier.weight(1f))
                         }
@@ -485,7 +488,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 subcolInfo.cardCount ?: 0
                             ),
                             style = appTypography.bodyLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -542,7 +546,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                 ) {
                     Text(
                         text = stringResource(R.string.filter_button_label),
-                        style = appTypography.labelLarge
+                        style = appTypography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -1480,7 +1485,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
         ) {
             Box(modifier = Modifier
                 .weight(split)
-                .background(MaterialTheme.colorScheme.onSecondaryContainer)) {
+                .background(MaterialTheme.colorScheme.inverseSurface)) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
                     style = appTypography.labelMedium,

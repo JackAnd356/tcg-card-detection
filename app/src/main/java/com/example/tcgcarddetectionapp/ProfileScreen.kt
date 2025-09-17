@@ -86,6 +86,7 @@ fun ProfileScreen(username: String,
         Text(
             text = stringResource(R.string.profile_screen_heading),
             style = appTypography.displayLarge,
+            color = MaterialTheme.colorScheme.primary
         )
         if(showDeletePopup) {
             DeleteUserWarningPopup(
@@ -198,15 +199,18 @@ fun UserDataComponent(label: String,
                     onValueChange = onChange,
                     label = { Text(
                         text = label,
-                        style = appTypography.labelLarge
-                    ) }
+                        style = appTypography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    ) },
+
                 )
             }
             else {
                 Text(modifier = Modifier.padding(start = 5.dp),
                     text = "$label: $data",
                     style = appTypography.labelLarge,
-                    textAlign = TextAlign.Left
+                    textAlign = TextAlign.Left,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -234,19 +238,22 @@ fun UserDataComponent(label: String,
                         Text(
                             text = stringResource(R.string.save_button_label),
                             style = appTypography.labelLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     } else if (flag) {
                         Text(
                             text = stringResource(R.string.cancel_button_label),
                             style = appTypography.labelLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     } else {
                         Text(
                             text = stringResource(R.string.change_button_label),
                             style = appTypography.labelLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }

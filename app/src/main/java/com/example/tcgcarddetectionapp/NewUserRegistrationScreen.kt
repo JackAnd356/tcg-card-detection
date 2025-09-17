@@ -123,7 +123,7 @@ fun NewUserRegistrationScreen(username: String,
                     .fillMaxWidth(.9f)
                     .padding(top = 50.dp),
                 colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
                     disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
                     disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
@@ -131,7 +131,8 @@ fun NewUserRegistrationScreen(username: String,
             ) {
                 Text(
                     text = stringResource(R.string.register_button_label),
-                    style = appTypography.labelLarge
+                    style = appTypography.labelLarge,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
             }
             Button(
@@ -140,15 +141,16 @@ fun NewUserRegistrationScreen(username: String,
                     .fillMaxWidth(.9f)
                     .padding(top = 20.dp),
                 colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     contentColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
                     disabledContentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(
                     text = stringResource(R.string.back_to_login_button_label),
-                    style = appTypography.labelLarge
+                    style = appTypography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             if (errorText != "") {
@@ -192,7 +194,8 @@ fun NewUserDataComponent(label: String,
                     .align(Alignment.CenterVertically),
                 label = { Text(
                     text = String.format(stringResource(R.string.labeled_data_entry_ghost_text), label),
-                    style = appTypography.labelSmall
+                    style = appTypography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
                 ) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer, unfocusedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer),
                 singleLine = true,

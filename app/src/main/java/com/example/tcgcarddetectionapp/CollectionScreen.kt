@@ -132,7 +132,8 @@ fun CollectionScreen(gameName: String,
                         stringResource(R.string.collection_screen_heading),
                         gameName
                     ),
-                    style = appTypography.displayLarge
+                    style = appTypography.displayLarge,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -153,7 +154,8 @@ fun CollectionScreen(gameName: String,
                         ),
                         modifier = Modifier.fillMaxWidth(1f),
                         style = appTypography.headlineMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = String.format(
@@ -163,7 +165,8 @@ fun CollectionScreen(gameName: String,
                         ),
                         modifier = Modifier.fillMaxWidth(1f),
                         style = appTypography.headlineMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = String.format(
@@ -173,7 +176,8 @@ fun CollectionScreen(gameName: String,
                         ),
                         modifier = Modifier.fillMaxWidth(1f),
                         style = appTypography.headlineMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -184,7 +188,7 @@ fun CollectionScreen(gameName: String,
                     .align(Alignment.CenterHorizontally),
                 value = searchTerm,
                 onValueChange = { searchTerm = it },
-                label = { Text(stringResource(R.string.search_label)) }
+                label = { Text(stringResource(R.string.search_label)) },
             )
             Box(
                 modifier = Modifier
@@ -205,7 +209,8 @@ fun CollectionScreen(gameName: String,
                 ) {
                     Text(
                         text = stringResource(R.string.create_new_collection_label),
-                        style = appTypography.labelMedium
+                        style = appTypography.labelMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer
                     )
                 }
             }
@@ -320,7 +325,8 @@ fun CollectionSummary(subcollection: SubcollectionInfo,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = appTypography.headlineLarge,
-                    textAlign = TextAlign.Left
+                    textAlign = TextAlign.Left,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = String.format(stringResource(R.string.cards_label), cardCount),

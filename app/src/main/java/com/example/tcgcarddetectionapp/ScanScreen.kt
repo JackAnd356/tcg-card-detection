@@ -316,13 +316,13 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                                 color = if (cardData.possRarities != null) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.extremelyLightRed
+                                        R.color.lightRed
                                     )
                                 )
                                 else if (isChecked.value) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.extremelyLightBlue
+                                        R.color.lightBlue
                                     )
                                 )
                                 else Color(ContextCompat.getColor(context, R.color.gray)),
@@ -333,13 +333,13 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                                 color = if (cardData.possRarities != null) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.buttonRedBorder
+                                        R.color.darkRed
                                     )
                                 )
                                 else if (isChecked.value) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.buttonBlueBorder
+                                        R.color.darkBlue
                                     )
                                 )
                                 else Color.Transparent,

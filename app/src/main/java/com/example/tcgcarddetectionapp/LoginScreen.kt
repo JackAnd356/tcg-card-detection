@@ -223,9 +223,9 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
                 modifier = modifier.size(190.dp, 40.dp),
                 shape = RoundedCornerShape(corner = CornerSize(0.dp)),
                 colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    containerColor = colorResource(R.color.FBBlue),
                     contentColor = MaterialTheme.colorScheme.primary,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    disabledContainerColor = colorResource(R.color.FBBlue),
                     disabledContentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
@@ -276,7 +276,8 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
         onValueChange = onChange,
         label = { Text(
             text = stringResource(R.string.username_label),
-            style = appTypography.labelMedium
+            style = appTypography.labelMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer
             ) },
         modifier = modifier.fillMaxWidth(.9f),
         colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer, unfocusedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer),
@@ -291,7 +292,9 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
         onValueChange = onChange,
         label = { Text(
             text = stringResource(R.string.password_label),
-            style = appTypography.labelMedium) },
+            style = appTypography.labelMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer)},
+
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         modifier = modifier
@@ -317,7 +320,8 @@ fun LoginButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.login_label),
-            style = appTypography.labelLarge
+            style = appTypography.labelLarge,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
         )
     }
 }

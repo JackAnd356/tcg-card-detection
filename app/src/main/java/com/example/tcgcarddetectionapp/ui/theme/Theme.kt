@@ -14,39 +14,39 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = White,
     secondary = DarkGreen, //Accept Button
-    tertiary = HyperlinkBlue, //Hyperlink Text
-    background = DarkBackground,
-    primaryContainer = DarkContainer,
-    error = Red,
-    secondaryContainer = White, //Text field container
-    onSecondaryContainer = TextLightGrey, //Text field text
+    tertiary = DarkBlue, //Hyperlink Text
+    background = Dark,
+    primaryContainer = DarkGrey,
+    error = DarkRed,
+    secondaryContainer = DarkGrey, //Text field container
+    onSecondaryContainer = White, //Text field text
     tertiaryContainer = DarkBlue, //Login Button
     onTertiaryContainer = White,
     inverseSurface = DarkGrey, //Disabled Buttons
     outline = White,
-    errorContainer = DeleteRed,
+    errorContainer = DarkRed,
     onErrorContainer = White,
-    outlineVariant = GrayOutline,
-    surfaceContainer = FBBlue,
+    outlineVariant = White,
+    surfaceContainer = DarkBlue,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Black,
     secondary = LightGreen, //Accept Button
-    tertiary = HyperlinkBlue, //Hyperlink Text
+    tertiary = LightBlue, //Hyperlink Text
     background = White,
     primaryContainer = Gray,
-    error = Red,
-    secondaryContainer = TextFieldGray, //Text field container
-    onSecondaryContainer = TextLightGrey, //Text field text
+    error = LightRed,
+    secondaryContainer = Gray, //Text field container
+    onSecondaryContainer = Black, //Text field text
     tertiaryContainer = LightBlue, //Login Button
     onTertiaryContainer = White,
     inverseSurface = DarkGrey, //Disabled Buttons
     outline = Black,
-    errorContainer = DeleteRed,
+    errorContainer = LightRed,
     onErrorContainer = White,
-    outlineVariant = GrayOutline,
-    surfaceContainer = FBBlue,
+    outlineVariant = Gray,
+    surfaceContainer = LightBlue,
 )
 
 @Composable
