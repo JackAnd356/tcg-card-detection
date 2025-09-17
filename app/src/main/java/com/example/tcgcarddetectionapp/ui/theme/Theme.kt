@@ -8,28 +8,45 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = White,
+    secondary = DarkGreen, //Accept Button
+    tertiary = DarkBlue, //Hyperlink Text
+    background = Dark,
+    primaryContainer = DarkGrey,
+    error = DarkRed,
+    secondaryContainer = DarkGrey, //Text field container
+    onSecondaryContainer = White, //Text field text
+    tertiaryContainer = DarkBlue, //Login Button
+    onTertiaryContainer = White,
+    inverseSurface = DarkGrey, //Disabled Buttons
+    outline = White,
+    errorContainer = DarkRed,
+    onErrorContainer = White,
+    outlineVariant = White,
+    surfaceContainer = DarkBlue,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = Black,
+    secondary = LightGreen, //Accept Button
+    tertiary = LightBlue, //Hyperlink Text
+    background = White,
+    primaryContainer = Gray,
+    error = LightRed,
+    secondaryContainer = Gray, //Text field container
+    onSecondaryContainer = Black, //Text field text
+    tertiaryContainer = LightBlue, //Login Button
+    onTertiaryContainer = White,
+    inverseSurface = DarkGrey, //Disabled Buttons
+    outline = Black,
+    errorContainer = LightRed,
+    onErrorContainer = White,
+    outlineVariant = Gray,
+    surfaceContainer = LightBlue,
 )
 
 @Composable
@@ -39,15 +56,7 @@ fun TCGCardDetectionAppTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

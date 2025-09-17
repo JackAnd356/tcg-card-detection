@@ -32,6 +32,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -229,7 +230,7 @@ fun ScanHome(modifier: Modifier, stage: MutableState<Stages>) {
             .height((screenHeight / 1.7).dp)
             .padding(horizontal = 10.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(colorResource(R.color.textLightGrey))) {
+            .background(MaterialTheme.colorScheme.secondaryContainer)) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(modifier = Modifier.padding(5.dp),
                     text = stringResource(R.string.user_photo_instructions_header),
@@ -294,7 +295,7 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
         .wrapContentWidth(Alignment.CenterHorizontally)) {
         Column(verticalArrangement = Arrangement.Top, modifier = modifier
             .padding(16.dp)
-            .background(Color.Gray)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(16.dp)) {
             val map = cards.groupBy { it.game }
             map.forEach { entry ->
@@ -315,13 +316,13 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                                 color = if (cardData.possRarities != null) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.extremelyLightRed
+                                        R.color.lightRed
                                     )
                                 )
                                 else if (isChecked.value) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.extremelyLightBlue
+                                        R.color.lightBlue
                                     )
                                 )
                                 else Color(ContextCompat.getColor(context, R.color.gray)),
@@ -332,13 +333,13 @@ fun ScanConfirmation(modifier: Modifier, userid: String, stage: MutableState<Sta
                                 color = if (cardData.possRarities != null) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.buttonRedBorder
+                                        R.color.darkRed
                                     )
                                 )
                                 else if (isChecked.value) Color(
                                     ContextCompat.getColor(
                                         context,
-                                        R.color.buttonBlueBorder
+                                        R.color.darkBlue
                                     )
                                 )
                                 else Color.Transparent,
@@ -421,7 +422,7 @@ fun ScanSetCodeChoicePopup(modifier: Modifier, card: CardData, dismissPopup: () 
     val selectedRarity = remember { mutableStateOf<String?>(null) }
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         modifier = modifier
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -687,7 +688,7 @@ fun DrawScope.drawRectGuideCorners(
     inset: Float = 10f,      // Bring corners closer to the edge
     bottomOffset: Float = 900f // Pull bottom corners upward
 ) {
-    val color = Color.White
+    val color = Color.White //Light/Dark Mode Agnostic
     val adjustedLeft = left + inset
     val adjustedTop = top + inset
     val adjustedRight = right - inset

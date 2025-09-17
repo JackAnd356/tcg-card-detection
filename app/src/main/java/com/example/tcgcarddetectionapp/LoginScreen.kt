@@ -31,6 +31,8 @@ import android.graphics.BitmapFactory
 import android.media.Image
 import android.os.Bundle
 import androidx.activity.result.ActivityResultRegistryOwner
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,6 +41,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.draw.clip
@@ -150,89 +153,109 @@ fun LoginScreen(onLoginNavigate: () -> Unit,
     })
 
 
-    Column(verticalArrangement = Arrangement.Top,
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Logo(modifier = modifier)
-        UsernameField(username = username, modifier = modifier.padding(bottom = 8.dp), onChange = {onUsernameChange(it)})
-        if (loginError != "") {
-            Text(
-                text = loginError,
-                style = appTypography.bodyLarge,
-                textAlign = TextAlign.Left
-            )
-        }
-        PasswordField(password = password, modifier = modifier, onChange = {password = it})
-        LoginButton(modifier = modifier){
-            loginPost(username,
-                password,
-                setErrorMessage = {loginError = it},
-                onLoginNavigate,
-                onUserIdChange,
-                onUserEmailChange,
-                onUserCollectionChange,
-                onUserSubColInfoChange)
-        }
-        GoogleSignInButtonStyled(context = context) {
-            val request: GetCredentialRequest = GetCredentialRequest.Builder()
-                .addCredentialOption(signInWithGoogleOption)
-                .build()
+    Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
+        Column(
+            verticalArrangement = Arrangement.Top,
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Logo(modifier = modifier)
+            UsernameField(
+                username = username,
+                modifier = modifier.padding(bottom = 8.dp),
+                onChange = { onUsernameChange(it) })
+            if (loginError != "") {
+                Text(
+                    text = loginError,
+                    style = appTypography.bodyLarge,
+                    textAlign = TextAlign.Left
+                )
+            }
+            PasswordField(password = password, modifier = modifier, onChange = { password = it })
+            LoginButton(modifier = modifier) {
+                loginPost(
+                    username,
+                    password,
+                    setErrorMessage = { loginError = it },
+                    onLoginNavigate,
+                    onUserIdChange,
+                    onUserEmailChange,
+                    onUserCollectionChange,
+                    onUserSubColInfoChange
+                )
+            }
+            GoogleSignInButtonStyled(context = context) {
+                val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                    .addCredentialOption(signInWithGoogleOption)
+                    .build()
 
-            runBlocking {
-                try {
-                    val result = credentialManager.getCredential(
-                        request = request,
-                        context = context,
-                    )
-                    handleGoogleSignIn(result) {
-                        googleid, email ->
-                        loginGooglePost(googleid,
-                            email,
-                            onLoginNavigate,
-                            onUserIdChange,
-                            onUserEmailChange,
-                            onUserCollectionChange,
-                            onUserSubColInfoChange,
-                            onLockdownEmailChange,)
+                runBlocking {
+                    try {
+                        val result = credentialManager.getCredential(
+                            request = request,
+                            context = context,
+                        )
+                        handleGoogleSignIn(result) { googleid, email ->
+                            loginGooglePost(
+                                googleid,
+                                email,
+                                onLoginNavigate,
+                                onUserIdChange,
+                                onUserEmailChange,
+                                onUserCollectionChange,
+                                onUserSubColInfoChange,
+                                onLockdownEmailChange,
+                            )
+                        }
+                    } catch (e: GetCredentialException) {
+                        e.printStackTrace()
                     }
-                } catch (e: GetCredentialException) {
-                    e.printStackTrace()
                 }
             }
-        }
-        Button(
-            onClick = {
-                loginManager.logIn(context as ActivityResultRegistryOwner, callbackManager, listOf("email"))
-            },
-            modifier = modifier.size(190.dp, 40.dp),
-            shape = RoundedCornerShape(corner = CornerSize(0.dp))
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.facebook_icon_white_logo),
-                contentDescription = stringResource(R.string.facebook_login_placeholder),
-            )
-            Text(
-                text = stringResource( R.string.facebook_login_placeholder),
-                style = appTypography.labelMedium
-            )
-        }
-        Button(
-            onClick = {
-                onNewUserNavigate()
-            },
-            colors = ButtonColors(
-                containerColor = Color.White,
-                contentColor = colorResource(R.color.hyperlinkBlue),
-                disabledContainerColor = Color.White,
-                disabledContentColor = colorResource(R.color.hyperlinkBlue)
-            ),
-            modifier = modifier.padding(top = 40.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.new_user_button_label),
-                style = appTypography.labelMedium,
-                color = colorResource(R.color.hyperlinkBlue)
-            )
+            Button(
+                onClick = {
+                    loginManager.logIn(
+                        context as ActivityResultRegistryOwner,
+                        callbackManager,
+                        listOf("email")
+                    )
+                },
+                modifier = modifier.size(190.dp, 40.dp),
+                shape = RoundedCornerShape(corner = CornerSize(0.dp)),
+                colors = ButtonColors(
+                    containerColor = colorResource(R.color.FBBlue),
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = colorResource(R.color.FBBlue),
+                    disabledContentColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.facebook_icon_white_logo),
+                    contentDescription = stringResource(R.string.facebook_login_placeholder),
+                )
+                Text(
+                    text = stringResource(R.string.facebook_login_placeholder),
+                    style = appTypography.labelMedium
+                )
+            }
+            Button(
+                onClick = {
+                    onNewUserNavigate()
+                },
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.tertiary,
+                    disabledContainerColor = MaterialTheme.colorScheme.background,
+                    disabledContentColor = MaterialTheme.colorScheme.tertiary
+                ),
+                modifier = modifier.padding(top = 40.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.new_user_button_label),
+                    style = appTypography.labelMedium,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+            }
         }
     }
 }
@@ -253,10 +276,11 @@ fun UsernameField(username: String, modifier: Modifier = Modifier, onChange: (St
         onValueChange = onChange,
         label = { Text(
             text = stringResource(R.string.username_label),
-            style = appTypography.labelMedium
+            style = appTypography.labelMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer
             ) },
         modifier = modifier.fillMaxWidth(.9f),
-        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer, unfocusedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer),
         singleLine = true,
     )
 }
@@ -268,11 +292,15 @@ fun PasswordField(password: String, modifier: Modifier = Modifier, onChange: (St
         onValueChange = onChange,
         label = { Text(
             text = stringResource(R.string.password_label),
-            style = appTypography.labelMedium) },
+            style = appTypography.labelMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer)},
+
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        modifier = modifier.fillMaxWidth(.9f).padding(bottom = 8.dp),
-        colors = TextFieldDefaults.colors(unfocusedContainerColor = colorResource(R.color.textFieldLightGrey), unfocusedLabelColor = colorResource(R.color.textLightGrey)),
+        modifier = modifier
+            .fillMaxWidth(.9f)
+            .padding(bottom = 8.dp),
+        colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer, unfocusedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer),
         singleLine = true,
     )
 }
@@ -284,15 +312,16 @@ fun LoginButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
         modifier = modifier.fillMaxWidth(.9f),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         colors = ButtonColors(
-            containerColor = colorResource(R.color.buttonLightBlue),
-            contentColor = Color.White,
-            disabledContainerColor = colorResource(R.color.buttonLightBlue),
-            disabledContentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
         )
     ) {
         Text(
             text = stringResource(R.string.login_label),
-            style = appTypography.labelLarge
+            style = appTypography.labelLarge,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
         )
     }
 }

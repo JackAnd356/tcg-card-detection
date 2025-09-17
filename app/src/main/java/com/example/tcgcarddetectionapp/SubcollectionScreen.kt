@@ -51,6 +51,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -351,7 +352,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
 
     Box(
         modifier = modifier
-            .background(color = Color.White)
+            .background(color = MaterialTheme.colorScheme.background)
             .fillMaxWidth()
             .fillMaxHeight(.9f),
         contentAlignment = Alignment.TopCenter) {
@@ -375,7 +376,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     .width(backArrowSize.dp),
                     painter = painterResource(R.drawable.arrow_left_icon),
                     contentDescription = stringResource(R.string.back_to_main_collections_button_label),
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -387,18 +388,18 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     .shadow(
                         elevation = 10.dp,
                         shape = RoundedCornerShape(10.dp),
-                        ambientColor = Color.Black,
-                        spotColor = Color.Black
+                        ambientColor = Color.Black, //Dark/Light mode agnostic
+                        spotColor = Color.Black //Dark/Light mode agnostic
                     )
             ) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gray)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .border(
                             1.dp,
-                            colorResource(R.color.borderGray),
+                            MaterialTheme.colorScheme.outlineVariant,
                             shape = RoundedCornerShape(10.dp)
                         )
                 ) {
@@ -413,7 +414,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             Text(
                                 text = subcolInfo.name,
                                 style = appTypography.displayMedium,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = String.format(
@@ -422,7 +424,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     "$"
                                 ),
                                 style = appTypography.headlineMedium,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                         if (subcolInfo.subcollectionid != "all") {
@@ -474,7 +477,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     subcolInfo.physLoc
                                 ),
                                 style = appTypography.bodyLarge,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(Modifier.weight(1f))
                         }
@@ -484,7 +488,8 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                 subcolInfo.cardCount ?: 0
                             ),
                             style = appTypography.bodyLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -500,7 +505,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                         onClick = {
                             showAllCardAddToSubcollection = !showAllCardAddToSubcollection
                         },
-                        colors = ButtonDefaults.buttonColors(colorResource(R.color.lightGreen))
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
                     ) {
                         Text(
                             text = stringResource(R.string.add_from_all_cards_button_label),
@@ -537,11 +542,12 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     onClick = {
                         showFilters = !showFilters
                     },
-                    colors = ButtonDefaults.buttonColors(colorResource(R.color.darkGray))
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.inverseSurface)
                 ) {
                     Text(
                         text = stringResource(R.string.filter_button_label),
-                        style = appTypography.labelLarge
+                        style = appTypography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -591,7 +597,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             onMaxErrChange = { maxQuantErr = it },
                             modifier = modifier
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(colorResource(R.color.darkGray))
+                                .background(MaterialTheme.colorScheme.inverseSurface)
                                 .padding(5.dp)
                         ) {
                             filterList.clear()
@@ -623,7 +629,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             maxError = maxPriceErr,
                             modifier = modifier
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(colorResource(R.color.darkGray))
+                                .background(MaterialTheme.colorScheme.inverseSurface)
                                 .padding(5.dp),
                             onMaxErrChange = { maxPriceErr = it }
                         ) {
@@ -687,7 +693,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                             onMaxErrChange = { maxLevelErr = it },
                             modifier = modifier
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(colorResource(R.color.darkGray))
+                                .background(MaterialTheme.colorScheme.inverseSurface)
                                 .padding(5.dp)
                         ) {
                             filterList.clear()
@@ -880,7 +886,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                     Column(modifier = Modifier
                         .fillMaxWidth(.9f)
                         .clip(RoundedCornerShape(10.dp, 0.dp, 10.dp, 10.dp))
-                        .background(color = colorResource(R.color.darkGray)),
+                        .background(color = MaterialTheme.colorScheme.inverseSurface),
                         horizontalAlignment = Alignment.CenterHorizontally) {
                         for (row in rows) {
                             Row(modifier = Modifier.fillMaxWidth()) {
@@ -888,7 +894,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                     item(
                                         Modifier
                                             .clip(RoundedCornerShape(10.dp))
-                                            .background(colorResource(R.color.darkGray))
+                                            .background(MaterialTheme.colorScheme.inverseSurface)
                                             .padding(5.dp)
                                             .weight(0.48f)
                                     )
@@ -900,7 +906,7 @@ fun SubcollectionScreen(subcolInfo: SubcollectionInfo,
                                         item(
                                             Modifier
                                                 .clip(RoundedCornerShape(10.dp))
-                                                .background(colorResource(R.color.darkGray))
+                                                .background(MaterialTheme.colorScheme.inverseSurface)
                                                 .padding(5.dp)
                                                 .weight(0.48f)
                                         )
@@ -1029,13 +1035,13 @@ fun CardImage(
         if (allCardsFlag) {
             Text(
                 text = "${cardData.quantity}x",
-                color = Color.White,
+                color = Color.White, //Dark/Light mode agnostic
                 fontSize = appTypography.labelMedium.fontSize,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .offset(y = 7.dp)
-                    .background(Color.Black.copy(alpha = 0.7f), shape = RoundedCornerShape(4.dp))
+                    .background(Color.Black.copy(alpha = 0.7f), shape = RoundedCornerShape(4.dp)) //Dark/Light mode agnostic
                     .padding(4.dp)
             )
         }
@@ -1061,7 +1067,7 @@ fun CardPopup(cardData: CardData,
     var showCardDeletePopup by remember { mutableStateOf(false) }
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         when (cardData.game) {
@@ -1266,13 +1272,13 @@ fun YugiohCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifi
             modifier = Modifier
                 .height(120.dp)
                 .padding(vertical = 5.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Gray)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             AutoResizeText(
                 text = StringEscapeUtils.unescapeJava(cardData.description!!),
                 fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
                 modifier = Modifier.fillMaxSize(),
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -1351,13 +1357,13 @@ fun MTGCardPopupInfo(cardData: CardData, navWebsite: (String) -> Unit, modifier:
             modifier = Modifier
                 .height(120.dp)
                 .padding(vertical = 5.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Gray)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             AutoResizeText(
                 text = StringEscapeUtils.unescapeJava(cardData.description!!),
                 fontSizeRange = FontSizeRange(15.sp, 30.sp, 2.sp),
                 modifier = Modifier.fillMaxSize(),
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -1479,7 +1485,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
         ) {
             Box(modifier = Modifier
                 .weight(split)
-                .background(colorResource(R.color.textLightGrey))) {
+                .background(MaterialTheme.colorScheme.inverseSurface)) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
                     style = appTypography.labelMedium,
@@ -1488,7 +1494,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, infoType: String, infoData: Strin
             }
             Box(modifier = Modifier
                 .weight(1 - split)
-                .background(colorResource(R.color.gray))) {
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
                 if (icons != null) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         for (icon in icons) {
@@ -1520,7 +1526,7 @@ fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
         ) {
             Box(modifier = Modifier
                 .weight(split)
-                .background(colorResource(R.color.textLightGrey))) {
+                .background(MaterialTheme.colorScheme.onSecondaryContainer)) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
                     style = appTypography.labelMedium,
@@ -1529,7 +1535,7 @@ fun CardInfoBox(modifier: Modifier, infoType: String, icons: Array<String>,
             }
             Box(modifier = Modifier
                 .weight(1 - split)
-                .background(colorResource(R.color.gray))) {
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     for (icon in icons) {
                         Image(painter = painterResource(mapPokemonTypeToIcon(icon)),
@@ -1553,7 +1559,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
         ) {
             Box(modifier = Modifier
                 .weight(split)
-                .background(colorResource(R.color.textLightGrey))) {
+                .background(MaterialTheme.colorScheme.onSecondaryContainer)) {
                 Text(
                     modifier = Modifier.padding(start = 5.dp),
                     style = appTypography.labelMedium,
@@ -1562,7 +1568,7 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
             }
             Box(modifier = Modifier
                 .weight(1 - split)
-                .background(colorResource(R.color.gray))) {
+                .background(MaterialTheme.colorScheme.primaryContainer)) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     for (weakness in weaknesses) {
                         Image(painter = painterResource(mapPokemonTypeToIcon(weakness.type)),
@@ -1583,11 +1589,11 @@ fun CardInfoBox(modifier: Modifier = Modifier, weaknesses: Array<Weakness>,
 fun PokemonAttackBox(modifier: Modifier = Modifier, cardData: CardData) {
     Card(modifier = modifier
         .padding(bottom = 5.dp)
-        .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+        .border(width = 2.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(10.dp))
         .clip(RectangleShape)
         .padding(5.dp),
-        colors = CardColors(containerColor = Color.White, contentColor = Color.Black,
-            disabledContainerColor = Color.White, disabledContentColor = Color.Black)
+        colors = CardColors(containerColor = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.primary,
+            disabledContainerColor = MaterialTheme.colorScheme.background, disabledContentColor = MaterialTheme.colorScheme.primary)
     ) {
         cardData.attacks!!.forEach { attack ->
             Row(modifier = Modifier.fillMaxWidth(),
@@ -1628,12 +1634,12 @@ fun PokemonAbilityBox(modifier: Modifier = Modifier, cardData: CardData) {
     Card(
         modifier = modifier
             .padding(bottom = 5.dp)
-            .border(width = 2.dp, Color.Black, shape = RoundedCornerShape(10.dp))
+            .border(width = 2.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(10.dp))
             .clip(RectangleShape)
             .padding(5.dp),
         colors = CardColors(
-            containerColor = Color.White, contentColor = Color.Black,
-            disabledContainerColor = Color.White, disabledContentColor = Color.Black
+            containerColor = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.primary,
+            disabledContainerColor = MaterialTheme.colorScheme.background, disabledContentColor = MaterialTheme.colorScheme.primary
         )
     ) {
         cardData.abilities!!.forEach { ability ->
@@ -1697,10 +1703,10 @@ fun AddCardToSubcollectionPopup(modifier: Modifier = Modifier, cardData: CardDat
             },
             enabled = selectedOption != "",
             colors = ButtonColors(
-                containerColor = colorResource(R.color.lightGreen),
-                contentColor = Color.Black,
-                disabledContainerColor = colorResource(R.color.gray),
-                disabledContentColor = Color.Black
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.primary,
+                disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                disabledContentColor = MaterialTheme.colorScheme.primary
             )
         ) {
             Text(
@@ -1768,7 +1774,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
         checkedStates.add(false)
     }
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         modifier = modifier
             .width(300.dp) // or adjust as needed
             .height(screenHeight * 0.8f) // 80% of screen height
@@ -1804,7 +1810,7 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
-                            .border(width = 1.dp, color = Color.Black)
+                            .border(width = 1.dp, color = MaterialTheme.colorScheme.outline)
                             .padding(8.dp)
                     ) {
                         Text(
@@ -1836,10 +1842,10 @@ fun AddFromAllCardsPopup(allCards: Array<CardData>,
                     .padding(8.dp),
                 enabled = checkedStates.any { it },
                 colors = ButtonColors(
-                    containerColor = colorResource(R.color.buttonLightBlue),
-                    contentColor = Color.Black,
-                    disabledContainerColor = Color.Gray,
-                    disabledContentColor = Color.Black)
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(
                     text = stringResource(R.string.add_to_subcollection_button_label),
@@ -1934,7 +1940,7 @@ fun CardPriceComponent(modifier: Modifier = Modifier,
                 navWebsite(cardData.purchaseurl!!)
             }
         })
-        .border(width = 1.dp, color = Color.Black),
+        .border(width = 1.dp, color = MaterialTheme.colorScheme.outline),
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -1973,7 +1979,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .size(36.dp)
                 .padding(5.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.minus_icon),
@@ -1989,7 +1995,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier, minusOnClick: () 
                 .size(36.dp)
                 .padding(5.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.plus_icon),
@@ -2042,7 +2048,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier,
                 .size(36.dp)
                 .padding(5.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.minus_icon),
@@ -2100,7 +2106,7 @@ fun ChangeQuantityCardComponent(modifier: Modifier = Modifier,
                 .size(36.dp)
                 .padding(5.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(5.dp)
         ) {
             Icon(painter = painterResource(R.drawable.plus_icon),
@@ -2195,7 +2201,7 @@ fun MinMaxIntComponent(minVal: String,
         if (minError || maxError) {
             Text(
                 text = stringResource(R.string.invalid_value_error),
-                color = Color.Red
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
@@ -2282,7 +2288,7 @@ fun MinMaxDoubleComponent(minVal: String,
         if (minError || maxError) {
             Text(
                 text = stringResource(R.string.invalid_value_error),
-                color = Color.Red
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
@@ -2303,7 +2309,7 @@ fun DropdownSelectorFilter(label: String? = null, data: Int,
         Icons.Filled.KeyboardArrowDown
     val interactionSource = remember { MutableInteractionSource() }
     Card(
-        colors = CardDefaults.cardColors(containerColor = colorResource(R.color.darkGray)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.inverseSurface),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
             .fillMaxWidth()
@@ -2338,11 +2344,11 @@ fun DropdownSelectorFilter(label: String? = null, data: Int,
                     },
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White)
+                        focusedBorderColor = MaterialTheme.colorScheme.outline,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background)
                 )
                 DropdownMenu(
                     expanded = mExpanded,
@@ -2385,7 +2391,7 @@ fun AutoResizeText(
     Box(
         modifier = modifier
             .onSizeChanged { parentSize = it }
-            .background(Color.LightGray)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .verticalScroll(scrollState)
     ) {
         if (parentSize.width > 0 && parentSize.height > 0) {

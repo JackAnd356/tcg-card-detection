@@ -27,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -85,6 +86,7 @@ fun ProfileScreen(username: String,
         Text(
             text = stringResource(R.string.profile_screen_heading),
             style = appTypography.displayLarge,
+            color = MaterialTheme.colorScheme.primary
         )
         if(showDeletePopup) {
             DeleteUserWarningPopup(
@@ -139,10 +141,10 @@ fun ProfileScreen(username: String,
         Button(
             onClick = { showDeletePopup = !showDeletePopup},
             colors = ButtonColors(
-                containerColor = Color(0xFFFF7A7A),
-                contentColor = Color.White,
-                disabledContainerColor = Color(0xFFFF7A7A),
-                disabledContentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.errorContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onErrorContainer
             ),
             modifier = Modifier.fillMaxWidth(.9f).padding(top = 30.dp),
         ) {
@@ -154,10 +156,10 @@ fun ProfileScreen(username: String,
         Button(
             onClick = { onLogout() },
             colors = ButtonColors(
-                containerColor = Color(0xFF77E6FF),
-                contentColor = Color.White,
-                disabledContainerColor = Color(0xFF77E6FF),
-                disabledContentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onTertiaryContainer
             ),
             modifier = Modifier.fillMaxWidth(.9f).padding(top = 30.dp),
         ) {
@@ -181,8 +183,8 @@ fun UserDataComponent(label: String,
                       oldData: String? = null,
                       mutable: Boolean? = true) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
             .fillMaxWidth()
@@ -197,15 +199,18 @@ fun UserDataComponent(label: String,
                     onValueChange = onChange,
                     label = { Text(
                         text = label,
-                        style = appTypography.labelLarge
-                    ) }
+                        style = appTypography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    ) },
+
                 )
             }
             else {
                 Text(modifier = Modifier.padding(start = 5.dp),
                     text = "$label: $data",
                     style = appTypography.labelLarge,
-                    textAlign = TextAlign.Left
+                    textAlign = TextAlign.Left,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -223,29 +228,32 @@ fun UserDataComponent(label: String,
                         .align(Alignment.CenterVertically)
                         .padding(end = 5.dp),
                     colors = ButtonColors(
-                        containerColor = colorResource(R.color.gray),
-                        contentColor = Color.Black,
-                        disabledContainerColor = colorResource(R.color.gray),
-                        disabledContentColor = Color.Black
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
                     if (flag && data != oldData) {
                         Text(
                             text = stringResource(R.string.save_button_label),
                             style = appTypography.labelLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     } else if (flag) {
                         Text(
                             text = stringResource(R.string.cancel_button_label),
                             style = appTypography.labelLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     } else {
                         Text(
                             text = stringResource(R.string.change_button_label),
                             style = appTypography.labelLarge,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -266,7 +274,7 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
     else
         Icons.Filled.KeyboardArrowDown
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         shape = RoundedCornerShape(corner = CornerSize(0.dp)),
         modifier = modifier
             .fillMaxWidth()
@@ -299,15 +307,16 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
                     },
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Black,
-                        unfocusedBorderColor = Color.Black,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White)
+                        focusedBorderColor = MaterialTheme.colorScheme.outline,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.background)
                 )
                 DropdownMenu(
                     expanded = mExpanded,
-                    onDismissRequest = {mExpanded = false}
+                    onDismissRequest = {mExpanded = false},
+                    containerColor = MaterialTheme.colorScheme.background
                 ) {
                     options.forEachIndexed{ index, optionLabel ->
                         DropdownMenuItem(
@@ -316,7 +325,7 @@ fun UserDropdownSelector(label: String, data: Int, onUserStorefrontChange: (Int)
                                 onUserStorefrontChange(index + 1)
                                 mExpanded = false
                             },
-                            text = {Text(optionLabel)}
+                            text = {Text(optionLabel)},
                         )
                     }
                 }
@@ -350,10 +359,10 @@ fun DeleteUserWarningPopup(
                         deleteUserPost(userid = userid, navLogin = navLogin)
                     },
                     colors = ButtonColors(
-                        containerColor = Color.Red,
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.Red,
-                        disabledContentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        disabledContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.onErrorContainer
                     )
                 ) {
                     Text(
@@ -365,10 +374,10 @@ fun DeleteUserWarningPopup(
                     modifier = Modifier.padding(horizontal = 10.dp),
                     onClick = { onDismiss() },
                     colors = ButtonColors(
-                        containerColor = colorResource(R.color.textLightGrey),
-                        contentColor = Color.White,
-                        disabledContainerColor = colorResource(R.color.textLightGrey),
-                        disabledContentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.background,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        disabledContentColor = MaterialTheme.colorScheme.background
                     )
                 ) {
                     Text(
