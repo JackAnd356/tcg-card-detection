@@ -976,4 +976,4 @@ def send_file_via_email(sender_email, app_password, recipient_email, subject, bo
 if __name__ == '__main__':
     app = create_app()
 
-    app.run()
+    app.run(host="0.0.0.0", port=5000, debug=True)
